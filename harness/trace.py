@@ -168,13 +168,21 @@ def _iso(ts: float) -> str:
 
 
 def _read_records(run_id: str) -> list[dict]:
+    """A run interrupted mid-write (Ctrl-C, OOM, laptop sleep) leaves a
+    truncated final line. Skip it rather than raise: one bad line must not
+    cost the whole trajectory, and render_index() must still cover every
+    other agent's runs."""
     path = TRACE_DIR / f"{run_id}.jsonl"
     records = []
     with path.open() as f:
         for line in f:
             line = line.strip()
-            if line:
+            if not line:
+                continue
+            try:
                 records.append(json.loads(line))
+            except json.JSONDecodeError:
+                print(f"[trace] skipping malformed line in {path.name}")
     return records
 
 
@@ -223,7 +231,9 @@ def render_markdown(run_id: str) -> str:
         lines.append(f"- **Action:** {s['action']}")
         if s.get("tool"):
             lines.append(f"- **Tool:** `{s['tool']}`")
+        if s.get("args") is not None:
             lines.extend(_render_field("Args", s["args"]))
+        if s.get("response") is not None:
             lines.extend(_render_field("Response", s["response"]))
         if s.get("retry") is not None:
             lines.append(f"- **Retry of:** {s['retry']}")
@@ -251,12 +261,18 @@ def render_index() -> str:
     by_agent: dict[str, list[str]] = {}
     for jf in sorted(TRACE_DIR.glob("*.jsonl")):
         run_id = jf.stem
-        records = _read_records(run_id)
-        meta = next((r for r in records if r["type"] == "meta"), None)
-        if not meta:
+        try:
+            records = _read_records(run_id)
+            meta = next((r for r in records if r["type"] == "meta"), None)
+            if not meta:
+                continue
+            render_markdown(run_id)
+            by_agent.setdefault(meta["agent"], []).append(run_id)
+        except Exception as e:
+            # One unreadable file must never take out every other agent's
+            # index entry: report it and move on.
+            print(f"[trace] skipping {jf.name}: {e}")
             continue
-        render_markdown(run_id)
-        by_agent.setdefault(meta["agent"], []).append(run_id)
 
     lines = ["# Trace Index", ""]
     for agent, run_ids in sorted(by_agent.items()):

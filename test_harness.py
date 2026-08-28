@@ -153,6 +153,37 @@ def test_render_markdown_handles_backticks_and_multiline():
     assert "```" in md or "````" in md  # fenced, not a broken inline span
 
 
+def test_render_index_survives_a_truncated_jsonl_file():
+    # objection: an interrupted run (Ctrl-C, OOM, laptop sleep) leaves a
+    # truncated final line. render_index() must still cover every OTHER
+    # agent's runs rather than raising and producing no INDEX.md at all.
+    with trace.Trace("healthy-agent", "finished cleanly") as t:
+        t.step("did a thing")
+        t.result = {"status": "ok", "outcome": "fine"}
+
+    broken_path = trace.TRACE_DIR / "crashed-agent-999.jsonl"
+    broken_path.write_text(
+        '{"type": "meta", "run_id": "crashed-agent-999", "agent": "crashed-agent", '
+        '"instruction": "x", "capture": "captured", "started_at": "2026-01-01T00:00:00Z"}\n'
+        '{"type": "step", "step": 0, "action": "mid-writ'  # truncated, no closing brace
+    )
+
+    md = trace.render_index()
+    assert "healthy-agent" in md
+    assert (trace.TRACE_DIR / "INDEX.md").exists()
+
+
+def test_render_markdown_includes_response_with_no_tool_set():
+    # objection: a step logged without tool= silently dropped its args and
+    # response from the rendered markdown that judges read, even though the
+    # JSONL kept them. Reasoning-only steps (no tool call) are common.
+    with trace.Trace("reasoning-agent", "think it through") as t:
+        t.step("model reasoned", response="THE IMPORTANT MODEL OUTPUT")
+        t.result = {"status": "ok", "outcome": "done"}
+    md = trace.render_markdown(t.run_id)
+    assert "THE IMPORTANT MODEL OUTPUT" in md
+
+
 def test_oversized_field_is_truncated():
     huge = "x" * (trace.MAX_FIELD_CHARS + 500)
     with trace.Trace("big-agent", "dump data") as t:

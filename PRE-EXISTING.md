@@ -4,8 +4,11 @@ Per rule book item 2: "Make it clear what existed before the competition and wha
 
 ## What existed before kickoff (2026-08-28 15:00 UTC)
 
-Built 2026-08-27, before the problem PDF was released, across two pre-kickoff commits (neither ever
-rewritten):
+Built 2026-08-27, before the problem PDF was released. Every commit dated before 2026-08-28 15:00 UTC
+in this repository's history is part of the pre-kickoff build, verifiable directly via `git log`; none
+of them are ever rewritten. That claim is timestamp-based on purpose so it stays true as further
+pre-kickoff hardening commits land, rather than naming a fixed commit count that a later commit could
+make stale. The commits known at time of writing:
 
 **Commit `f8be460869f94b00a5eb3340cfe8deb0dd2b5753`, 2026-08-27 23:43:54 UTC** — trajectory-logging
 infrastructure that cannot be reconstructed retroactively once real agent runs start:
@@ -26,12 +29,16 @@ submission-template scaffolding:
 - `docs/video-script.md` — five-minute beat sheet template
 - `docs/reproduction.md` — reproduction-guide template
 
+**Commit `633aade`, 2026-08-28 00:09:18 UTC** — closed a pre-kickoff review pass: a connection-URL
+credential redaction gap (`scheme://user:password@host` strings), plus its test coverage.
+
+Later pre-kickoff commits continue hardening these same declared files (bug fixes found in review,
+e.g. crash-safety on malformed trace lines, ignore-file coverage) with no new problem-specific logic.
+See `git log` for the full, current, authoritative list.
+
 Nothing above is adapted from any prior repository. It was written from scratch against the
 published rule book and deliverables page, generic to any future problem, with zero
 problem-specific logic.
-
-Both commits in this repository's pre-kickoff history are dated before kickoff and are the
-machine-verifiable timestamps for this declaration. Neither commit is ever rewritten.
 
 ## What gets added after kickoff (2026-08-28 15:00 UTC)
 
