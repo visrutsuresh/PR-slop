@@ -40,6 +40,16 @@ next decision.
 
 <!-- TODO: one opinionated, defensible claim about the problem or the approach. -->
 
+## Agent instructions
+
+The system prompt / instruction text given to each agent used in this submission, per deliverable 1
+verbatim wording ("the instructions that shape each agent"). This is the project-level statement;
+the per-trace `instruction` field in `traces/*.md` is the corroborating evidence for each run, not a
+substitute for it.
+
+<!-- TODO after kickoff: paste the actual instruction/system-prompt text per agent role used
+     (e.g. baseline-agent, advanced-agent). One subsection per agent. -->
+
 ## Tools disclosure
 
 Required per the rule book: "You must disclose the tools you used and submit the required

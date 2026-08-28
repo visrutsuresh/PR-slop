@@ -1,12 +1,20 @@
 """ponytail: one runnable check, plain asserts, no framework.
 Run: python3 test_harness.py
+
+This test suite NEVER touches the real traces/ directory. It repoints
+trace.TRACE_DIR at a throwaway directory it owns before any test runs, and
+only that directory is ever rmtree'd. Real submission trajectories in
+traces/ must survive `python3 test_harness.py` / `./run.sh eval` untouched.
 """
 import json
 import shutil
+from pathlib import Path
 
 import harness.trace as trace
 
-shutil.rmtree(trace.TRACE_DIR, ignore_errors=True)
+_TEST_TRACE_DIR = Path(__file__).resolve().parent / "traces_test"
+shutil.rmtree(_TEST_TRACE_DIR, ignore_errors=True)
+trace.TRACE_DIR = _TEST_TRACE_DIR
 
 
 def test_round_trip_and_terminal_result_on_clean_exit():
@@ -84,6 +92,65 @@ def test_planted_secret_redacted_from_jsonl_and_rendered_markdown():
     assert "supersecretvalue123" not in md
     assert fake_bearer not in md
     assert home_marker not in md
+
+
+def test_string_blob_secret_shapes_redacted():
+    # Keyless-blob shapes the key-name check alone cannot catch: exercises
+    # the string-level rules added for objection #3 (JWT, PEM block, Stripe
+    # / HuggingFace prefixes, in-string key=value / key: value pairs) plus
+    # scheme://user:password@host connection URLs (incl. redis's empty-user
+    # `redis://:password@host` shape).
+    jwt = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
+    jwt_in_json = '{"access_token": "%s", "type": "bearer"}' % jwt
+    pem = "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAK...fakekeydata...\n-----END RSA PRIVATE KEY-----"
+    stripe = "sk_live_51ABCDEFGHIJKLMNOPQRSTUV"
+    hf = "hf_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef"
+    kv_password = "PASSWORD=hunter2plaintext"
+    kv_secret_colon = 'aws_secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"'
+    pg_url = "postgres://user:hunter2@db.internal:5432/prod"
+    mongo_url = "mongodb+srv://admin:p4ssw0rd@cluster0.mongodb.net/db"
+    redis_url = "redis://:mysecret@127.0.0.1:6379/0"
+
+    with trace.Trace("secret-blob-agent", "call an api") as t:
+        t.step("bare jwt", tool="http_get", args=None, response=jwt)
+        t.step("jwt in json body", tool="http_post", args=None, response=jwt_in_json)
+        t.step("pem block", tool="read_file", args=None, response=pem)
+        t.step("stripe key", tool="env_dump", args=None, response=stripe)
+        t.step("hf token", tool="env_dump", args=None, response=hf)
+        t.step("kv password", tool="env_dump", args=None, response=kv_password)
+        t.step("kv secret colon", tool="env_dump", args=None, response=kv_secret_colon)
+        t.step("postgres url", tool="env_dump", args=None, response=pg_url)
+        t.step("mongodb url", tool="env_dump", args=None, response=mongo_url)
+        t.step("redis url", tool="env_dump", args=None, response=redis_url)
+        t.result = {"status": "ok", "outcome": "done"}
+
+    secrets = (jwt, "fakekeydata", stripe, hf, "hunter2plaintext",
+               "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+               "hunter2", "p4ssw0rd", "mysecret")
+    jsonl_text = (trace.TRACE_DIR / f"{t.run_id}.jsonl").read_text()
+    for secret in secrets:
+        assert secret not in jsonl_text, f"leaked: {secret!r}"
+    # scheme, user and host must survive so the trace stays readable
+    for readable in ("postgres://user:", "@db.internal:5432/prod",
+                      "mongodb+srv://admin:", "@cluster0.mongodb.net/db",
+                      "redis://:", "@127.0.0.1:6379/0"):
+        assert readable in jsonl_text, f"over-redacted: {readable!r} missing"
+
+    md = trace.render_markdown(t.run_id)
+    for secret in secrets:
+        assert secret not in md, f"leaked into markdown: {secret!r}"
+
+
+def test_render_markdown_handles_backticks_and_multiline():
+    # objection #4: a response with an embedded backtick and a multi-line
+    # shell dump must not break the list item or collapse the newlines.
+    tricky = "line one\nline two with a `backtick` inside\nline three"
+    with trace.Trace("markdown-agent", "run a shell command") as t:
+        t.step("ran command", tool="bash", args={"cmd": "echo hi"}, response=tricky)
+        t.result = {"status": "ok", "outcome": "done"}
+    md = trace.render_markdown(t.run_id)
+    assert "line one" in md and "line two" in md and "line three" in md
+    assert "```" in md or "````" in md  # fenced, not a broken inline span
 
 
 def test_oversized_field_is_truncated():
