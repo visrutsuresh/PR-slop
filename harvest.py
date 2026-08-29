@@ -137,7 +137,34 @@ def build_input(raw_pr: dict) -> dict:
     out = {k: raw_pr[k] for k in ALLOWED}
     out["title"] = CLOSING_RE.sub(REDACT_TOKEN, out["title"] or "")
     out["body"] = CLOSING_RE.sub(REDACT_TOKEN, out["body"] or "")
+    out["patch"] = scrub_patch(out["patch"] or "")
     return out
+
+
+IDENTITY_LINE_RE = re.compile(r"^(From|Date|Co-authored-by|Signed-off-by):.*$", re.M | re.I)
+EMAIL_RE = re.compile(r"[\w.+-]+@[\w.-]+\.\w+")
+IDENTITY_TOKEN = "[REDACTED-IDENTITY]"
+
+
+def scrub_patch(patch: str) -> str:
+    """Remove contributor identity and any surviving closing reference from the
+    diff text.
+
+    Two defects made this necessary, both measured on the shipped 15 cases:
+    every patch carried a `From:` line with a real name and mail address (15 of
+    15), falsifying the README's claim that the system never sees who submitted
+    a pull request and leaving a no-model identity shortcut worth 53.3% balanced
+    accuracy against a 33.3% floor; and one patch (case 308696) still contained
+    `Fixes #305306`, the exact declaration the strip exists to remove.
+
+    Publishing real personal mail addresses would also breach ground rules 6
+    and 8. The scrub is deterministic so it can be applied to already-committed
+    cases without re-running the harvest, which matters because the closed-pull
+    window has moved and a re-run would produce a different case set."""
+    patch = IDENTITY_LINE_RE.sub(IDENTITY_TOKEN, patch)
+    patch = EMAIL_RE.sub(IDENTITY_TOKEN, patch)
+    patch = CLOSING_RE.sub(REDACT_TOKEN, patch)
+    return patch
 
 
 def pseudonym(login: str) -> str:

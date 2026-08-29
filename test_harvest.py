@@ -168,6 +168,29 @@ def test_issue_corpus_and_manifest_committed():
     assert manifest["case_counts"] == {"1": 5, "2": 5, "3": 5}
 
 
+# --- added after the baseline plan review found both defects in shipped data ---
+
+def test_no_identity_or_closing_ref_survives_in_patch():
+    """Every patch must be free of contributor identity and of any closing
+    reference. Both failed on the first shipped case set: 15 of 15 carried a
+    real name and mail address, and case 308696 still contained `Fixes #305306`."""
+    import json as _json, glob as _glob
+    from harvest import IDENTITY_LINE_RE, EMAIL_RE, CLOSING_RE
+    cases = sorted(_glob.glob("data/cases/*.json"))
+    assert cases, "no cases on disk"
+    scrubbed_something = False
+    for path in cases:
+        patch = _json.load(open(path))["input"]["patch"]
+        assert not IDENTITY_LINE_RE.search(patch), f"identity line survives in {path}"
+        assert not EMAIL_RE.search(patch), f"mail address survives in {path}"
+        assert not CLOSING_RE.search(patch), f"closing reference survives in {path}"
+        if "[REDACTED-IDENTITY]" in patch:
+            scrubbed_something = True
+    # positive control: the scrub must have actually fired somewhere, otherwise
+    # this whole test passes vacuously on data that never had the problem.
+    assert scrubbed_something, "scrub never fired; test would pass vacuously"
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for fn in tests:
