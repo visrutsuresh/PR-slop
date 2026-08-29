@@ -110,7 +110,11 @@ See `CHANGELOG.md`. Every meaningful change is logged there with the evidence th
 
 ## Main failure mode
 
-<!-- TODO: where does the advanced solution still break, and why. -->
+**It is good at spotting work that was accepted and poor at spotting work that was not.** It catches 1 of 5 not-merged items, against 5 of 5 on both merged piles.
+
+That is the wrong way round for a tool whose purpose is finding the pile you can safely leave until last, and we are not going to dress it up. Overall accuracy of 73.3% hides it, which is why the per-pile numbers are printed next to it everywhere.
+
+The cause is visible in our own evaluation design and we wrote it down before running anything. On this project "not merged" mostly does not mean poor work. Of seventeen such pull requests we inspected, four were automated housekeeping and about ten were maintainers closing their own real work in favour of another approach. Our system reads those as genuine contributions, because they are genuine contributions. It is being marked wrong for being right about the work and wrong about the outcome.
 
 ## Hot take
 
@@ -126,16 +130,89 @@ Anyone reproducing a maintainer-behaviour triage tool on a different repository 
 
 The exact instructions given to each AI agent used in this submission, in the words actually used to prompt it. This satisfies deliverable 1's own wording, "the instructions that shape each agent." This section is the one place those instructions live in full. Each individual run also carries its own copy of the instruction it was given, inside that run's trace file (a trace is the full step-by-step record of what one agent run actually did, saved under `traces/`). That per-run copy is supporting evidence that a real run used these instructions. It does not replace stating them here.
 
-<!-- TODO after kickoff: paste the actual instruction/system-prompt text per agent role used
-     (e.g. baseline-agent, advanced-agent). One subsection per agent. -->
+### The task description, given word for word to BOTH sides
+
+This is the whole of it. The simple version and our system receive this identical text, so the measured difference reflects what the systems can reach, not how hard we tried on the wording. It lives in one file, `task_spec.py`, for exactly that reason.
+
+```
+You are triaging a pull request for a busy open source maintainer.
+
+Sort it into exactly one of three buckets:
+
+  1 = act now.          Work worth merging, and it addresses a problem someone
+                        had already reported in the project.
+  2 = worth reviewing.  A genuine contribution that needs a human read, with no
+                        indication it answers an already-reported problem.
+  3 = not merged.       You judge the maintainer would not merge this. Note this
+                        covers several different things: routine automated
+                        housekeeping, work superseded by another approach, a
+                        duplicate, or low-effort or machine-generated filler.
+
+Bucket 3 is NOT a quality verdict on the contributor. It means you judge this
+did not become part of the codebase.
+
+You may also answer 0 = cannot determine, if the evidence does not support a
+call. Answering 0 is preferred over guessing.
+
+Reply with JSON only, no prose around it, in exactly this shape:
+
+{"bucket": 1|2|3|0,
+ "confidence": "high"|"medium"|"low",
+ "reason": "one or two sentences",
+ "citations": ["#12345", "src/path/to/file.ts"]}
+
+Rules for "citations":
+  - Cite only things you can actually point at: issue numbers as #NNNNN, or
+    file paths.
+  - If you have no way to check the repository, return an EMPTY list. Do not
+    invent an issue number or a file path to fill the field. An empty list is
+    a correct answer and is scored as such.
+
+```
+
+Each case then appends that pull request's title, description, list of changed files, and code changes.
+
+### What our system adds, and only our system
+
+After the text above, our system appends the eight closest matches from searching the project's 403 saved reported problems, under this instruction:
+
+> These were found by searching the project. They may or may not be what this pull request answers. Judge for yourself. If one of them is genuinely what this work fixes, cite it as #NNNNN and use it to support bucket 1. If none of them really matches, say so and do NOT cite one anyway.
+
+The simple version receives no such section, because having no way to search the project is precisely the thing being measured.
+
+### The instruction added to every call, both sides
+
+> You answer with JSON only. No preamble, no markdown fences.
+
+## Results
+
+| Measure | Simple version | Our system | Change |
+| --- | --- | --- | --- |
+| Balanced accuracy | 33.3% | **73.3%** | +40.0 points |
+| Per-pile recall | 0.20 / 0.40 / 0.40 | 1.00 / 1.00 / 0.20 | |
+| Merge-worthy work wrongly rejected | 1 of 10 | **0 of 10** | |
+| Reported problems named that really exist | 1 of 3 (33%) | **9 of 9 (100%)** | |
+| Declined to answer | 5 of 15 | 0 of 15 | |
+| Cost across 15 cases | 1.84 USD | 1.88 USD | +0.04 |
+
+The floor for three equal piles is 33.3%, so the simple version scored exactly as well as guessing.
+
+**What we can and cannot claim from fifteen cases.** One case moves balanced accuracy by 6.7 points, so two systems within about two cases of each other cannot be told apart by this. A 40-point gap is well clear of that. The false-rejection figure is a different matter: 0 out of 10 still carries a 95% upper bound of about 26%, so we **cannot** demonstrate our promised "under 10%" at this sample size, and we are not going to claim we did.
+
+**Citations are counted in two groups on purpose.** A file path copied out of the case the system was just handed is free and proves nothing. Only a reported-problem number, which cannot be known without going and checking, is informative. The table uses those only. Counting both together is what produced a misleading 86.7% for the simple version in our first scoring pass, described in the changelog.
 
 ## Tools disclosure
 
-Required per the rule book: "You must disclose the tools you used and submit the required trajectories for evaluation." (A trajectory, also called a trace in this repo, is the step-by-step record of everything one agent run did: what it read, what it changed, what it decided, and how it ended.)
+Required per the rule book: "You must disclose the tools you used and submit the required trajectories for evaluation."
 
 | Tool / model | Where used | Notes |
 | --- | --- | --- |
-| <!-- TODO --> | | |
+| `claude-sonnet-5` | Both the simple version and ours | Same model on both sides, so the comparison measures the system and not the model. Recorded in every saved response and checkable from them. |
+| Claude Code, non-interactive | How the model is called | Run from an empty folder outside this project with file reading, searching, shell, web access, editing and sub-agents all switched off. See `isolation_probe.py`. |
+| `gh` command line | Collecting the fifteen cases, once | Its output is committed under `data/`. Nothing else needs it. |
+| Python standard library only | Everything else | No packages installed. |
+
+**Why the isolation matters.** Our first attempt asked the model, running normally inside this project, to report the recorded answer for one case. **It opened the answer file and returned the correct value.** Left alone, the simple comparison version could have read the answers instead of reasoning, making the whole comparison worthless. `isolation_probe.py` now has to pass before anything is generated, and it must reply that it has no way to read a file.
 
 The trace files themselves live in `traces/`. Each run gets its own readable write-up at `traces/<run_id>.md`. `traces/INDEX.md` lists every run, grouped by agent.
 

@@ -1,0 +1,28 @@
+{
+  "name": "our system, search plus checking",
+  "balanced_accuracy": 0.7333333333333334,
+  "per_bucket_recall": {
+    "1": 1.0,
+    "2": 1.0,
+    "3": 0.2
+  },
+  "false_prune": [
+    0,
+    10
+  ],
+  "citations": {
+    "self_cited": 15,
+    "external_offered": 9,
+    "external_resolved": 9,
+    "external_rate": 1.0,
+    "unknown": 0,
+    "total_offered": 24
+  },
+  "abstained": 0,
+  "cost_usd": 1.8762,
+  "models": [
+    "claude-sonnet-5"
+  ],
+  "struck_citations": 0,
+  "stage": 2
+}

@@ -1,0 +1,107 @@
+{
+  "duration_api_ms": 4268,
+  "stop_reason": "end_turn",
+  "session_id": "87aca39f-9a54-406e-89a0-56bfb70ccf0c",
+  "total_cost_usd": 0.1151064,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 27275,
+    "cache_read_input_tokens": 15062,
+    "output_tokens": 299,
+    "output_tokens_details": {
+      "thinking_tokens": 191
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 27275,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 299,
+        "cache_read_input_tokens": 15062,
+        "cache_creation_input_tokens": 27275,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 27275
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 299,
+      "cacheReadInputTokens": 15062,
+      "cacheCreationInputTokens": 27275,
+      "webSearchRequests": 0,
+      "costUSD": 0.1151064,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "{\"bucket\": 2, \"confidence\": \"medium\", \"reason\": \"This is a well-tested, self-contained hotfix building on a prior change (#332018), but none of the listed open issues describe the ghost-text/unified-completions bug it fixes, so there's no evidence it answers an already-reported problem.\", \"citations\": []}",
+  "ttft_ms": 3361,
+  "type": "result",
+  "duration_ms": 4388,
+  "uuid": "4d0a64c2-adad-45e9-8227-73174d477990",
+  "ttft_stream_ms": 1050,
+  "time_to_request_ms": 47,
+  "queued_turn_count": 0,
+  "_retrieved": [
+    333017,
+    333009,
+    332518,
+    325558,
+    313458,
+    333297,
+    333268,
+    333156
+  ],
+  "_prompt_chars": 18008,
+  "_wall_seconds": 6.0,
+  "_stage": 2
+}
