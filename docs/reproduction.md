@@ -11,25 +11,26 @@ Written for someone starting from a clean environment (a fresh machine or contai
 
 ```bash
 git clone <repo-url>
-cd micro1-frontier-2026
+cd PR-slop
 <!-- TODO: any solution-specific setup, e.g. pip install -r requirements.txt -->
 ```
 
 ## Exact commands
 
 ```bash
+./run.sh harvest      # network, gh api, re-fetches the eval set (skips if data/cases/ already has 15 cases; already committed, so you normally never need this)
 ./run.sh baseline   # <!-- TODO: describe what this runs -->
 ./run.sh advanced    # <!-- TODO: describe what this runs -->
-./run.sh eval         # runs the harness's own test suite today; runs the solution's own eval once written
+./run.sh eval         # runs the harness's own test suite plus the harvested eval-set tests plus the leak baseline; runs the solution's own eval once written. Never touches the network: reads only the committed cache under data/ (ground rule 10)
 ```
 
 ## Data required
 
-<!-- TODO: what input data/fixtures the solution needs, and where they come from. -->
+The evaluation set (15 `microsoft/vscode` pull requests, balanced 5/5/5 across the three buckets, plus a supporting issue corpus) is fetched once by `harvest.py` and committed under `data/`: `data/cases/pr-<n>.json` (one per case, `input` + `truth`), `data/issues.jsonl` (the retrieval corpus), `data/manifest.json` (exact queries, the re-derived bucket census, the pinned source commit, out-of-repo exclusions), and `data/pseudonym_salt.txt`. A fresh clone already has all of this; `./run.sh harvest` only re-runs the fetch if it is missing (or with `--force`), and requires `gh` authenticated with public read scope.
 
 ## Expected output
 
-Today: `./run.sh eval` prints 10 `PASS` lines (one per test) followed by a summary line reading `10/10 passed`.
+Today: `./run.sh eval` runs `test_harness.py` (10 `PASS` lines, `10/10 passed`), then `test_harvest.py` (14 `PASS` lines, `14/14 passed`), then `baselines/regex_rule.py` (prints the leak baseline's balanced accuracy, currently 0.667).
 <!-- TODO: expected output of baseline/advanced once written. -->
 
 ## How trace redaction actually works (read this before sharing any trace file)
@@ -45,5 +46,6 @@ This is real protection, but it is defense in depth, not a guarantee. It catches
 
 ## Approximate runtime and cost
 
-- Harness test suite: under 1 second, $0 (no API calls involved).
+- `./run.sh eval` (harness + harvest tests + leak baseline): under 1 second, $0, no API calls, reads only the committed cache.
+- `./run.sh harvest` (only needed if `data/` is missing or `--force`): a few minutes, roughly 450-500 `gh api` calls, well inside GitHub's authenticated 5,000/hour rate limit, $0 (no LLM calls).
 - <!-- TODO: baseline/advanced runtime and API cost once written. -->
