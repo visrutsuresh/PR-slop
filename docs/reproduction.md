@@ -1,51 +1,104 @@
-# Reproduction Guide
+# Reproduction guide
 
-Written for someone starting from a clean environment (a fresh machine or container with nothing from this project already set up) who has never seen this repo before. Filled in once the problem is known. The harness section below already works today.
+Written for someone starting from nothing, with no account of any kind.
 
-## Clean environment
-
-- macOS/Linux, Python 3.12 (the version used inside the Docker container, from `Dockerfile`'s `python:3.12-slim` base image, not necessarily the Python version already on your own machine, which may be different).
-- No third-party Python packages required to run the harness itself. Only the Python standard library is used.
-
-## Setup
+## The short version
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/visrutsuresh/PR-slop
 cd PR-slop
-<!-- TODO: any solution-specific setup, e.g. pip install -r requirements.txt -->
+./run.sh eval        # checks
+./run.sh baseline    # the simple version's numbers
+./run.sh advanced    # our system's numbers
 ```
 
-## Exact commands
+That is everything. **No account, no key, no payment, no internet.** Those three commands reproduce every number in the README exactly.
+
+## What you need
+
+Python 3.10 or newer. Nothing else. No packages are installed, nothing is downloaded, and the standard library is all that is used.
+
+## Why nothing needs an account
+
+Every model answer this project ever received is saved whole, under `data/responses/`, and committed. The commands above read those saved answers and recompute the results from them.
+
+This is deliberate, and it is the only honest way to do it. **These models are not repeatable.** Ask one the same question twice and the wording differs. So if you re-ran the models yourself, you would get different text, possibly different verdicts, and numbers that do not match our README, through no fault of either of us. The saved answers are the record. Recomputing from them gives the same result every time, for anyone.
+
+The competition organisers supply no accounts or credits, so every entrant faces this. We solved it by making verification need nothing.
+
+## What you should see
+
+```
+=== baseline, one direct prompt, no repository access ===
+balanced accuracy : 33.3%   per-bucket ['0.20', '0.40', '0.40']
+false prune       : 1/10 merged items called not-merged
+citations, free   : 12 file paths copied from the case's own input
+citations, real   : 1/3 issue numbers exist (33.3%)
+declined to call  : 5/15
+
+=== our system, search plus checking ===
+balanced accuracy : 73.3%   per-bucket ['1.00', '1.00', '0.20']
+false prune       : 0/10 merged items called not-merged
+citations, free   : 15 file paths copied from the case's own input
+citations, real   : 9/9 issue numbers exist (100.0%)
+declined to call  : 0/15
+struck as made up : 0 references removed by the check
+```
+
+Roughly two seconds each. No cost.
+
+## What the data is
+
+Fifteen closed pull requests from `microsoft/vscode`, all public, collected once and committed under `data/`.
+
+- `data/cases/` : the fifteen. Each has an `input` half, which is all a system is allowed to see, and a `truth` half, the answer.
+- `data/issues.jsonl` : 403 reported problems from the same project, the thing our system searches.
+- `data/manifest.json` : when it was collected, the exact queries used, the pile counts, and the pinned commit.
+- `data/responses/` : every model answer, saved whole.
+- `traces/` : a readable step-by-step record for each of the thirty runs.
+
+## Checking that we are not cheating
+
+The strongest reason to distrust an evaluation like this is that the system might be reading the answers rather than working them out. We nearly had exactly that problem.
+
+An early check asked the model, running normally inside this project folder, to report the recorded answer for one case. **It opened the file and gave the correct answer.** So every model call now runs from an empty folder outside the project, with file reading, searching, shell access, web access, editing and sub-agents all switched off.
+
+You can rerun that check:
 
 ```bash
-./run.sh harvest      # network, gh api, re-fetches the eval set (skips if data/cases/ already has 15 cases; already committed, so you normally never need this)
-./run.sh baseline   # <!-- TODO: describe what this runs -->
-./run.sh advanced    # <!-- TODO: describe what this runs -->
-./run.sh eval         # runs the harness's own test suite plus the harvested eval-set tests plus the leak baseline; runs the solution's own eval once written. Never touches the network: reads only the committed cache under data/ (ground rule 10)
+./run.sh probe
 ```
 
-## Data required
+It must print `PASS` and the model must say it has no way to read a file. If it ever prints the answer instead, nothing generated afterwards can be trusted.
 
-The evaluation set (15 `microsoft/vscode` pull requests, balanced 5/5/5 across the three buckets, plus a supporting issue corpus) is fetched once by `harvest.py` and committed under `data/`: `data/cases/pr-<n>.json` (one per case, `input` + `truth`), `data/issues.jsonl` (the retrieval corpus), `data/manifest.json` (exact queries, the re-derived bucket census, the pinned source commit, out-of-repo exclusions), and `data/pseudonym_salt.txt`. A fresh clone already has all of this; `./run.sh harvest` only re-runs the fetch if it is missing (or with `--force`), and requires `gh` authenticated with public read scope.
+You can also confirm the answers never leaked into the questions:
 
-## Expected output
+```bash
+python3 test_harvest.py
+```
 
-Today: `./run.sh eval` runs `test_harness.py` (10 `PASS` lines, `10/10 passed`), then `test_harvest.py` (14 `PASS` lines, `14/14 passed`), then `baselines/regex_rule.py` (prints the leak baseline's balanced accuracy, currently 0.667).
-<!-- TODO: expected output of baseline/advanced once written. -->
+Fifteen checks. Among them: the input half contains exactly five permitted fields and nothing else, no contributor name or email survives anywhere, and no giveaway phrase pointing at the answer survives. That last set exists because an earlier version of this project failed all three, which is written up in `CHANGELOG.md`.
 
-## How trace redaction actually works (read this before sharing any trace file)
+## If you want to run the models yourself
 
-Every agent run is logged as a trace: the full step-by-step record of what that run did, saved under `traces/`. Before anything is written to disk, the logger runs a redaction pass that looks for common shapes of API keys, passwords, and tokens (things like `sk-...`, `AKIA...`, GitHub tokens, JWTs, PEM private key blocks, and any `key=value` pair whose key name looks like a secret) and replaces the matched part with `[REDACTED]`.
+```bash
+REGENERATE=1 ./run.sh baseline
+REGENERATE=1 ./run.sh advanced
+```
 
-This is real protection, but it is defense in depth, not a guarantee. It catches the credential shapes this project has actually seen come up during a build; it does not catch every possible shape a secret could take, and it cannot catch a secret sitting in plain unstructured text with no recognizable prefix or key name attached to it. Never assume a trace file is fully clean just because it went through this pass. Review a trace yourself before it leaves the machine, especially before it goes into a public repository. Once submitted, this repository becomes micro1's permanent property, so this check matters more here than it would for a throwaway local log.
+This needs Claude Code installed and signed in. **Expect different numbers.** That is the models being unrepeatable, not a fault. The isolation check runs first and refuses to continue if it fails.
 
-## Versions
+Recollecting the fifteen cases needs the GitHub command line tool and will produce a **different set entirely**, because it takes the most recently closed pull requests and that list moves daily:
 
-- Container Python: 3.12 (`python:3.12-slim`)
-- <!-- TODO: any pinned solution dependencies -->
+```bash
+REGENERATE=1 ./run.sh harvest
+```
 
-## Approximate runtime and cost
+## Cost and time, measured not estimated
 
-- `./run.sh eval` (harness + harvest tests + leak baseline): under 1 second, $0, no API calls, reads only the committed cache.
-- `./run.sh harvest` (only needed if `data/` is missing or `--force`): a few minutes, roughly 450-500 `gh api` calls, well inside GitHub's authenticated 5,000/hour rate limit, $0 (no LLM calls).
-- <!-- TODO: baseline/advanced runtime and API cost once written. -->
+| | Simple version | Our system |
+| --- | --- | --- |
+| Fifteen cases | 1.84 USD | 1.88 USD |
+| Per case | about 0.12 USD | about 0.13 USD |
+
+Verifying from the saved answers costs nothing and takes seconds.
