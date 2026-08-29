@@ -1,20 +1,37 @@
-# micro1 Frontier Engineering Challenge 2026: Submission
+# Slopgate
 
-<!-- TODO after kickoff: real project name and one-line description. -->
+**Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three buckets, act now, worth reviewing, safe to prune, where every claim carries a citation checked against the real repository.
 
-Status: pre-kickoff scaffolding only. The problem PDF (the document that says what to actually build) is published 2026-08-28 15:00 UTC. Nothing below the harness section is filled in yet. See `PRE-EXISTING.md` for what existed before kickoff.
+Submission for the **micro1 Agentic Workflows Hackathon 2026**. Kickoff 2026-08-28 15:00 UTC, submissions close 2026-08-31 18:00 UTC.
+
+Status: problem locked, evaluation design fixed, build in progress. See `PRE-EXISTING.md` for exactly what existed before kickoff.
 
 ## Intended user
 
-<!-- TODO: who is this for? Be specific, not "developers". -->
+A solo or small-team maintainer of a popular public repository. Unpaid, no triage staff, and every low-effort submission costs them the same first read as a genuine one.
 
 ## Their current bottleneck
 
-<!-- TODO: what makes this painful today, without this project? -->
+They personally read every incoming pull request, verify its claims by hand, and search their own issue history to see whether it duplicates something already filed. There is no filter in front of them.
+
+The volume is documented, not assumed. Daniel Stenberg has said the curl project is "effectively being DDoSed" by AI-generated bug reports, roughly 20% of its 2025 submissions were AI slop, and OCaml maintainers rejected a single AI-generated pull request of 13,000 lines.
 
 ## Why solving it is valuable
 
-<!-- TODO: what changes for the intended user once this exists? -->
+The maintainer stops reading the prune pile. That is the whole proposition. If they cannot trust bucket 3 enough to skip it, nothing has been saved no matter how good the accuracy number looks.
+
+### The cause is upstream, and it is a hiring incentive
+
+Most write-ups of this problem stop at "maintainers are tired". The more useful observation is why the slop exists at all.
+
+Job descriptions ask candidates for evidence of open source contribution. Students and career switchers who want that line on a CV are therefore pushed toward contribution VOLUME rather than contribution VALUE, and generative tools make volume nearly free. The slop is not vandalism. It is a rational response to a hiring signal.
+
+Two job postings collected first-hand during the author's own internship search, quoted verbatim:
+
+- Chubb, AI Apprentice, desirable criteria: "Contribution to open-source AI projects"
+- Singtel, AI Product Manager Builder Intern: "Public portfolio, hackathon wins, open-source contributions"
+
+The author is not a maintainer and does not claim to be. He is the person standing under the pressure that produces the slop, which is why this framing is first-hand rather than researched.
 
 ## Quickstart
 
@@ -25,6 +42,41 @@ Status: pre-kickoff scaffolding only. The problem PDF (the document that says wh
 ```
 
 `baseline` runs the simple, first-pass solution. `advanced` runs the improved version built on top of it. `eval` runs the checks that confirm both are working. See `docs/reproduction.md` for the full step-by-step guide, written for someone starting from a clean checkout with nothing set up yet.
+
+## How it works
+
+Four stages, built incrementally, each one added only after a measurement showed it was needed.
+
+1. **Retriever.** Fetches the pull request, the repository's contributing guidelines, and searches the existing issue corpus for near-duplicates and for the issue this pull request may be addressing.
+2. **Claim checker.** Pulls out each factual assertion in the submission ("this crashes on empty input") and checks it against the actual source.
+3. **Adjudicator.** Weighs the retrieved evidence into a bucket and a disposition.
+4. **Verifier.** A separate pass that resolves every citation against the real repository and downgrades anything that does not resolve to "cannot determine".
+
+**Multi-agent, but NOT autonomous.** It performs no consequential action of any kind. It never posts, comments, closes, merges or labels anything on any real repository. It writes a report and a human decides. Closing a real contributor's pull request affects a real person, so a qualified human reviewer stays in the loop by design.
+
+There is also a single-pull-request mode, because real reviewers work sequentially. It is deliberately NOT part of the evaluation: single-item triage is close to what one prompt already does, and scoring it would misrepresent where the system's value actually is.
+
+## Evaluation
+
+**Repository:** `microsoft/vscode`. Verified before use: of the 100 most recent closed pull requests, 15 fall in bucket 1, 74 in bucket 2, 11 in bucket 3, so all three buckets clear a 5-case floor. It was preferred over `home-assistant/core` because it rejects more pull requests (11 per 100 against 4), and rejected pull requests are the class this tool exists to find.
+
+**Cases:** 15, sampled DELIBERATELY to 5 per bucket. Random sampling would have skewed to bucket 2, which is 74% of recent closed pull requests.
+
+**Where the answer key comes from.** No maintainer ever records "this pull request was high value", so the answer key is built from what the maintainer actually DID:
+
+| What the maintainer did | Bucket |
+| --- | --- |
+| Merged it, and it closed a linked issue | 1, act now |
+| Merged it, no linked issue | 2, worth reviewing |
+| Closed it without merging | 3, prune |
+
+The agent sees each pull request with every outcome signal stripped out, as though it had just arrived, and predicts a bucket. The baseline gets the identical cases and the identical output format.
+
+**Known limits of that answer key, stated up front.** Merge decisions carry social and political factors unrelated to technical quality, so this is a proxy for value, not truth. It is also survivorship-flavoured: a good pull request that sat ignored and was auto-closed as stale is filed under "prune", so the system is marked wrong for correctly calling it good.
+
+**Baseline.** A single direct prompt with basic instructions, given the pull request text, with NO repository access. This is micro1's own first suggested baseline. Declared resource difference: the agent has repository access and the baseline does not, because repository access is precisely the intervention being measured. A stronger keyword-search baseline was considered and was out of scope for the time available.
+
+**Pre-registered targets, frozen before any evaluation was run.** False-prune rate under 10%, since that is the error that destroys the product's value. Citation validity at 90% or higher. Both were fixed in advance and are not revised in light of results.
 
 ## Improvement Changelog
 

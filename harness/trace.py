@@ -1,4 +1,4 @@
-"""Trajectory logger for micro1 Frontier Engineering Challenge submissions.
+"""Trajectory logger for micro1 Agentic Workflows Hackathon submissions.
 
 ponytail: single-purpose module, no framework, no plugin system. If judges
 ever need step-level capture provenance (some steps raw, others hand-typed
