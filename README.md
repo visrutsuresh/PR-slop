@@ -1,4 +1,4 @@
-# Slopgate
+# PR-slop
 
 **Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three buckets, act now, worth reviewing, safe to prune, where every claim carries a citation checked against the real repository.
 
