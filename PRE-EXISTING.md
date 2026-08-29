@@ -36,4 +36,4 @@ Nothing above is copied or adapted from any prior repository. It was written fro
 
 Everything else: the simple first-pass solution (the "baseline"), the improved solution built on top of it (the "advanced" solution), `harness/compare.py` (which will score the two against each other), any extra dependencies added to the Dockerfile, the filled-in content of `docs/reproduction.md`, and any code adapted from elsewhere. This section gets updated once the problem is known, listing anything reused and where it came from.
 
-<!-- POST-KICKOFF: list reused code / sources here -->
+`harvest.py`, `baselines/regex_rule.py`, `baselines/__init__.py`, `test_harvest.py`, and the `harvest` subcommand added to `run.sh`: the evaluation-set harvester, written from scratch after kickoff against the finalised PRD (`01-Projects/micro1 Hackathon/PRD.md`, gated by contrarian plan-review PASS loop 3, change_id `prslop-harvest-2026-08-29`). Nothing in these files is adapted from any prior repository. `data/cases/`, `data/issues.jsonl`, `data/manifest.json`, and `data/pseudonym_salt.txt` are its committed output, fetched live from `microsoft/vscode` via the authenticated `gh api` CLI.

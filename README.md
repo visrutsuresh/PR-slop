@@ -1,6 +1,6 @@
 # PR-slop
 
-**Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three buckets, act now, worth reviewing, safe to prune, where every claim carries a citation checked against the real repository.
+**Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three buckets, act now, worth reviewing, not merged, where every claim carries a citation checked against the real repository.
 
 Submission for the **micro1 Agentic Workflows Hackathon 2026**. Kickoff 2026-08-28 15:00 UTC, submissions close 2026-08-31 18:00 UTC.
 
@@ -18,7 +18,9 @@ The volume is documented, not assumed. Daniel Stenberg has said the curl project
 
 ## Why solving it is valuable
 
-The maintainer stops reading the prune pile. That is the whole proposition. If they cannot trust bucket 3 enough to skip it, nothing has been saved no matter how good the accuracy number looks.
+The maintainer reads the not-merged pile **LAST instead of first**, and can trust that merge-worthy work rarely lands there. That is the proposition, and it is deliberately narrower than "skip that pile entirely".
+
+We do not claim the stronger version, because our own data contradicts it. See the bucket-3 note below: most of what lands there is real work, not slop, so promising a maintainer they can skip it unread would be dishonest. The honest claim is triage ORDERING.
 
 ### The cause is upstream, and it is a hiring incentive
 
@@ -58,7 +60,7 @@ There is also a single-pull-request mode, because real reviewers work sequential
 
 ## Evaluation
 
-**Repository:** `microsoft/vscode`. Verified before use: of the 100 most recent closed pull requests, 15 fall in bucket 1, 74 in bucket 2, 11 in bucket 3, so all three buckets clear a 5-case floor. It was preferred over `home-assistant/core` because it rejects more pull requests (11 per 100 against 4), and rejected pull requests are the class this tool exists to find.
+**Repository:** `microsoft/vscode`. Repo selection was verified before use against a 15/74/11 split under an earlier, narrower label rule (`home-assistant/core` was the alternative, rejecting fewer pull requests, 4 per 100 against vscode's double-digit rate). **Re-derived at harvest time under the FROZEN pattern actually shipped (`harvest.py`), because a published number must be one the project's own rule reproduces:** of the true 100 most-recently-closed pull requests as of the harvest run, **23 fall in bucket 1, 54 in bucket 2, 23 in bucket 3** (see `data/manifest.json` -> `census_re_derived`). All three buckets still clear the 5-case floor comfortably, and no decision changes.
 
 **Cases:** 15, sampled DELIBERATELY to 5 per bucket. Random sampling would have skewed to bucket 2, which is 74% of recent closed pull requests.
 
@@ -66,17 +68,35 @@ There is also a single-pull-request mode, because real reviewers work sequential
 
 | What the maintainer did | Bucket |
 | --- | --- |
-| Merged it, and it closed a linked issue | 1, act now |
-| Merged it, no linked issue | 2, worth reviewing |
-| Closed it without merging | 3, prune |
+| Merged it, and it DECLARED a closing link to an issue | 1, act now |
+| Merged it, no DECLARED closing link | 2, worth reviewing |
+| Closed it without merging | 3, not merged |
 
-The agent sees each pull request with every outcome signal stripped out, as though it had just arrived, and predicts a bucket. The baseline gets the identical cases and the identical output format.
+The agent sees each pull request as an allow-list of five fields (number, title, body, changed-file list, patch), with the closing reference redacted, and predicts a bucket. Source reads are pinned to a commit predating the case window, because reading live `HEAD` would itself reveal whether a pull request was merged.
 
-**Known limits of that answer key, stated up front.** Merge decisions carry social and political factors unrelated to technical quality, so this is a proxy for value, not truth. It is also survivorship-flavoured: a good pull request that sat ignored and was auto-closed as stale is filed under "prune", so the system is marked wrong for correctly calling it good.
+**Known bias we did not fix, stated here rather than left for a reader to find.** Every bucket-1 target issue is guaranteed present in our corpus by seeding. Bucket-2 cases have no declared target to seed, so their real counterparts are present only by chance. "Found a strong topical match" therefore correlates with bucket 1 by construction, which flatters the act-now versus worth-reviewing split inside our bucket-accuracy figure. Fixing it properly would need hand-labelling, which would make the evaluation circular. So we disclose it instead. The baseline gets the identical cases and the identical output format.
+
+**Bucket 3 is NOT a slop detector, stated plainly.** "Not merged" is a workflow fact the API records for free. It is not a quality judgment. Of 17 `microsoft/vscode` bucket-3 pull requests inspected before building the eval set, 4 were bots and roughly 10 were team members closing their own real work, one of them over 7,700 added lines, in favour of another approach. Only ONE resembled AI slop. If the agent correctly calls an insider's real refactor "real work, do not deprioritise it", the oracle still grades that bucket 3. That is a disclosed proxy error, not a system failure.
+
+**Sampling rule.** At least 3 of the 5 bucket-3 cases are non-bot, outside-contributor closes (bot: `user.type == "Bot"` or a verified automation account; outside contributor: `author_association` is `CONTRIBUTOR`, `FIRST_TIME_CONTRIBUTOR` or `NONE`). This deliberately skews the sample away from the true bucket-3 population, where bots and insiders are the majority.
+
+The unfiltered breakdown, measured on all 23 bucket-3 pull requests in the same census window above: **4 bots, 5 insiders, 14 outside-contributor closes.** The curated 5 (the actual eval cases): **1 bot, 1 insider, 3 outside-contributor closes**, the minimum the sampling rule allows. So the eval set is deliberately more outsider-heavy than the true population, and that skew is disclosed here rather than hidden. (This mechanical bot/insider/outsider split is measured directly from `author_association` and is separate from the smaller, human-read 17-case spot check above, which judges AI-slop content, not authorship.)
+
+**Author identity is pseudonymised.** Before building the agent we checked whether a rule with no model at all, using only the declared closing reference and whether the author is a project insider, could already sort the queue. It scores 78% balanced accuracy on its own. With the declaration signal removed, author identity alone still scores 50%, against a 33% chance floor. We report this because hiding it would make our agent's accuracy look more impressive than it is. Every author identity in this repository is a one-way pseudonym for exactly that reason, and the agent never sees who submitted a pull request.
+
+**Stripping includes the declared closing reference, not just the merge outcome.** The bucket label is a deterministic function of that field, so leaving it visible would let the agent read the label off the input instead of earning it. For the pull requests that declare a link, and every bucket-1 case does by definition, this makes the input less realistic than what a maintainer actually sees. That is a disclosed trade, not a free one.
+
+**Known limits of that answer key, stated up front.** Merge decisions carry social and political factors unrelated to technical quality, so this is a proxy for value, not truth. It is also survivorship-flavoured: a good pull request that sat ignored and was auto-closed as stale is filed under "not merged", so the system is marked wrong for correctly calling it good.
 
 **Baseline.** A single direct prompt with basic instructions, given the pull request text, with NO repository access. This is micro1's own first suggested baseline. Declared resource difference: the agent has repository access and the baseline does not, because repository access is precisely the intervention being measured. A stronger keyword-search baseline was considered and was out of scope for the time available.
 
-**Pre-registered targets, frozen before any evaluation was run.** False-prune rate under 10%, since that is the error that destroys the product's value. Citation validity at 90% or higher. Both were fixed in advance and are not revised in light of results.
+**Pre-registered targets, frozen before any evaluation was run.** False-prune rate under 10%, where a false prune means the system predicted "not merged" for something the maintainer actually merged. Citation validity at 90% or higher. Both were fixed in advance and are not revised in light of results.
+
+**We cannot actually demonstrate the false-prune threshold at this sample size, and we say so rather than let a reader assume otherwise.** The denominator is 10 cases. Even a perfect 0 of 10 gives a 95% upper confidence bound of about 26%, so "under 10%" is unfalsifiable in the passing direction here. The pre-registration still earns its place as anti-goalpost-moving discipline, but the result is reported with its bound, never as a bare pass.
+
+**Resolution limit.** One flipped case moves balanced accuracy by 6.7 points. Two systems within about two cases of each other are not distinguishable by this evaluation.
+
+**Contamination, precisely.** The harvest window postdates the model's training cutoff, so memorisation of these specific pull requests is genuinely mitigated. What recency does not mitigate is identity-level priors: the model knows the vscode maintainer roster from pretraining. That is why author identity is pseudonymised and removed from the input entirely.
 
 ## Improvement Changelog
 
@@ -88,7 +108,13 @@ See `CHANGELOG.md`. Every meaningful change is logged there with the evidence th
 
 ## Hot take
 
-<!-- TODO: one opinionated, defensible claim about the problem or the approach. -->
+**DRAFT. Confirm against the real 15-case results before finalising.**
+
+"Closed without merging" looks like it should mean "rejected as low quality". On `microsoft/vscode` it mostly does not. Of 17 such pull requests inspected while building this eval set, 4 were bots doing routine housekeeping, roughly 10 were the vscode team closing their OWN large and real work in favour of a different approach, one case being a refactor of over 7,700 added lines, and only 1 looked like actual AI slop.
+
+The practical lesson: any triage system built from GitHub's free mechanical metadata, merged or not, linked issue or not, is measuring maintainer BEHAVIOUR, not maintainer JUDGMENT of quality. That is enough to build and evaluate a working system. It is not the same claim as "this detects AI slop". Detecting slop specifically would need a narrower, probably human-labelled oracle.
+
+Anyone reproducing a maintainer-behaviour triage tool on a different repository should expect the same gap and disclose it the same way, rather than assuming their own repo's bots and insiders average out to the label they hoped to measure.
 
 ## Agent instructions
 

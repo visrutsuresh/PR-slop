@@ -1,0 +1,33 @@
+{
+  "input": {
+    "number": 243255,
+    "title": "fix merging snippets",
+    "body": "increase nesting level of the snippet based on how many snippets need to be merged instead an arbitrary value of 10.\r\n[REDACTED-CLOSING-REF] and whatever duplicate it is of. \r\nThis doesn't adress the floating point issue that arises when more then 14 snippets are expanded.\r\n\r\nCurrentlty it is not possible to make a snippet for a 4x4 matrix in latex which uses atleast 16 tabstops, exceeding the 10 tabstop limit.\r\n",
+    "changed_files": [
+      "src/vs/editor/contrib/snippet/browser/snippetSession.ts"
+    ],
+    "patch": "From c84c37c87dccc2de93bd09f11826b60b8d581791 Mon Sep 17 00:00:00 2001\nFrom: superle3 <987654321.yo.na.than@gmail.com>\nDate: Tue, 11 Mar 2025 20:29:13 +0100\nSubject: [PATCH] fix merging snippets\n\nincrease nesting level of the snippet based on how many snippets need to be merged instead an arbitrary value of 10 and reorder the indexes afterwards to avoid floating point problems where nestinglevel< 1e-15 would be added upon index > 1, where the index then wouldn't change.\n---\n .../contrib/snippet/browser/snippetSession.ts | 21 ++++++++++++++++---\n 1 file changed, 18 insertions(+), 3 deletions(-)\n\ndiff --git a/src/vs/editor/contrib/snippet/browser/snippetSession.ts b/src/vs/editor/contrib/snippet/browser/snippetSession.ts\nindex 30e42dd539a6b..c3309210e8d4c 100644\n--- a/src/vs/editor/contrib/snippet/browser/snippetSession.ts\n+++ b/src/vs/editor/contrib/snippet/browser/snippetSession.ts\n@@ -289,7 +289,13 @@ export class OneSnippet {\n \tmerge(others: OneSnippet[]): void {\n \n \t\tconst model = this._editor.getModel();\n-\t\tthis._nestingLevel *= 10;\n+\t\tconst nestingLevel = Math.max(8, ...others.map((o, i) => {\n+\t\t\tif (i < this._placeholderGroups[this._placeholderGroupsIdx].length) {\n+\t\t\t\treturn o._snippet.placeholderInfo.last!.index || 8;\n+\t\t\t}\n+\t\t\treturn 8;\n+\t\t})) + 2;\n+\t\tthis._nestingLevel *= nestingLevel;\n \n \t\tthis._editor.changeDecorations(accessor => {\n \n@@ -309,9 +315,9 @@ export class OneSnippet {\n \n \t\t\t\tfor (const nestedPlaceholder of nested._snippet.placeholderInfo.all) {\n \t\t\t\t\tif (nestedPlaceholder.isFinalTabstop) {\n-\t\t\t\t\t\tnestedPlaceholder.index = placeholder.index + ((indexLastPlaceholder + 1) / this._nestingLevel);\n+\t\t\t\t\t\tnestedPlaceholder.index = placeholder.index + ((indexLastPlaceholder + 1) / nestingLevel);\n \t\t\t\t\t} else {\n-\t\t\t\t\t\tnestedPlaceholder.index = placeholder.index + (nestedPlaceholder.index / this._nestingLevel);\n+\t\t\t\t\t\tnestedPlaceholder.index = placeholder.index + (nestedPlaceholder.index / nestingLevel);\n \t\t\t\t\t}\n \t\t\t\t}\n \t\t\t\tthis._snippet.replace(placeholder, nested._snippet.children);\n@@ -339,6 +345,15 @@ export class OneSnippet {\n \t\t\t// Last, re-create the placeholder groups by sorting placeholders by their index.\n \t\t\tthis._placeholderGroups = groupBy(this._snippet.placeholders, Placeholder.compareByIndex);\n \t\t});\n+\t\t// Reorder indexes to only use ints to avoid floating point issues\n+\t\tfor (const [i, placeholderGroup] of this._placeholderGroups.entries()) {\n+\t\t\tfor (const placeholder of placeholderGroup) {\n+\t\t\t\tif (placeholder.isFinalTabstop) {\n+\t\t\t\t\tbreak;\n+\t\t\t\t}\n+\t\t\t\tplaceholder.index = i + 1;\n+\t\t\t}\n+\t\t}\n \t}\n \n \tgetEnclosingRange(): Range | undefined {\n"
+  },
+  "truth": {
+    "number": 243255,
+    "bucket": 3,
+    "merged": false,
+    "closed_at": "2026-08-29T05:01:09Z",
+    "created_at": "2025-03-11T19:35:31Z",
+    "author_pseudonym": "AUTHOR-9319cc17",
+    "author_association": "NONE",
+    "is_bot": false,
+    "link_declared": true,
+    "closing_ref_forms": [
+      "url"
+    ],
+    "referenced_issues": [
+      {
+        "owner": "microsoft",
+        "repo": "vscode",
+        "number": 230149,
+        "in_repo": true
+      }
+    ]
+  }
+}

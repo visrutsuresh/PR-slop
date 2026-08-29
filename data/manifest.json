@@ -1,0 +1,114 @@
+{
+  "generated_at": "2026-08-29T18:19:06Z",
+  "repo": "microsoft/vscode",
+  "gh_version": "gh version 2.92.0 (2026-04-28)",
+  "queries": {
+    "closed_pr_pool": {
+      "endpoint": "repos/microsoft/vscode/pulls",
+      "params": {
+        "state": "closed",
+        "sort": "updated",
+        "direction": "desc",
+        "per_page": 100
+      },
+      "pages_fetched": 5,
+      "deduped_count": 500
+    },
+    "census_window": {
+      "size": 100,
+      "closed_at_min": "2026-08-28T02:26:33Z",
+      "closed_at_max": "2026-08-29T17:23:43Z",
+      "window_days": 1.623
+    },
+    "pr_files": "repos/microsoft/vscode/pulls/{number}/files?per_page=100",
+    "pr_patch": "{patch_url}",
+    "issues_recent": {
+      "endpoint": "repos/microsoft/vscode/issues",
+      "params": {
+        "state": "all",
+        "sort": "updated",
+        "direction": "desc",
+        "per_page": 100
+      },
+      "target_n": 200,
+      "actual_n": 200
+    },
+    "issue_by_number": "repos/microsoft/vscode/issues/{number}",
+    "distractor_band": {
+      "width": 25,
+      "seeded_targets": 9
+    },
+    "commit_pin": "repos/microsoft/vscode/commits?until={closed_at_min}&per_page=1"
+  },
+  "census_re_derived": {
+    "bucket_1": 23,
+    "bucket_2": 54,
+    "bucket_3": 23,
+    "pool_size": 100,
+    "window_days": 1.623,
+    "note": "re-derived under the frozen CLOSING_RE pattern (condition E), not the earlier 15/74/11 count in PRD 7.0"
+  },
+  "case_counts": {
+    "1": 5,
+    "2": 5,
+    "3": 5
+  },
+  "case_numbers": {
+    "1": [
+      331442,
+      332998,
+      333162,
+      333191,
+      333295
+    ],
+    "2": [
+      332802,
+      333264,
+      333281,
+      333282,
+      333308
+    ],
+    "3": [
+      243255,
+      306519,
+      308696,
+      324044,
+      332108
+    ]
+  },
+  "bucket_3_composition": {
+    "selected": {
+      "bot": 1,
+      "insider": 1,
+      "outsider": 3
+    },
+    "population_pool_100": {
+      "bot": 4,
+      "insider": 5,
+      "outsider": 14
+    }
+  },
+  "issue_corpus_count": 403,
+  "issue_corpus_recent_n": 200,
+  "issue_corpus_seeded_targets": [
+    230149,
+    305306,
+    306495,
+    331002,
+    331834,
+    332537,
+    333034,
+    333149,
+    333150
+  ],
+  "pinned_commit_sha": "8512d16a6b20ff9197d24424918ff105703f91f4",
+  "pinned_commit_predates": "2026-08-28T02:26:33Z",
+  "out_of_repo_references": [],
+  "verification": {
+    "in_repo_targets": 9,
+    "resolved": 9,
+    "unresolved": 0,
+    "excluded_out_of_repo": 0
+  },
+  "pseudonym_salt_file": "data/pseudonym_salt.txt"
+}
