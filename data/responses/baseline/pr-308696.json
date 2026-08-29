@@ -1,0 +1,96 @@
+{
+  "duration_api_ms": 2165,
+  "stop_reason": "end_turn",
+  "session_id": "4adb5a5f-9b40-4899-b28b-58e6b8d385bc",
+  "total_cost_usd": 0.0994964,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 23905,
+    "cache_read_input_tokens": 15062,
+    "output_tokens": 86,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 23905,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 86,
+        "cache_read_input_tokens": 15062,
+        "cache_creation_input_tokens": 23905,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 23905
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 86,
+      "cacheReadInputTokens": 15062,
+      "cacheCreationInputTokens": 23905,
+      "webSearchRequests": 0,
+      "costUSD": 0.0994964,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "{\"bucket\": 0, \"confidence\": \"low\", \"reason\": \"The fix is a plausible, well-scoped behavior change referencing an issue, but I cannot verify the codebase or the referenced issue since no repository access is available in this environment.\", \"citations\": []}",
+  "ttft_ms": 2188,
+  "type": "result",
+  "duration_ms": 2277,
+  "uuid": "2d3624a2-7109-4961-9c17-66a7bf5d0389",
+  "ttft_stream_ms": 1155,
+  "time_to_request_ms": 45,
+  "queued_turn_count": 0,
+  "_prompt_chars": 8946,
+  "_wall_seconds": 3.8
+}

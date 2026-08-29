@@ -1,0 +1,26 @@
+{
+  "name": "baseline, one direct prompt, no repository access",
+  "balanced_accuracy": 0.3333333333333333,
+  "per_bucket_recall": {
+    "1": 0.2,
+    "2": 0.4,
+    "3": 0.4
+  },
+  "false_prune": [
+    1,
+    10
+  ],
+  "citations": {
+    "self_cited": 12,
+    "external_offered": 3,
+    "external_resolved": 1,
+    "external_rate": 0.3333333333333333,
+    "unknown": 0,
+    "total_offered": 15
+  },
+  "abstained": 5,
+  "cost_usd": 1.8353,
+  "models": [
+    "claude-sonnet-5"
+  ]
+}

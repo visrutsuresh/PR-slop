@@ -1,0 +1,96 @@
+{
+  "duration_api_ms": 2298,
+  "stop_reason": "end_turn",
+  "session_id": "f725bc87-e84b-48af-b85d-a54d00cd8c8c",
+  "total_cost_usd": 0.1130266,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 27484,
+    "cache_read_input_tokens": 9733,
+    "output_tokens": 114,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 27484,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 114,
+        "cache_read_input_tokens": 9733,
+        "cache_creation_input_tokens": 27484,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 27484
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 114,
+      "cacheReadInputTokens": 9733,
+      "cacheCreationInputTokens": 27484,
+      "webSearchRequests": 0,
+      "costUSD": 0.1130266,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "{\"bucket\": 3, \"confidence\": \"low\", \"reason\": \"Plausible bug-fix contribution addressing a real reported limitation, but I cannot verify the referenced issue or check if this was superseded/merged elsewhere without repository access, and the author's own description of remaining floating-point issues suggests it's incomplete.\", \"citations\": []}",
+  "ttft_ms": 2300,
+  "type": "result",
+  "duration_ms": 2397,
+  "uuid": "cc76716e-a371-4bc8-b3a0-abc1d40fc2ad",
+  "ttft_stream_ms": 886,
+  "time_to_request_ms": 41,
+  "queued_turn_count": 0,
+  "_prompt_chars": 4627,
+  "_wall_seconds": 3.9
+}

@@ -1,0 +1,96 @@
+{
+  "duration_api_ms": 2323,
+  "stop_reason": "end_turn",
+  "session_id": "f21b922c-2f1c-4c1d-b4a9-aaead62e39da",
+  "total_cost_usd": 0.1261184,
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 30458,
+    "cache_read_input_tokens": 15062,
+    "output_tokens": 127,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 30458,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 127,
+        "cache_read_input_tokens": 15062,
+        "cache_creation_input_tokens": 30458,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 30458
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-sonnet-5": {
+      "inputTokens": 2,
+      "outputTokens": 127,
+      "cacheReadInputTokens": 15062,
+      "cacheCreationInputTokens": 30458,
+      "webSearchRequests": 0,
+      "costUSD": 0.1261184,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 1,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "{\"bucket\": 1, \"confidence\": \"medium\", \"reason\": \"Fixes a specific regression from a prior PR (#330142) causing disposed code actions to break commands with arguments in an open Quick Fix menu, with tests and manual validation included.\", \"citations\": [\"#330142\", \"src/vs/editor/contrib/codeAction/browser/codeActionModel.ts\"]}",
+  "ttft_ms": 2345,
+  "type": "result",
+  "duration_ms": 2420,
+  "uuid": "324d74bf-cec5-4947-9862-164edf30e930",
+  "ttft_stream_ms": 851,
+  "time_to_request_ms": 45,
+  "queued_turn_count": 0,
+  "_prompt_chars": 24923,
+  "_wall_seconds": 4.0
+}
