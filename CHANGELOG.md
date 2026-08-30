@@ -150,3 +150,23 @@ The bug: "named no problem at all" was being counted as "named a problem that do
 **This is the exact error this project pre-registered a rule against**, in writing, before any system was run: zero offered is not zero percent correct. We wrote the rule, published it, and then broke it in a new file two days later. The real figure is 16 of 16.
 
 Recorded rather than quietly fixed, because the lesson is the useful part: writing a rule down does not make you follow it. The thing that caught this was a number looking wrong next to another number, not discipline.
+
+## The product, built against a stated goal
+
+**Why this came last, which was a mistake.** Everything before this improved a number without a stated product. That is how version 5 happened: a change that sounded obviously right, made with no picture of what it was for, cost 27 points.
+
+**The goal, written down before building.** A maintainer opens their queue, runs one command, and gets a single page: what to read first and why, the normal middle, what to leave, and separately anything closed that probably should not have been. Every claim points at something real. Nothing is touched.
+
+Done means four things: one command, every factual claim resolves, it never acts, and a maintainer would behave differently for having read it. We had the first three and not the fourth. We produced scores for a judge, not a page for a person.
+
+**Three passes, then stop.** The stopping rule was fixed in advance, because version 5 proved that past a point this becomes tuning noise.
+
+**Pass 1.** Built the page. It worked and it was incoherent: the same submission appeared under "read these first" and again under "closed, worth a second look". A closed item has no business in an open queue.
+
+**Pass 2.** Closed items now appear only in the second-opinion section. Text cut at word boundaries instead of mid-word, which had made the page look unfinished. File paths shortened to the last two segments so the layout holds.
+
+**Pass 3.** Removed a number I had invented. The page said "roughly 31 minutes of reading", computed from three minutes plus one per file, a formula with no basis in anything. **This project had already dropped a human-time metric once for exactly that reason, and I reintroduced it an hour later.** Replaced with counts that are simply true: files and lines. Added the pull request links, since a maintainer wants to open the thing.
+
+**Verified after.** Every reported problem named on the page resolves against the repository. Five named, zero fake.
+
+**The honest count of made-up numbers in this project: three.** The 86.7% citation figure, the 61.5% evidence figure, and the invented minutes. Each was caught, each is recorded. The pattern is worth more than any single fix: every one came from producing a number that felt reasonable rather than one that was measured, and every one was caught by a human or a machine noticing it sat oddly beside another number. Writing a rule against it did not prevent the second and third.

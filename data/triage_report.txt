@@ -1,0 +1,102 @@
+==========================================================================
+  PULL REQUEST TRIAGE                                   microsoft/vscode
+==========================================================================
+
+  10 open, 5 recently closed.
+  Nothing has been touched. This is a reading list, not an action.
+
+--------------------------------------------------------------------------
+  READ THESE FIRST  (4)
+  Close something already reported. 19 files, 660 lines added.
+--------------------------------------------------------------------------
+
+    #331442  Enforce custom agent subagent allowlists
+      fixes reported #331002 | code matches its description | has tests | 166 lines, 2 file(s)
+      https://github.com/microsoft/vscode/pull/331442
+      why: The diff adds real enforcement of subagent allowlists (validateSubagentAllowed called in both prepare and invoke paths, nested...
+      points at: #331002, builtinTools/runSubagentTool.ts
+
+    #333162  chat: summarize Agent Merge turns in the prompt timeline
+      fixes reported #333034 | code matches its description | has tests | 165 lines, 6 file(s)
+      https://github.com/microsoft/vscode/pull/333162
+      why: Change matches its description exactly (adds getAgentMergeRequestLabel preview with caching, tested), and it addresses a...
+      points at: #333034, promptTimeline/promptTimelineModel.ts
+
+    #333191  sessions: Improve GitHub context attachments
+      fixes reported #333149 | has tests | 165 lines, 7 file(s)
+      https://github.com/microsoft/vscode/pull/333191
+      why: Adds pasted GitHub URL recognition and openable attachment pills for the new-session composer, matching a real reported gap in...
+      points at: #333149, vscode-node/copilotCloudSessionsProvider.ts, browser/newChatContextAttachments.ts
+
+    #333282  Handle prefix in exp treatements by new endpoint
+      fixes reported #333310 | has tests | 164 lines, 4 file(s)
+      https://github.com/microsoft/vscode/pull/333282
+      why: Substantive fix with tests addressing a real experimentation/treatment-resolution bug in TAS assignments, matching the pattern...
+      points at: #333310
+
+--------------------------------------------------------------------------
+  NORMAL QUEUE  (6)
+  Real work. Needs your eyes, no particular urgency.
+--------------------------------------------------------------------------
+
+    #333264  agentHost: map legacy `chat.tools.eligibleForAutoApproval`...
+      code matches its description | has tests | 179 lines, 4 file(s)
+      https://github.com/microsoft/vscode/pull/333264
+      why: Genuine, well-documented compatibility work matching its description, but no verifiable link to a specific already-reported...
+      points at: common/agentHostManagedSettings.ts, common/agentHostSchema.ts
+
+    #332802  nes: apply supportsUnifiedCompletions on the default...
+      code matches its description | no tests | 17 lines, 1 file(s)
+      https://github.com/microsoft/vscode/pull/332802
+      why: Plausible follow-up hotfix fixing a real gap in unified-completions gating, but the cited issue #322010 is only a search hit...
+      points at: vscode-node/inlineEditProviderFeature.ts
+
+    #333281  Fix Chat Customizations layout and context
+      code does NOT match its description | has tests | 118 lines, 5 file(s)
+      https://github.com/microsoft/vscode/pull/333281
+      why: Genuine-looking UI/layout fix with tests, but the search found no clearly matching pre-reported issue, so it can't be confirmed...
+      points at: aiCustomization/aiCustomizationManagement.ts, media/aiCustomizationManagement.css
+
+    #333295  Fix delayed code action commands with arguments
+      code does NOT match its description | has tests | 197 lines, 3 file(s)
+      https://github.com/microsoft/vscode/pull/333295
+      why: Genuine substantive fix to a real code-action lifecycle bug, but the code in the diff doesn't match the current source...
+      points at: browser/codeActionModel.ts, browser/codeActionController.ts
+
+    #333308  Gate new Gemini Flash prompt guidance behind an experiment...
+      has tests | 121 lines, 5 file(s)
+      https://github.com/microsoft/vscode/pull/333308
+      why: This is a genuine, well-tested contribution (experiment flag, model-family gating, unit tests) but there's no evidence it...
+      points at: agent/geminiPrompts.tsx, test/agentPrompt.spec.tsx
+
+    #332998  Allow ZIP selection for manually installed dictation models
+      code matches its description | no tests | 0 lines, 1 file(s)
+      https://github.com/microsoft/vscode/pull/332998
+      why: The diff plausibly removes an overly restrictive file filter as described, but there's no verifiable evidence this addresses a...
+      points at: actions/installDictationModelAction.ts
+
+--------------------------------------------------------------------------
+  LEAVE UNTIL LAST  (0)
+  Least supported by evidence. NOT a verdict that they are bad.
+--------------------------------------------------------------------------
+    nothing here
+
+==========================================================================
+  SECOND OPINION
+==========================================================================
+
+  These were closed without merging, but the evidence says they were
+  well supported. Not an accusation. Worth thirty seconds each.
+
+    #308696  Close non-dirty editors when cancelling Close All Editors
+      fixes reported #305306 | code matches its description | no tests | 44 lines, 1 file(s)
+      https://github.com/microsoft/vscode/pull/308696
+
+    #324044  Report when buffered events are flushed to a late listener
+      code matches its description | has tests | 99 lines, 7 file(s)
+      https://github.com/microsoft/vscode/pull/324044
+
+==========================================================================
+  Every number above resolves against the repository. Nothing was
+  posted, closed, merged or commented on. You decide.
+==========================================================================

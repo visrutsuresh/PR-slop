@@ -12,11 +12,15 @@
 # committed responses are the record.
 set -euo pipefail
 
-usage() { echo "usage: $0 {harvest|probe|baseline|advanced|eval}" >&2; exit 1; }
+usage() { echo "usage: $0 {triage|harvest|probe|baseline|advanced|eval}" >&2; exit 1; }
 
 [ $# -eq 1 ] || usage
 
 case "$1" in
+  triage)
+    echo "[triage] the product: one page a maintainer reads. offline, from the cache."
+    python3 triage.py
+    ;;
   harvest)
     if [ "${REGENERATE:-0}" != "1" ]; then
       echo "[harvest] cached. data/ already holds the 15-case evaluation set."
