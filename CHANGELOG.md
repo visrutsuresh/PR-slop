@@ -273,7 +273,7 @@ Two gaps the CEO found in the live tool.
 
 **"How does it decide how many go in each pile?"** It did not. Each submission is judged on its own, so the piles are whatever falls out. With eight open pull requests that is fine. Point it at a busy repository with two hundred and the first pile could hold sixty, which is the original problem with extra steps.
 
-Fixed without touching the model. Within each group, submissions are ordered by how much CHECKED evidence supports them: a confirmed link to a reported problem, then a confirmed description, then tests, then size. **Size ranks last deliberately.** A large diff is work, not value, and ranking by it would reward the exact thing this tool exists to filter.
+Fixed without touching the model. Within each group, submissions are ordered by how much CHECKED evidence supports them: a confirmed link to a reported problem, then a confirmed description, then tests, then size. **Size ranks last deliberately.** A large diff is work, not value, and ranking by it would reward the exact thing this tool exists to filter. **Corrected later:** this ordering rule is withdrawn, both the tests-and-size keys and the "size ranks last" claim about the code, under the section "Size never ranked last, it ranked first" below, which states the key that actually ships.
 
 Then a cap: only the strongest few per group are marked as today's reading, 5 and 8. The rest sit behind one click, still ordered. **Nothing is hidden.** A hidden submission is one nobody ever looks at again, which is the harm we are trying to prevent, so collapsing is as far as we go.
 
@@ -291,12 +291,23 @@ evidence on the page, because it is a statement by the person who wrote the
 code rather than something a model inferred. We were deleting it and then
 binning the submission for having no evidence of a link.
 
-Measured on the eight-submission run at commit `e3ce07e8`, recorded in
-`reports/microsoft-vscode.json`: **three of eight submissions declared a
-reference and all three were destroyed** (#333390 declared #231076, #333399
-declared #333395, #333404 declared #330410; all three are real open issues).
-One of them, #333390, had it removed from its **title**, so the page rendered
+Measured on the eight-submission run of 2026-08-30 20:01 UTC: **three of eight
+submissions declared a reference and all three were destroyed** (#333390
+declared #231076, #333399 declared #333395, #333404 declared #330410; all three
+are real open issues).
+
+A run writes its record to `reports/` (`live.py`), and this repository tracks
+nothing in there except the one example page, so that run would have left
+nothing to check. A reduced copy of its record is therefore
+committed at `data/live-record-prefix.json`: every field kept is verbatim, with
+the raw GitHub objects, the submission bodies and the patches removed, because
+those carry contributor identity this project does not publish. In it, all
+three of those submissions carry an empty `problems` list, and #333390 had the
+reference removed from its **title**, so the page rendered
 `[REDACTED-CLOSING-REF]: Restore NODE_OPTIONS environment variable on Windows`.
+The three declarations themselves are readable on the later page,
+`reports/example-microsoft-vscode.html`, generated after this fix: *author's
+text: "Fix #231076"*, *"This PR fixes #333395"*, *"Fixes #330410"*.
 
 Five things changed, none of them the model or any prompt.
 
@@ -329,16 +340,24 @@ membership object, with `agent_v4.py` unedited, so the evaluation path (which
 builds its own plain set) cannot move.
 
 **The line count was measured off a truncated string.** The patch is capped at
-40000 characters before the counter runs, so every large submission was
-undercounted. #333423 read **209 lines against GitHub's 608**, #333404 read 242
-against 566. The control is exact: in that same run #333426's patch was 34411
-characters, under the cap, and its count of 473 matched GitHub's additions to
-the line. Both wrong ones sat at exactly 40000. (That pull request has had
-commits pushed to it since, so GitHub now reports a larger number for it. The
-comparison above is between the run record and GitHub as it stood at commit
-`e3ce07e8`, which is the only comparison that means anything.) The count now comes from GitHub's own per-file `additions`,
-and the file fetch is paginated, which it was not: above 100 changed files the
-file list was silently short too.
+40000 characters before the counter runs (`live.py`), so every large submission
+was undercounted. #333423 read **209 lines against GitHub's 608**, #333404 read
+242 against 566. The control is exact, and it is scoped to a run rather than to
+a commit: in that same run #333426's patch came in under the cap, and its count
+of 473 matched GitHub's additions to the line. Both wrong ones were over it. The
+count now comes from GitHub's own per-file `additions`, and the file fetch is
+paginated, which it was not: above 100 changed files the file list was silently
+short too.
+
+One number needs saying out loud, because two committed files disagree about it
+and neither is wrong. 473 and 544 are the same pull request read an hour apart,
+with commits pushed to #333426 in between. `data/live-record-prefix.json` is the
+pre-fix run of eight submissions, generated 2026-08-30 20:01 UTC, and records
+473 lines for it; `reports/example-microsoft-vscode.html` is the later run of
+nine, generated 21:00 UTC, and shows 544. Both name commit `e3ce07e8`, which is
+microsoft/vscode's own default branch head: it pins the source the roles read,
+not the state of any one submission, so it cannot separate the two figures. The
+run is the unit of comparison here. The sha is not.
 
 **A citation shape the model really returns used to crash the run.** `#333395
 (memory tool)` starts with `#`, and `int(c[1:])` raises on it, after the entire
@@ -367,15 +386,16 @@ tool "would be the sixth mislabelled number in this project". The sixth arrived
 anyway, through a different door.
 
 That section claimed **#333399 was correctly linked to reported problem
-#333395**. The shipped run record says the opposite. In
-`reports/microsoft-vscode.json` that submission carries no citations, no
+#333395**. The run record says the opposite. In
+`data/live-record-prefix.json` that submission carries no citations, no
 reported problems, pile 3, and a reason that explicitly REJECTS the link: *"No
 verifiable evidence the linked issue #333395 or others actually correspond to
-this bug."*
+this bug"*.
 
 Worth being precise about what went wrong, because it is not a typo. The line
-describes a five-submission run at 145 seconds and 2.28 USD whose record is not
-in this repository, and it contradicts the record that is. So it is not merely
+describes a five-submission run at 145 seconds and 2.28 USD whose record this
+repository does not have, and it contradicts the eight-submission record that is
+now committed here as `data/live-record-prefix.json`. So it is not merely
 contradicted, it is unreproducible, which is the worse of the two.
 
 The cause is understood and is fixed in the section above: live mode was
@@ -384,8 +404,8 @@ binning the submission for having no evidence of a link. Three of eight
 submissions in that run declared a reference and all three were destroyed.
 
 The corrected claim, taken from the record instead of from memory, specifically
-the eight-submission run at commit `e3ce07e8` recorded in
-`reports/microsoft-vscode.json` **before** this change: of the eight open
+the eight-submission run of 2026-08-30 20:01 UTC, taken **before** this change
+and committed at `data/live-record-prefix.json`: of the eight open
 submissions, **six returned at least one citation (an issue number or a file
 path), and only one of those was an issue number**, two returned nothing, there
 were zero invented references, and exactly one had a confirmed link to an

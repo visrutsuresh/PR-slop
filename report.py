@@ -157,18 +157,23 @@ def card(r, repo):
 # reading order instead ("Read these first", "Leave until last"), a different
 # claim from the one behind them.
 GROUPS = [
-    (1, "b1", "Predicted merge, and it answers something already reported",
+    (1, "b1", "Predicted merge, and the model tied it to an already-reported "
+     "problem",
      "A prediction about what a maintainer would decide, not a measurement. "
-     "The order inside the group is evidence strength."),
-    (2, "b2", "Predicted merge, with nothing reported to attach it to",
-     "Same prediction, minus the link to an already-reported problem. The "
+     "The link to a reported problem is the model's, checked against GitHub "
+     "before you saw it. The order inside the group is evidence strength."),
+    (2, "b2", "Predicted merge, with no reported problem cited by the model",
+     "Same prediction, without the model finding and citing an already-"
+     "reported problem for it. That describes the model's search, not the "
+     "world: a card below can still carry the author's own declared "
+     "reference, which is machine-derived and does not move the group. The "
      "order inside the group is evidence strength."),
     (3, "b3", "Predicted not merged",
      "A prediction about a human decision, NOT a judgement that the work is "
      "bad. Housekeeping, superseded work and duplicates all land here."),
-    (0, "bx", "Not enough evidence to predict either way",
-     "The model declined to call these rather than guess. Shown rather than "
-     "hidden."),
+    (0, "bx", "No prediction either way",
+     "The model declined to call these rather than guess, which says nothing "
+     "about the evidence on the cards below. Shown rather than hidden."),
 ]
 
 

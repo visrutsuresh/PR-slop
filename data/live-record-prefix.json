@@ -1,0 +1,245 @@
+{
+  "repo": "microsoft/vscode",
+  "sha": "e3ce07e8fe526cd0fdd39a4da95f376bf65cfa2d",
+  "corpus": 300,
+  "generated": "2026-08-30 20:01 UTC",
+  "derivation": "Reduced copy of the live run record produced BEFORE the closing-reference fix. Removed: the raw GitHub `pr` objects, the submission bodies and the patches. Those carry contributor identity (logins, avatar URLs, fork branch labels), which this repository does not publish. Everything kept is copied verbatim from that record, field for field, with no values changed. Line and file counts are the ones that run recorded, including the two the 40000-character truncation got wrong.",
+  "results": [
+    {
+      "input": {
+        "number": 333426,
+        "title": "Show action icons on title bar buttons again"
+      },
+      "verdict": {
+        "bucket": 2,
+        "confidence": "low",
+        "reason": "Genuine UI fix for a real regression (icons disappearing behind spinners), but no evidence it maps to an already-filed issue, and the claim checker suggests the diff may not have landed cleanly in the current source.",
+        "citations": [
+          "src/vs/platform/actions/browser/buttonbar.ts",
+          "src/vs/platform/actions/browser/buttonbar.css"
+        ],
+        "_claim_supported": false,
+        "_cost": 0.4955
+      },
+      "facts": {
+        "problems": [],
+        "invented": [],
+        "has_tests": true,
+        "files": 8,
+        "lines": 473,
+        "claim": false
+      },
+      "cost": 0.4955,
+      "searches": 2,
+      "rank": 4,
+      "today": true,
+      "group_size": 4
+    },
+    {
+      "input": {
+        "number": 333423,
+        "title": "nes: let settings and experiments override baked strategy values"
+      },
+      "verdict": {
+        "bucket": 1,
+        "confidence": "medium",
+        "reason": "The diff genuinely implements the described precedence fix (settings/experiments over baked model config) and follows explicit prior work (#332018/#332316/#332802), matching the pattern of already-reported precedence bugs like #333154.",
+        "citations": [
+          "#333154",
+          "extensions/copilot/src/platform/inlineEdits/common/modelConfigurationResolution.ts"
+        ],
+        "_claim_supported": true,
+        "_cost": 0.3051
+      },
+      "facts": {
+        "problems": [
+          "#333154"
+        ],
+        "invented": [],
+        "has_tests": true,
+        "files": 24,
+        "lines": 209,
+        "claim": true
+      },
+      "cost": 0.3051,
+      "searches": 2,
+      "rank": 1,
+      "today": true,
+      "group_size": 1
+    },
+    {
+      "input": {
+        "number": 333418,
+        "title": "refactor: migrate AsyncIterableObject to AsyncIterableProducer to fix memory leaks"
+      },
+      "verdict": {
+        "bucket": 3,
+        "confidence": "medium",
+        "reason": "The diff is a superficial class rename (AsyncIterableObject -> AsyncIterableProducer) with no actual leak-fixing logic shown, bundled with unrelated and suspicious changes: whitespace-only edits to a file explicitly marked 'DO NOT MODIFY THIS FILE MANUALLY' and deletion of a built test/dist HTML artifact, none of which fit the stated purpose.",
+        "citations": [
+          "src/vs/base/common/async.ts",
+          ".config/1espt/PipelineAutobaseliningConfig.yml",
+          "test/monaco/dist/core.html"
+        ],
+        "_claim_supported": true,
+        "_cost": 0.3024
+      },
+      "facts": {
+        "problems": [],
+        "invented": [],
+        "has_tests": true,
+        "files": 7,
+        "lines": 15,
+        "claim": true
+      },
+      "cost": 0.3024,
+      "searches": 2,
+      "rank": 1,
+      "today": true,
+      "group_size": 3
+    },
+    {
+      "input": {
+        "number": 333404,
+        "title": "editor: show session homes in breadcrumbs"
+      },
+      "verdict": {
+        "bucket": 3,
+        "confidence": "low",
+        "reason": "Plumbing-only change (adds a getUriHome API, a home field on the formatter interface, and a session-provider collector) with no wiring shown into actual label/breadcrumb rendering, and the investigator's link to #332933 is unverified circumstantial evidence rather than a confirmed match; without stronger signal this reads more like an in-progress internal refactor than a merged fix.",
+        "citations": [],
+        "_claim_supported": "cannot tell",
+        "_cost": 0.2206
+      },
+      "facts": {
+        "problems": [],
+        "invented": [],
+        "has_tests": true,
+        "files": 21,
+        "lines": 242,
+        "claim": "cannot tell"
+      },
+      "cost": 0.2206,
+      "searches": 1,
+      "rank": 2,
+      "today": true,
+      "group_size": 3
+    },
+    {
+      "input": {
+        "number": 333399,
+        "title": "Fix Copilot memory tool infinite loop with empty old_str in str_replace"
+      },
+      "verdict": {
+        "bucket": 3,
+        "confidence": "low",
+        "reason": "No verifiable evidence the linked issue #333395 or others actually correspond to this bug, and I cannot access the repository to confirm merge status or code accuracy; the described fix is plausible but on this project small defensive-guard PRs like this are frequently superseded or duplicated by maintainer-authored fixes.",
+        "citations": [],
+        "_claim_supported": "cannot tell",
+        "_cost": 0.1907
+      },
+      "facts": {
+        "problems": [],
+        "invented": [],
+        "has_tests": true,
+        "files": 2,
+        "lines": 26,
+        "claim": "cannot tell"
+      },
+      "cost": 0.1907,
+      "searches": 1,
+      "rank": 3,
+      "today": true,
+      "group_size": 3
+    },
+    {
+      "input": {
+        "number": 333397,
+        "title": "fix: memory leak in extension host pseudoterminals"
+      },
+      "verdict": {
+        "bucket": 2,
+        "confidence": "medium",
+        "reason": "Genuine substantive fix with a coherent diff and new regression test addressing a real memory leak, but no evidence it was tied to an already-reported issue.",
+        "citations": [
+          "src/vs/workbench/api/common/extHostTerminalService.ts"
+        ],
+        "_claim_supported": true,
+        "_cost": 0.3043
+      },
+      "facts": {
+        "problems": [],
+        "invented": [],
+        "has_tests": true,
+        "files": 2,
+        "lines": 90,
+        "claim": true
+      },
+      "cost": 0.3043,
+      "searches": 2,
+      "rank": 1,
+      "today": true,
+      "group_size": 4
+    },
+    {
+      "input": {
+        "number": 333391,
+        "title": "Fix workspace symbol search with double-colon qualifiers"
+      },
+      "verdict": {
+        "bucket": 2,
+        "confidence": "low",
+        "reason": "Genuine, self-contained fix with a real test that matches its stated behavior, but no evidence it corresponds to an already-reported issue despite the referenced number.",
+        "citations": [
+          "src/vs/workbench/contrib/search/browser/symbolsQuickAccess.ts",
+          "src/vs/workbench/contrib/search/test/browser/symbolsQuickAccess.test.ts"
+        ],
+        "_claim_supported": true,
+        "_cost": 0.49
+      },
+      "facts": {
+        "problems": [],
+        "invented": [],
+        "has_tests": true,
+        "files": 2,
+        "lines": 70,
+        "claim": true
+      },
+      "cost": 0.49,
+      "searches": 2,
+      "rank": 2,
+      "today": true,
+      "group_size": 4
+    },
+    {
+      "input": {
+        "number": 333390,
+        "title": "[REDACTED-CLOSING-REF]: Restore NODE_OPTIONS environment variable on Windows"
+      },
+      "verdict": {
+        "bucket": 2,
+        "confidence": "medium",
+        "reason": "Real, verified code change extending an existing macOS NODE_OPTIONS workaround to Windows, with tests and typecheck passing, but no evidence it maps to a specific already-reported issue.",
+        "citations": [
+          "src/vs/workbench/contrib/terminal/common/terminalEnvironment.ts",
+          "resources/win32/bin/code.cmd"
+        ],
+        "_claim_supported": true,
+        "_cost": 0.4864
+      },
+      "facts": {
+        "problems": [],
+        "invented": [],
+        "has_tests": true,
+        "files": 4,
+        "lines": 54,
+        "claim": true
+      },
+      "cost": 0.4864,
+      "searches": 2,
+      "rank": 3,
+      "today": true,
+      "group_size": 4
+    }
+  ]
+}
