@@ -26,7 +26,17 @@ The floor for three equal piles is 33.3%, so **the simple version scored exactly
 ./run.sh agent       # the numbers above, recomputed
 ```
 
-No account, no network, no cost, from a fresh clone. Full command list under Quickstart. `PRE-EXISTING.md` lists what existed before kickoff.
+No account, no network, no cost, from a fresh clone.
+
+**Point it at your own repository.** This is the tool rather than the evaluation:
+
+```bash
+./run.sh live microsoft/vscode      # or any owner/repo
+```
+
+It triages the pull requests **actually open** right now and writes a page you open in a browser. This one does need a GitHub login and the model, because there is nothing to replay: the queue is different every day.
+
+**Say plainly what changes here.** Everything scored in this README runs on 15 **closed** submissions, because closed ones are the only place answers exist. A maintainer's queue is **open** submissions, where no answer exists at all, which is exactly why they want help. The system is identical; it simply cannot be scored there, and we are not going to invent a number for it. What it gives you is checked evidence and a suggested order. Full command list under Quickstart. `PRE-EXISTING.md` lists what existed before kickoff.
 
 ## Intended user
 

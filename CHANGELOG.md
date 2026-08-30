@@ -244,3 +244,25 @@ Checking the run records: **it read real source on all fifteen.** On five it ret
 Relabelled in every version of the agent and corrected in the README. The honest version is also the better one: it reads the source every time, and where the code does not settle the question it says so instead of guessing.
 
 **Fifth time now** that a number in this project meant something other than what it was labelled. The others: a citation rate counting free self-quotes, an evidence rate counting silence as a lie, an invented reading time, and a verifier capability stated without its frequency. The common thread is never arithmetic. It is a label written once, early, and then trusted.
+
+## From evaluation to tool: live open pull requests, and a page instead of terminal text
+
+**The gap, named by the CEO.** "A real tool that maintainers are willing to use isn't a script and terminal text, and it should show them the open PRs, not the closed ones already."
+
+Both halves were right, and together they were the difference between an evaluation wearing a product's clothes and something a person would actually run.
+
+**Why everything until now used closed submissions.** Because that is the only place answers exist. You cannot score a system against pull requests nobody has decided on yet. That constraint shaped the whole project and it was the correct call for measuring, but it meant the tool had never once been pointed at the thing it exists for.
+
+**`./run.sh live owner/repo`** fetches the pull requests actually waiting on any repository, pulls that project's recorded problems to search, and runs the same four roles. Nothing about the system changed. What changed is what it is aimed at.
+
+**Run against the real `microsoft/vscode` queue, five open submissions:**
+
+- **#333399** was correctly linked to reported problem **#333395**, a live link that did not exist when this project started
+- **zero invented references** across all five
+- 145 seconds, 2.28 USD
+
+**And a page instead of terminal text.** `report.py` writes a self-contained HTML file: no server, no build step, no internet. Three design rules, each from a real constraint. Every claim carries its evidence beside it, because a triage tool a maintainer cannot audit is one they stop trusting after the first wrong call. Anything unconfirmed is shown as unconfirmed rather than quietly dropped. And nothing is ever presented as a decision.
+
+**What the page says about its own limits**, in the footer, because a maintainer deserves to read it before they trust the order: *it does not know your roadmap, your release schedule, or that you already decided against an approach. Those are the reasons good work gets closed, and it cannot see any of them.*
+
+**No score is claimed here and none will be.** Open submissions have no answer to check against. Inventing an accuracy figure for the live tool would be the sixth mislabelled number in this project, and the previous five are already written up above.

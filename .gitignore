@@ -8,3 +8,4 @@ traces/*.jsonl
 traces_test/
 results/
 .DS_Store
+reports/
