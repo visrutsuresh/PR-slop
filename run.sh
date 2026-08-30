@@ -12,7 +12,7 @@
 # committed responses are the record.
 set -euo pipefail
 
-usage() { echo "usage: $0 {live <owner/repo>|triage [pr-number]|evidence|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
+usage() { echo "usage: $0 {live <owner/repo> [pr-number]|triage [pr-number]|evidence|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
 
 [ $# -ge 1 ] && [ $# -le 3 ] || usage
 
@@ -22,8 +22,12 @@ case "$1" in
     # requests really waiting there, then writes a page you open in a browser.
     # Needs gh and the model, because there is nothing cached to replay: the
     # queue is different every day. That is the point.
-    [ -n "${2:-}" ] || { echo "usage: $0 live <owner/repo>   e.g. $0 live microsoft/vscode" >&2; exit 1; }
-    python3 live.py "$2" --limit "${PRSLOP_LIMIT:-8}"
+    [ -n "${2:-}" ] || { echo "usage: $0 live <owner/repo> [pr-number]" >&2; exit 1; }
+    if [ -n "${3:-}" ]; then
+      python3 live.py "$2" --pr "$3"
+    else
+      python3 live.py "$2" --limit "${PRSLOP_LIMIT:-8}"
+    fi
     ;;
   triage)
     # optional second argument: a pull request number, for a reviewer working

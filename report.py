@@ -42,6 +42,12 @@ main{padding:30px 26px 90px}
 .pr .top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
 .num{font:600 14px ui-monospace,Menlo,monospace;color:var(--muted)}
 .title{font-weight:650;font-size:17px;flex:1;min-width:240px}
+.rank{font:600 12px ui-monospace,Menlo,monospace;color:#8a8078;background:#f2ede5;
+  padding:2px 8px;border-radius:6px}
+.rest{margin-top:8px}
+.rest summary{cursor:pointer;color:var(--muted);font-size:14.5px;padding:9px 2px;
+  list-style:revert}
+.rest summary:hover{color:var(--ink)}
 .chips{margin:11px 0 0;display:flex;gap:7px;flex-wrap:wrap}
 .chip{font-size:13px;padding:3px 10px;border-radius:999px;background:#f2ede5;color:#5c554e}
 .chip.ok{background:#e6f4ec;color:var(--green)}
@@ -89,8 +95,10 @@ def card(r, repo):
     if strong and v.get("bucket") == 3:
         flag = ('<div class="flag">The evidence here is stronger than the '
                 'suggested order implies. Worth a look before you skip it.</div>')
+    rankbadge = (f'<span class="rank">{r["rank"]} of {r["group_size"]}</span>'
+                 if r.get("group_size", 0) > 1 else "")
     return f"""<article class="pr">
-  <div class="top"><span class="num">#{n}</span>
+  <div class="top"><span class="num">#{n}</span>{rankbadge}
     <span class="title">{esc(ci['title'])}</span></div>
   <div class="chips">{chips(f)}</div>
   <div class="why"><b>Why:</b> {esc((v.get('reason') or '')[:280])}</div>
@@ -120,12 +128,20 @@ def write(data, path):
         grp = [r for r in rs if (r["verdict"].get("bucket") or 0) == b]
         if not grp:
             continue
-        grp.sort(key=lambda r: (-len(r["facts"]["problems"]),
-                                -r["facts"]["lines"]))
-        parts.append(f'<section class="group {cls}"><div class="bar"></div>'
-                     f'<h2>{name} <span class="num">{len(grp)}</span></h2>'
-                     f'<p>{note}</p>' +
-                     "".join(card(r, repo) for r in grp) + "</section>")
+        grp.sort(key=lambda r: r.get("rank", 999))
+        today = [r for r in grp if r.get("today", True)]
+        later = [r for r in grp if not r.get("today", True)]
+        head = (f'<section class="group {cls}"><div class="bar"></div>'
+                f'<h2>{name} <span class="num">{len(grp)}</span></h2>'
+                f'<p>{note}</p>')
+        body_html = "".join(card(r, repo) for r in today)
+        if later:
+            body_html += (
+                f'<details class="rest"><summary>{len(later)} more in this '
+                f'group, ordered by how much evidence supports them. Nothing '
+                f'is hidden, this is just not today\'s reading.</summary>'
+                + "".join(card(r, repo) for r in later) + "</details>")
+        parts.append(head + body_html + "</section>")
 
     body = "\n".join(parts)
     out = f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
@@ -142,6 +158,10 @@ def write(data, path):
 </div></header>
 <main><div class="wrap">{body}</div></main>
 <footer><div class="wrap">
+  <div><span class="k">The order</span> Within each group, by how much
+  <em>checked</em> evidence supports it: a confirmed link to a reported problem
+  first, then a confirmed description, then tests, then size. Size ranks last on
+  purpose, because a large diff is work, not value.</div>
   <div><span class="k">How to read it</span> Every claim shows its evidence.
   Anything unconfirmed says so rather than being dropped.</div>
   <div><span class="k">What it cannot do</span> It does not know your roadmap,

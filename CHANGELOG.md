@@ -266,3 +266,15 @@ Both halves were right, and together they were the difference between an evaluat
 **What the page says about its own limits**, in the footer, because a maintainer deserves to read it before they trust the order: *it does not know your roadmap, your release schedule, or that you already decided against an approach. Those are the reasons good work gets closed, and it cannot see any of them.*
 
 **No score is claimed here and none will be.** Open submissions have no answer to check against. Inventing an accuracy figure for the live tool would be the sixth mislabelled number in this project, and the previous five are already written up above.
+
+## Deciding how much is worth reading today, and pointing at one submission
+
+Two gaps the CEO found in the live tool.
+
+**"How does it decide how many go in each pile?"** It did not. Each submission is judged on its own, so the piles are whatever falls out. With eight open pull requests that is fine. Point it at a busy repository with two hundred and the first pile could hold sixty, which is the original problem with extra steps.
+
+Fixed without touching the model. Within each group, submissions are ordered by how much CHECKED evidence supports them: a confirmed link to a reported problem, then a confirmed description, then tests, then size. **Size ranks last deliberately.** A large diff is work, not value, and ranking by it would reward the exact thing this tool exists to filter.
+
+Then a cap: only the strongest few per group are marked as today's reading, 5 and 8. The rest sit behind one click, still ordered. **Nothing is hidden.** A hidden submission is one nobody ever looks at again, which is the harm we are trying to prevent, so collapsing is as far as we go.
+
+**"It should be able to be pointed at a specific open one."** `./run.sh live owner/repo 333418`. Verified against a live open submission: 54 seconds, 0.30 USD, its own page. A reviewer working a queue by hand wants this far more often than the whole list.

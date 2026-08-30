@@ -31,12 +31,19 @@ No account, no network, no cost, from a fresh clone.
 **Point it at your own repository.** This is the tool rather than the evaluation:
 
 ```bash
-./run.sh live microsoft/vscode      # or any owner/repo
+./run.sh live microsoft/vscode           # the open queue
+./run.sh live microsoft/vscode 333418    # one specific open pull request
 ```
 
 It triages the pull requests **actually open** right now and writes a page you open in a browser. This one does need a GitHub login and the model, because there is nothing to replay: the queue is different every day.
 
-**Say plainly what changes here.** Everything scored in this README runs on 15 **closed** submissions, because closed ones are the only place answers exist. A maintainer's queue is **open** submissions, where no answer exists at all, which is exactly why they want help. The system is identical; it simply cannot be scored there, and we are not going to invent a number for it. What it gives you is checked evidence and a suggested order. Full command list under Quickstart. `PRE-EXISTING.md` lists what existed before kickoff.
+**Say plainly what changes here.** Everything scored in this README runs on 15 **closed** submissions, because closed ones are the only place answers exist. A maintainer's queue is **open** submissions, where no answer exists at all, which is exactly why they want help. The system is identical; it simply cannot be scored there, and we are not going to invent a number for it. What it gives you is checked evidence and a suggested order.
+
+**How the order is decided, since "which pile" is not enough on a real queue.** The decider judges each submission on its own, so on a busy repository "read these first" could hold sixty items, which is the original problem with extra steps. Two things fix that, and neither is a model change.
+
+Within each group, submissions are ordered by how much **checked** evidence supports them: a confirmed link to a reported problem first, then a confirmed description, then tests, then size. **Size ranks last on purpose, because a large diff is work, not value.**
+
+Then only the strongest few in each group are marked as today's reading, currently 5 in the first group and 8 in the second. The rest stay visible behind one click, still ordered. **Nothing is hidden**, because a hidden submission is one nobody looks at again, and that is exactly the harm this tool exists to prevent. Full command list under Quickstart. `PRE-EXISTING.md` lists what existed before kickoff.
 
 ## Intended user
 

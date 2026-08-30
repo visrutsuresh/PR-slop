@@ -42,6 +42,16 @@ def gh(path, jq=None):
     return r.stdout
 
 
+def fetch_one(repo, number):
+    """Point it at one specific open pull request. A reviewer working a queue by
+    hand wants this far more often than they want the whole list."""
+    pr = json.loads(gh(f"repos/{repo}/pulls/{number}"))
+    if pr.get("state") != "open":
+        print(f"note: #{number} is {pr.get('state')}, not open. Triaging anyway.",
+              file=sys.stderr)
+    return [pr]
+
+
 def fetch_open_prs(repo, limit, include_drafts=False):
     out = []
     page = 1
@@ -125,9 +135,13 @@ def facts_for(ci, verdict, known):
     }
 
 
-def run(repo, limit, include_drafts):
-    print(f"[live] fetching open pull requests from {repo}")
-    prs = fetch_open_prs(repo, limit, include_drafts)
+def run(repo, limit, include_drafts, only=None):
+    if only:
+        print(f"[live] fetching pull request #{only} from {repo}")
+        prs = fetch_one(repo, only)
+    else:
+        print(f"[live] fetching open pull requests from {repo}")
+        prs = fetch_open_prs(repo, limit, include_drafts)
     if not prs:
         print("no open pull requests found", file=sys.stderr)
         return None
@@ -160,9 +174,42 @@ def run(repo, limit, include_drafts):
                         "facts": facts_for(ci, v, known),
                         "cost": v["_cost"],
                         "searches": found["rounds"]})
+    rank(results)
     return {"repo": repo, "sha": sha, "corpus": len(corpus),
             "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
             "results": results}
+
+
+def rank(results):
+    """Order within each pile, and mark how many are worth doing today.
+
+    The decider judges each submission on its own, so with a large queue a pile
+    can hold sixty items, which is the original problem again. Two things fix
+    that, and neither is a model change.
+
+    Ordering: by how much CHECKED evidence supports it. A confirmed link to a
+    reported problem outranks a confirmed description, which outranks tests,
+    which outranks size. Size is last on purpose, because a big diff is work,
+    not value.
+
+    A cap: only the strongest few in each pile are marked as today's reading.
+    The rest stay visible and stay ordered. Nothing is hidden, because a hidden
+    submission is one nobody ever looks at again.
+    """
+    CAP = {1: 5, 2: 8, 3: 99, 0: 99}
+    for bucket in (1, 2, 3, 0):
+        grp = [r for r in results if (r["verdict"].get("bucket") or 0) == bucket]
+        grp.sort(key=lambda r: (
+            -len(r["facts"]["problems"]),
+            -(1 if r["facts"]["claim"] is True else 0),
+            -(1 if r["facts"]["has_tests"] else 0),
+            -r["facts"]["lines"],
+        ))
+        for i, r in enumerate(grp):
+            r["rank"] = i + 1
+            r["today"] = i < CAP.get(bucket, 99)
+        for r in grp:
+            r["group_size"] = len(grp)
 
 
 if __name__ == "__main__":
@@ -170,13 +217,14 @@ if __name__ == "__main__":
     ap.add_argument("repo", help="owner/name, e.g. microsoft/vscode")
     ap.add_argument("--limit", type=int, default=8)
     ap.add_argument("--drafts", action="store_true", help="include drafts")
+    ap.add_argument("--pr", type=int, help="triage one specific pull request")
     a = ap.parse_args()
     t0 = time.time()
-    data = run(a.repo, a.limit, a.drafts)
+    data = run(a.repo, a.limit, a.drafts, a.pr)
     if not data:
         raise SystemExit(1)
     os.makedirs(OUT_DIR, exist_ok=True)
-    slug = a.repo.replace("/", "-")
+    slug = a.repo.replace("/", "-") + (f"-pr{a.pr}" if a.pr else "")
     json.dump(data, open(f"{OUT_DIR}/{slug}.json", "w"), indent=2, default=str)
     import report
     path = report.write(data, f"{OUT_DIR}/{slug}.html")
