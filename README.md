@@ -135,11 +135,18 @@ See `CHANGELOG.md`. Every meaningful change is logged there with the evidence th
 
 ## Main failure mode
 
-**It is good at spotting work that was accepted and poor at spotting work that was not.** It catches 1 of 5 not-merged items, against 5 of 5 on both merged piles.
+**The decider quietly overrules the searcher, and it is wrong to.** Per-pile the shipped system scores 3 / 4 / 4. Its weakest pile is the first one, the work you most want surfaced.
 
-That is the wrong way round for a tool whose purpose is finding the pile you can safely leave until last, and we are not going to dress it up. Overall accuracy of 73.3% hides it, which is why the per-pile numbers are printed next to it everywhere.
+Both misses have the same shape, and we can point at them:
 
-The cause is visible in our own evaluation design and we wrote it down before running anything. On this project "not merged" mostly does not mean poor work. Of seventeen such pull requests we inspected, four were automated housekeeping and about ten were maintainers closing their own real work in favour of another approach. Our system reads those as genuine contributions, because they are genuine contributions. It is being marked wrong for being right about the work and wrong about the outcome.
+- **pr-332998.** The investigator concluded this fixes reported problem #332537. Correct. The adjudicator wrote "no verifiable evidence this addresses a specific already-reported issue" and downgraded it.
+- **pr-333295.** The investigator concluded #331834. Correct. The adjudicator filed it under a different number entirely.
+
+In both cases a specialised role did its job and the role above it redid that job badly on a hunch. We attempted a fix in version 5, telling the adjudicator to accept the investigator's conclusion. It **overcorrected catastrophically**, 73.3% down to 46.7%, because we had loosened the investigator the version before, so binding plus loose put nearly everything in one pile. Version 6 tried graded certainty and reached 66.7%. Neither beat version 4, so version 4 ships with the flaw intact and documented.
+
+**Why we stopped rather than keep trying.** One case is worth 6.7 points on fifteen. Six attempts against the same fifteen answers is already the point where a better number stops meaning a better system. Fixing this properly needs more cases, not more prompt wording, and that is written up as the honest next step rather than attempted in the last hours.
+
+**The older weakness, now largely fixed, recorded because we published it.** Earlier versions were poor at the not-merged pile, 1 in 5 for the intermediate script. The shipped agent gets 4 in 5. We are leaving this note in because an earlier README stated the old figure as current, and silently deleting a published weakness is worse than correcting it in the open.
 
 ## Hot take
 
