@@ -7,9 +7,11 @@ Written for someone starting from nothing, with no account of any kind.
 ```bash
 git clone https://github.com/visrutsuresh/PR-slop
 cd PR-slop
+./run.sh triage      # the product: one page a maintainer reads
 ./run.sh eval        # checks
 ./run.sh baseline    # the simple version's numbers
-./run.sh advanced    # our system's numbers
+./run.sh script      # the intermediate two-stage version
+./run.sh agent       # the shipped system's numbers
 ```
 
 That is everything. **No account, no key, no payment, no internet.** Those three commands reproduce every number in the README exactly.
@@ -36,14 +38,17 @@ citations, free   : 12 file paths copied from the case's own input
 citations, real   : 1/3 issue numbers exist (33.3%)
 declined to call  : 5/15
 
-=== our system, search plus checking ===
-balanced accuracy : 73.3%   per-bucket ['1.00', '1.00', '0.20']
+=== the agent: investigate, check, decide, verify ===
+balanced accuracy : 73.3%   per-bucket ['0.60', '0.80', '0.80']
 false prune       : 0/10 merged items called not-merged
-citations, free   : 15 file paths copied from the case's own input
-citations, real   : 9/9 issue numbers exist (100.0%)
-declined to call  : 0/15
-struck as made up : 0 references removed by the check
+citations, real   : 5/5 issue numbers exist (100.0%)
+searches decided  : 21 rounds across 15 cases (6 the agent chose itself)
+claims tested     : 10/15 against the real source
 ```
+
+Note the two 73.3% figures are not the same system. The intermediate script
+(`./run.sh script`) reaches it by being uniformly generous, scoring 0.20 on the
+pile you actually want to skip. The shipped agent scores 0.80 there.
 
 Roughly two seconds each. No cost.
 

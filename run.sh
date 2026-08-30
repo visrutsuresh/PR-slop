@@ -12,7 +12,7 @@
 # committed responses are the record.
 set -euo pipefail
 
-usage() { echo "usage: $0 {triage|harvest|probe|baseline|advanced|eval}" >&2; exit 1; }
+usage() { echo "usage: $0 {triage|baseline|script|agent|eval|probe|harvest}" >&2; exit 1; }
 
 [ $# -eq 1 ] || usage
 
@@ -43,13 +43,26 @@ case "$1" in
       python3 run_baseline.py --replay
     fi
     ;;
-  advanced)
+  script)
+    # The intermediate two-stage version. Kept because the changelog compares
+    # against it, and because it is the thing the agent had to beat.
     if [ "${REGENERATE:-0}" = "1" ]; then
       python3 isolation_probe.py
       python3 run_advanced.py --generate
     else
-      echo "[advanced] replaying committed responses, no network, no credential"
+      echo "[script] two-stage version, replaying committed responses"
       python3 run_advanced.py --replay
+    fi
+    ;;
+  advanced|agent)
+    # THE SHIPPED SYSTEM. Four roles with a loop. See CHANGELOG.md for the six
+    # versions and why v4 is the one that ships.
+    if [ "${REGENERATE:-0}" = "1" ]; then
+      python3 isolation_probe.py
+      PRSLOP_AGENT_DIR=data/responses/agent-v4 python3 agent_v4.py --generate
+    else
+      echo "[agent] shipped system, replaying committed responses, no credential"
+      PRSLOP_AGENT_DIR=data/responses/agent-v4 python3 agent_v4.py --replay
     fi
     ;;
   eval)

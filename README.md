@@ -38,12 +38,14 @@ The author is not a maintainer and does not claim to be. He is the person standi
 ## Quickstart
 
 ```bash
-./run.sh baseline
-./run.sh advanced
-./run.sh eval
+./run.sh triage      # the product: one page a maintainer reads
+./run.sh baseline    # the simple comparison version
+./run.sh script      # the intermediate two-stage version
+./run.sh agent       # the shipped system, four roles with a loop
+./run.sh eval        # the checks
 ```
 
-`baseline` runs the simple, first-pass solution. `advanced` runs the improved version built on top of it. `eval` runs the checks that confirm both are working. See `docs/reproduction.md` for the full step-by-step guide, written for someone starting from a clean checkout with nothing set up yet.
+All of these replay from committed responses. No account, no network, no cost. See `docs/reproduction.md` for the full step-by-step guide, written for someone starting from a clean checkout with nothing set up yet.
 
 ## How it works
 
