@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The six versions, explained</title>
+<style>
+ :root{--ink:#12100e;--paper:#faf7f2;--muted:#6b6560;--red:#c0392b;--green:#1e7a4d;--amber:#c98a12;--line:#e3ddd3}
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 19px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+ section{max-width:940px;margin:0 auto;padding:80px 26px;border-bottom:1px solid var(--line)}
+ section:last-of-type{border-bottom:0}
+ .step{font:600 13px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+ h1{font-size:clamp(38px,6.5vw,68px);line-height:1.03;letter-spacing:-.03em;margin:0 0 18px;font-weight:800}
+ h2{font-size:clamp(26px,4vw,42px);line-height:1.12;letter-spacing:-.02em;margin:0 0 20px;font-weight:750}
+ h3{font-size:22px;margin:0 0 8px;font-weight:700}
+ p{margin:0 0 18px;max-width:66ch}
+ .quiet{color:var(--muted)}
+ .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 26px;margin:14px 0}
+ .hero{background:var(--ink);color:#f7f3ec;border-bottom:0}.hero h1{color:#fff}.hero p{color:#bdb4a8}
+ table{width:100%;border-collapse:collapse;font-size:17px;margin:12px 0}
+ th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+ th{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+ td.n{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+ .best{background:#f1faf5}
+ .up{color:var(--green);font-weight:700}.down{color:var(--red);font-weight:700}
+ .v{display:inline-block;min-width:34px;padding:3px 9px;border-radius:7px;background:#efe9df;font:700 14px ui-monospace,Menlo,monospace}
+ .pileno{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;border-radius:7px;font:700 14px/26px inherit;margin-right:6px}
+ .b1{background:#e8f3ec;color:var(--green)}.b2{background:#fdf3dc;color:var(--amber)}.b3{background:#fbeae8;color:var(--red)}
+ .row{display:flex;gap:10px;align-items:center;margin:8px 0}
+ .box{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 15px inherit}
+ .ok{background:#e8f3ec;color:var(--green)}.no{background:#fbeae8;color:var(--red)}
+ svg{display:block;width:100%;height:auto}
+ code{font:500 15px ui-monospace,Menlo,monospace;background:#f1ece4;padding:2px 6px;border-radius:5px}
+ .warn{border-left:4px solid var(--amber);padding-left:18px;background:#fffdf6}
+ .good{border-left:4px solid var(--green);padding-left:18px;background:#f8fdfa}
+ .bad{border-left:4px solid var(--red);padding-left:18px;background:#fffaf9}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="step" style="color:#8a8078">PR-slop</div>
+  <h1>Six attempts. One number. Here is what it all means.</h1>
+  <p>What each version changed, how the score is worked out, and why the table looks the way it does.</p>
+</section>
+
+<!-- SCORING -->
+<section>
+  <div class="step">Part 1 &middot; How the score works</div>
+  <h2>Sort 15 things into 3 piles. Count how many landed right.</h2>
+
+  <p>We have <strong>15</strong> real submissions whose fate is already known. Five belong in each pile. The tool guesses; we compare.</p>
+
+  <div class="card">
+    <p style="margin:0 0 14px"><strong>Why not just count correct answers out of 15?</strong></p>
+    <p class="quiet" style="margin:0">Because a lazy tool could put <em>everything</em> in the biggest pile and look decent. So we score each pile separately, then average. A tool has to do well at all three.</p>
+  </div>
+
+  <h3>Worked example, the version we shipped</h3>
+  <div class="card">
+    <div class="row"><span class="pileno b1">1</span><span>Act now &mdash; got <strong>3 of 5</strong> right</span><span class="quiet">= 0.60</span></div>
+    <div class="row"><span class="pileno b2">2</span><span>Worth a look &mdash; got <strong>4 of 5</strong> right</span><span class="quiet">= 0.80</span></div>
+    <div class="row"><span class="pileno b3">3</span><span>Not merged &mdash; got <strong>4 of 5</strong> right</span><span class="quiet">= 0.80</span></div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+    <p style="margin:0"><strong>(0.60 + 0.80 + 0.80) &divide; 3 = 0.733</strong>, which we write as <strong>73.3%</strong>.</p>
+  </div>
+
+  <div class="card warn">
+    <p style="margin:0"><strong>Pure guessing scores 33.3%.</strong> Three piles, so one in three by luck. That is the floor. Anything at 33% has added nothing.</p>
+  </div>
+
+  <div class="card bad">
+    <p style="margin:0"><strong>And one case is worth 6.7 points.</strong> With only 5 items per pile, a single item changing its mind moves the headline by nearly 7. Two versions within 7 points of each other are <strong>not meaningfully different</strong>. Remember that when you read the table.</p>
+  </div>
+</section>
+
+<!-- SECOND NUMBER -->
+<section>
+  <div class="step">Part 2 &middot; The other number</div>
+  <h2>&ldquo;Good work wrongly rejected&rdquo; is the one that would get you shouted at.</h2>
+
+  <svg viewBox="0 0 800 120" role="img" aria-label="Two kinds of mistake, one much worse">
+    <rect x="20" y="20" width="360" height="80" rx="12" fill="#fff" stroke="#e3ddd3"/>
+    <text x="42" y="52" font-size="17" font-weight="700">Rubbish left in the &ldquo;look at this&rdquo; pile</text>
+    <text x="42" y="78" font-size="15" fill="#6b6560">annoying, a human catches it in seconds</text>
+    <rect x="420" y="20" width="360" height="80" rx="12" fill="#fbeae8" stroke="#f0cdc7"/>
+    <text x="442" y="52" font-size="17" font-weight="700" fill="#c0392b">Real work thrown in the reject pile</text>
+    <text x="442" y="78" font-size="15" fill="#a5564b">a person's contribution silently ignored</text>
+  </svg>
+
+  <p style="margin-top:22px">So we track it on its own. <code>0 of 10</code> means: of the 10 submissions that were genuinely accepted in real life, it wrongly rejected none.</p>
+</section>
+
+<!-- VERSIONS -->
+<section>
+  <div class="step">Part 3 &middot; The six versions</div>
+  <h2>Each one changed exactly one thing, on purpose.</h2>
+
+  <div class="card">
+    <h3><span class="v">v1</span> The first real agent</h3>
+    <p class="quiet" style="margin:8px 0 0">Four workers instead of one. One writes its own searches and can search again. One reads the real source code and checks whether the submission does what it claims. One decides the pile. One checks the answer and can send it back.</p>
+    <p style="margin:10px 0 0"><span class="down">46.7%</span> &mdash; far worse than the simple script. It wrongly rejected good work <strong>4 times in 10</strong>.</p>
+    <p class="quiet" style="margin:8px 0 0"><strong>Why:</strong> the code-checker said &ldquo;the code does not match the description&rdquo; on three submissions, and the decider threw all three in the reject pile. <strong>All three had actually been accepted.</strong> It confused &ldquo;I do not rate this code&rdquo; with &ldquo;this was not accepted&rdquo;.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="v">v2</span> Told it those are different questions</h3>
+    <p class="quiet" style="margin:8px 0 0">Added: a &ldquo;no&rdquo; from the code-checker is about whether the description is accurate. It says nothing about whether anyone accepted the work.</p>
+    <p style="margin:10px 0 0"><span class="up">Wrong rejections: 4 &rarr; 1</span>. Headline unchanged at 46.7%.</p>
+    <p class="quiet" style="margin:8px 0 0"><strong>Why no better:</strong> it stopped rejecting and started shrugging instead. Three times it answered &ldquo;cannot tell&rdquo;, which scores as wrong.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="v">v3</span> Made it commit, and told it the odds</h3>
+    <p class="quiet" style="margin:8px 0 0">Two changes. No shrugging allowed &mdash; a sorting tool that refuses to sort leaves you reading everything anyway. And it was told a true fact it never had: <strong>about 9 in 10 submissions here were accepted</strong>. Rejection is the rare case.</p>
+    <p style="margin:10px 0 0"><span class="up">46.7% &rarr; 73.3%</span></p>
+    <p class="quiet" style="margin:8px 0 0">It had been treating all three piles as equally likely, so every flicker of doubt pushed work into reject.</p>
+  </div>
+
+  <div class="card best" style="border-color:#bfe3cd">
+    <h3><span class="v">v4</span> Fixed the workers talking to each other &nbsp;&larr; shipped</h3>
+    <p class="quiet" style="margin:8px 0 0">Two faults found by reading the actual logs. The searcher's conclusion arrived at the decider as a bare number with no explanation, so the decider ignored it. And the searcher was throwing away correct matches for not being worded closely enough.</p>
+    <p style="margin:10px 0 0"><strong>73.3%</strong>, and <span class="up">wrong rejections back to 0 of 10</span>, and the reject pile up to <span class="up">0.80</span>.</p>
+    <p class="quiet" style="margin:8px 0 0"><strong>Worth noticing:</strong> both faults were <em>handover</em> problems. Every worker behaved sensibly on its own. The system still got it wrong because information was lost between them.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="v">v5</span> Overcorrected, badly</h3>
+    <p class="quiet" style="margin:8px 0 0">Told the decider it must accept the searcher's conclusion.</p>
+    <p style="margin:10px 0 0"><span class="down">73.3% &rarr; 46.7%</span></p>
+    <p class="quiet" style="margin:8px 0 0"><strong>My mistake.</strong> In v4 I had loosened the searcher so it accepts near-matches. Then in v5 I made it the final word. Loose <em>plus</em> final word means nearly everything gets called &ldquo;act now&rdquo;. Pile 1 went perfect, the other two collapsed.</p>
+  </div>
+
+  <div class="card">
+    <h3><span class="v">v6</span> Let it say how sure it was</h3>
+    <p class="quiet" style="margin:8px 0 0">The searcher now rates itself: certain, likely, or just a guess. Only &ldquo;certain&rdquo; carries weight.</p>
+    <p style="margin:10px 0 0"><span class="up">46.7% &rarr; 66.7%</span>, still below v4.</p>
+  </div>
+</section>
+
+<!-- TABLE -->
+<section>
+  <div class="step">Part 4 &middot; Reading the table</div>
+  <h2>The headline hides the important bit.</h2>
+
+  <table>
+    <tr><th>Version</th><th>Score</th><th>Pile 1<br>act now</th><th>Pile 2<br>look at it</th><th>Pile 3<br>reject</th><th>Good work<br>wrongly binned</th></tr>
+    <tr><td>Simple script</td><td class="n">73.3%</td><td class="n">1.00</td><td class="n">1.00</td><td class="n down">0.20</td><td class="n">0 of 10</td></tr>
+    <tr><td>Agent v1</td><td class="n down">46.7%</td><td class="n">0.40</td><td class="n">0.60</td><td class="n">0.40</td><td class="n down">4 of 10</td></tr>
+    <tr><td>v2</td><td class="n">46.7%</td><td class="n">0.40</td><td class="n">0.60</td><td class="n">0.40</td><td class="n">1 of 10</td></tr>
+    <tr><td>v3</td><td class="n">73.3%</td><td class="n">0.60</td><td class="n">1.00</td><td class="n">0.60</td><td class="n">1 of 10</td></tr>
+    <tr class="best"><td><strong>v4 &nbsp;shipped</strong></td><td class="n">73.3%</td><td class="n">0.60</td><td class="n">0.80</td><td class="n up">0.80</td><td class="n up">0 of 10</td></tr>
+    <tr><td>v5</td><td class="n down">46.7%</td><td class="n">1.00</td><td class="n down">0.20</td><td class="n down">0.20</td><td class="n">0 of 10</td></tr>
+    <tr><td>v6</td><td class="n">66.7%</td><td class="n">0.80</td><td class="n">0.80</td><td class="n">0.40</td><td class="n">1 of 10</td></tr>
+  </table>
+
+  <p class="quiet" style="font-size:16px">Each pile column is &ldquo;how many of those 5 did it get right&rdquo;. 0.80 means 4 out of 5.</p>
+
+  <div class="card good">
+    <p style="margin:0 0 10px"><strong>Look along the two rows that both say 73.3%.</strong></p>
+    <p style="margin:0 0 10px">The <strong>simple script</strong> gets 1.00 and 1.00 on the two &ldquo;accepted&rdquo; piles, and <strong>0.20</strong> on reject. It wins by being generous to everything. It finds <strong>one in five</strong> of the pile you wanted to skip.</p>
+    <p style="margin:0"><strong>v4</strong> finds <strong>four in five</strong> of that pile, while still never binning good work. Same headline. Four times better at the actual job.</p>
+  </div>
+
+  <div class="card bad">
+    <p style="margin:0"><strong>Why I stopped at six.</strong> One case is worth 6.7 points, and I have now tried six times against the same 15 answers. That is how you talk yourself into a number that falls apart on the sixteenth case. Carrying on would have produced a better-looking figure and a worse tool.</p>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section>
+  <div class="step">Part 5 &middot; In one line</div>
+  <h2>Nothing beat the simple script on the headline. Something beat it at the job.</h2>
+  <p class="lead">Six honest attempts, two of them my own overcorrections, all kept in the record with their numbers. The one we ship ties on the score everyone looks at and is four times better at finding the pile a maintainer actually wants to stop reading.</p>
+</section>
+
+</body>
+</html>

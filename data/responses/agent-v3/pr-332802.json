@@ -1,0 +1,89 @@
+{
+  "bucket": 2,
+  "confidence": "medium",
+  "reason": "A genuine, verified bug fix extending unified-completions gating to the default provider path, but the investigator found no matching pre-reported issue, so it reads as a self-identified follow-up rather than a response to a filed report.",
+  "citations": [
+    "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "ghost text completions still showing when unified completions model enabled",
+      "looking_for": "a report describing that despite enabling a unified/NES completions model (e.g. copilot-proxy custom model), duplicate or unwanted inline ghost-text completions still appear alongside next-edit-suggestions",
+      "cost": 0.0082766
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        325558,
+        333034,
+        333297,
+        332840,
+        330986,
+        333046,
+        325237,
+        333310
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "none of these concern ghost text completions or a unified completions model",
+      "cost": 0.08606380000000001
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        333297,
+        325558,
+        333046,
+        333207,
+        333173,
+        277422,
+        306511,
+        32856
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these concern a unified completions model producing duplicate ghost-text/inline suggestions; closest hits are about ghost text in chat input, Copilot path bugs, or unrelated telemetry/UI issues.",
+      "cost": 0.08671580000000001
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts",
+      "source_chars": 12175,
+      "supported": true,
+      "why": "The current file still has the pre-patch code exactly as described (no _modelService, no _supportsUnifiedCompletions, and `if (unificationStateValue?.modelUnification)` unmodified), confirming the claimed bug exists; the diff correctly adds IInlineEditsModelService injection, a _supportsUnifiedCompletions observable, and ORs it into the modelUnification check that drives the excludes array, which matches the stated fix.",
+      "cost": 0.010579999999999999
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [
+        "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts"
+      ],
+      "reason": "A genuine, verified bug fix extending unified-completions gating to the default provider path, but the investigator found no matching pre-reported issue, so it reads as a self-identified follow-up rather than a response to a filed report.",
+      "cost": 0.10842560000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.3001,
+  "_wall_seconds": 41.7
+}

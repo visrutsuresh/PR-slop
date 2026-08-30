@@ -1,0 +1,77 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Targeted fix to a regression from #330142 with test coverage and manual validation; investigator matched it with certainty to a reported disposal/command-arguments bug, and the base rate strongly favors merge for substantive fixes like this.",
+  "citations": [
+    "#331834",
+    "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+    "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "Quick Fix code action command arguments not found delayed",
+      "looking_for": "a report describing that invoking a code action/quick fix command with arguments fails or shows an 'Actual command not found' error, especially when the Quick Fix menu is left open for a bit before selecting an action",
+      "cost": 0.008158599999999998
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        230126,
+        331834,
+        306475,
+        332515,
+        331016,
+        230162,
+        333297,
+        330027
+      ],
+      "decision": "stop",
+      "matched": 331834,
+      "why": "Title matches exactly: code actions with arguments failing when Quick Fix menu is open, same area and behavior.",
+      "certainty": "certain",
+      "cost": 0.0870518
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/editor/contrib/codeAction/browser/codeActionController.ts",
+      "source_chars": 19504,
+      "supported": "cannot tell",
+      "why": "The controller diff (actions = await newState.actions; disposal on _disposed/selection mismatch) is NOT present in the current file contents shown, which still has the old unconditional `actions = await newState.actions;` without takeCodeActions/dispose calls \u2014 so the patch as described does not match the current repo state, meaning either the diff wasn't applied or is against a different version. The claimed model.ts changes (DisposableStore, _setCodeActions) also cannot be verified since codeActionModel.ts contents weren't shown.",
+      "cost": 0.0109976
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#331834",
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+        "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+      ],
+      "reason": "Targeted fix to a regression from #330142 with test coverage and manual validation; investigator matched it with certainty to a reported disposal/command-arguments bug, and the base rate strongly favors merge for substantive fixes like this.",
+      "cost": 0.10870360000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#331834",
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+        "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": "cannot tell",
+  "_cost": 0.2149,
+  "_wall_seconds": 34.7
+}

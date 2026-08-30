@@ -1,0 +1,92 @@
+{
+  "bucket": 2,
+  "confidence": "medium",
+  "reason": "This is a genuine, scoped experiment-gated prompt tuning change with matching tests, but there's no indication it responds to a reported issue rather than internal prompt-tuning work.",
+  "citations": [
+    "extensions/copilot/src/extension/prompts/node/agent/geminiPrompts.tsx",
+    "extensions/copilot/src/extension/prompts/node/agent/test/agentPrompt.spec.tsx"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "Gemini Flash prompt instructions experiment ast/definitions tool batching grep search precision",
+      "looking_for": "an existing issue/PR requesting or proposing gating new Gemini Flash agent prompt guidance (reading definitions first, batching terminal commands, precise grep search) behind an experiment flag for Flash 3.6/3.7",
+      "cost": 0.008415800000000001
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        309589,
+        333151,
+        333267,
+        333332,
+        306477,
+        305319,
+        305313,
+        333107
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these results relate to Gemini Flash, AST/definitions tooling, batching, or grep search precision \u2014 they're unrelated Copilot/harness UI and tool-execution issues.",
+      "cost": 0.0867638
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        305313,
+        305326,
+        306478,
+        309589,
+        333332,
+        333151,
+        333267,
+        333278
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of the results mention Gemini Flash, code search tools, AST symbols, or prompt tuning/batch requests \u2014 they're about unrelated Copilot Chat UI/tool-call issues.",
+      "cost": 0.0867338
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/package.json",
+      "source_chars": 288529,
+      "supported": "cannot tell",
+      "why": "The provided package.json snippet is unrelated to the diff and doesn't contain geminiPrompts.tsx or configurationService.ts contents to verify against; the diff itself is internally consistent (gates three new prompt strings behind isGeminiFlash36Or37 && EnableGeminiFlashPromptAdditions experiment flag, with matching tests), but no current-state file was actually given to check the claim against.",
+      "cost": 0.0105932
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [
+        "extensions/copilot/src/extension/prompts/node/agent/geminiPrompts.tsx",
+        "extensions/copilot/src/extension/prompts/node/agent/test/agentPrompt.spec.tsx"
+      ],
+      "reason": "This is a genuine, scoped experiment-gated prompt tuning change with matching tests, but there's no indication it responds to a reported issue rather than internal prompt-tuning work.",
+      "cost": 0.10701959999999999
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "extensions/copilot/src/extension/prompts/node/agent/geminiPrompts.tsx",
+        "extensions/copilot/src/extension/prompts/node/agent/test/agentPrompt.spec.tsx"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": "cannot tell",
+  "_cost": 0.2995,
+  "_wall_seconds": 46.5
+}

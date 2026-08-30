@@ -1,0 +1,77 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Genuine, tested compatibility mapping matching an existing pattern in the file, and the investigator found supporting evidence (rated likely) that it addresses a reported gap in eligibleForAutoApproval enforcement.",
+  "citations": [
+    "#333280",
+    "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+    "src/vs/platform/agentHost/common/agentHostSchema.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "chat.tools.eligibleForAutoApproval setting not respected auto approve tools",
+      "looking_for": "an issue where a user reports that the eligibleForAutoApproval / auto-approval policy setting for specific chat tools (like fetch or runTask) isn't being honored, especially in newer agent/managed-settings contexts",
+      "cost": 0.0084324
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        305317,
+        305308,
+        305312,
+        333280,
+        333023,
+        333134,
+        305320,
+        230139
+      ],
+      "decision": "stop",
+      "matched": 333280,
+      "why": "auto-approval/auto-approve settings not being respected for tool calls matches the terminal auto-approve rules being ignored in #333280.",
+      "certainty": "likely",
+      "cost": 0.08709979999999999
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+      "source_chars": 14070,
+      "supported": true,
+      "why": "The current file matches the diff: ELIGIBLE_FOR_AUTO_APPROVAL_SETTING_ID is defined and imported, contributeEligibleForAutoApprovalRestriction is registered as 'policyOnly' and maps a non-all-true/non-empty value to { disableBypassPermissionsMode: 'disable' }, matching the stated bypass-lock fallback rationale (no tool-name ManagedRuleFamily exists).",
+      "cost": 0.01086
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#333280",
+        "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+        "src/vs/platform/agentHost/common/agentHostSchema.ts"
+      ],
+      "reason": "Genuine, tested compatibility mapping matching an existing pattern in the file, and the investigator found supporting evidence (rated likely) that it addresses a reported gap in eligibleForAutoApproval enforcement.",
+      "cost": 0.1114136
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#333280",
+        "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+        "src/vs/platform/agentHost/common/agentHostSchema.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.2178,
+  "_wall_seconds": 38.3
+}

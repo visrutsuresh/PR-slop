@@ -1,0 +1,95 @@
+{
+  "bucket": 2,
+  "confidence": "medium",
+  "reason": "A genuine diagnostic/telemetry contribution referencing an internal issue (#307156 in a comment) rather than a reported bug, adding real functionality with tests, but the investigator found no genuinely matching reported problem and the PR itself frames this as exploratory investigation work needing human review.",
+  "citations": [
+    "src/vs/base/common/event.ts",
+    "src/vs/base/parts/ipc/common/ipc.ts",
+    "src/vs/base/test/common/event.test.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "buffered event lost late listener flush",
+      "looking_for": "a report where a user notices an event emitted before a listener subscribes never reaches that listener, or asks how to know which events pass through Event.buffer",
+      "cost": 0.007874
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        277422,
+        333294,
+        331003,
+        333324,
+        306497,
+        230169,
+        333019,
+        333017
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "none of these are about buffered events being lost when a listener attaches late/after a flush \u2014 closest are #331003 (WebSocket event edge case) and #333019 (webview revival/dispose ordering) but neither is specifically an event-buffering-before-listener-attach bug",
+      "cost": 0.0868198
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        331856,
+        277422,
+        331027,
+        332830,
+        333151,
+        329654,
+        333019,
+        331786
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these relate to an event emitter buffering/replaying messages to late-attaching subscribers; they're about terminal buffers, telemetry, session management, and unrelated UI bugs.",
+      "cost": 0.08674180000000001
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/base/common/event.ts",
+      "source_chars": 64536,
+      "supported": true,
+      "why": "Event.buffer now takes a reportBufferedOnFirstListener callback invoked in onDidAddFirstListener only when buffer.length > 0, matching the claim; ProxyChannel.fromService wires this to a settable bufferUsageReporter keyed by service/event name, and tests confirm the callback fires with the buffered count on first listener attach and not on empty buffers.",
+      "cost": 0.0104462
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [
+        "src/vs/base/common/event.ts",
+        "src/vs/base/parts/ipc/common/ipc.ts",
+        "src/vs/base/test/common/event.test.ts"
+      ],
+      "reason": "A genuine diagnostic/telemetry contribution referencing an internal issue (#307156 in a comment) rather than a reported bug, adding real functionality with tests, but the investigator found no genuinely matching reported problem and the PR itself frames this as exploratory investigation work needing human review.",
+      "cost": 0.1071956
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "src/vs/base/common/event.ts",
+        "src/vs/base/parts/ipc/common/ipc.ts",
+        "src/vs/base/test/common/event.test.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.2991,
+  "_wall_seconds": 43.5
+}

@@ -1,0 +1,64 @@
+{
+  "bucket": 3,
+  "confidence": "low",
+  "reason": "Investigator's own issue search returned nothing directly matching this specific 'raw agent_merge_state tag in prompt timeline' problem (candidates like #333034 are unconfirmed guesses), and this reads as a narrow internal polish PR on a VS Code-internal Agent Merge feature rather than a user-reported bug fix.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "chat prompt timeline agent merge state tag mini map shows raw tag instead of summary",
+      "looking_for": "a bug report from someone restoring a chat session with Agent Merge turns, noticing the prompt timeline gutter/ruler/sticky header shows a raw '<agent_merge_state>' tag instead of a readable summary",
+      "cost": 0.008464200000000002
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333034,
+        305308,
+        305327,
+        316002,
+        333174,
+        328072,
+        330999,
+        328669
+      ],
+      "decision": "stop",
+      "matched": 333034,
+      "why": "Issue #333034 is exactly about agent_merge_state raw tags appearing as events in the chat mini map, matching the timeline/tag-vs-summary display bug described.",
+      "cost": 0.0863698
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/contrib/chat/browser/accessibility/chatAccessibilityProvider.ts",
+      "source_chars": 9443,
+      "supported": true,
+      "why": "The final state of promptTimelineModel.ts shows _requestPreview() calling getAgentMergeRequestLabel(item) with fallback to messageText, feeding into getPromptPreview(), and this is wired into the prompts array used to build prompt ticks \u2014 matching the claim that Agent Merge turns get a proper summary instead of the bare state-block tag. The test added in patch 2 confirms the resulting tick text is 'Agent Merge, 1 comment, 1 check failing' rather than the raw tag.",
+      "cost": 0.0107176
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 3,
+      "citations": [],
+      "reason": "Investigator's own issue search returned nothing directly matching this specific 'raw agent_merge_state tag in prompt timeline' problem (candidates like #333034 are unconfirmed guesses), and this reads as a narrow internal polish PR on a VS Code-internal Agent Merge feature rather than a user-reported bug fix.",
+      "cost": 0.11070559999999999
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.2163,
+  "_wall_seconds": 34.4
+}

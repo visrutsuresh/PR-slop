@@ -1,0 +1,76 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Describes a specific regression (from a prior PR) causing lost command arguments in delayed code actions, with a concrete fix, test coverage, and manual verification steps; this pattern matches genuine bug-fix work addressing a real reported problem rather than filler.",
+  "citations": [
+    "#331834",
+    "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+    "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "quick fix code action command arguments not found delayed",
+      "looking_for": "a bug report where invoking a code action/quick fix command after leaving the menu open for a bit fails with an error like the command or its arguments not being found, especially after a newer code action result arrived and replaced/disposed the one behind the open menu",
+      "cost": 0.0082486
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        230126,
+        331834,
+        306475,
+        332515,
+        331016,
+        230162,
+        333297,
+        330027
+      ],
+      "decision": "stop",
+      "matched": 331834,
+      "why": "The title exactly matches: quick fix code action with arguments fails with 'Actual command not found' when Quick Fix menu is open.",
+      "cost": 0.0862578
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/editor/contrib/codeAction/browser/codeActionController.ts",
+      "source_chars": 19504,
+      "supported": "cannot tell",
+      "why": "The controller file matches the pre-patch version (still `let actions: CodeActionSet;` with no `takeCodeActions`/dispose-on-cancel logic), so the 'current contents' shown appear to be the unpatched baseline, not the result of applying this diff \u2014 I can't verify the patch was actually applied to reach this state. The diff itself is internally consistent with the stated goal (transferring ownership via takeCodeActions/DisposableStore, disposing actions on cancel/mismatch), but the model.ts changes are only partially shown and the test file diff isn't included at all.",
+      "cost": 0.011187599999999999
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#331834",
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+        "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+      ],
+      "reason": "Describes a specific regression (from a prior PR) causing lost command arguments in delayed code actions, with a concrete fix, test coverage, and manual verification steps; this pattern matches genuine bug-fix work addressing a real reported problem rather than filler.",
+      "cost": 0.1075536
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#331834",
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+        "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": "cannot tell",
+  "_cost": 0.2132,
+  "_wall_seconds": 36.6
+}

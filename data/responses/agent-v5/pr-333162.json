@@ -1,0 +1,73 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "The PR fixes a real UX bug where Agent Merge turns showed a raw machine-facing state tag in the prompt timeline instead of a readable summary, matching a reported issue, and the code changes verifiably implement the described fix.",
+  "citations": [
+    "#333034",
+    "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "chat mini map timeline agent merge state shows raw tag prompt preview",
+      "looking_for": "a bug report describing that the chat prompt timeline (mini map/gutter/ruler/sticky header) shows a raw '<agent_merge_state>' tag instead of a readable summary for Agent Merge turns in restored sessions",
+      "cost": 0.0084442
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333034,
+        305308,
+        305327,
+        333174,
+        316002,
+        328072,
+        333151,
+        333023
+      ],
+      "decision": "stop",
+      "matched": 333034,
+      "why": "It directly matches: agent_merge_state showing as raw tag/events in the chat mini map timeline is the exact behavior described.",
+      "cost": 0.0864518
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/contrib/chat/browser/accessibility/chatAccessibilityProvider.ts",
+      "source_chars": 9443,
+      "supported": true,
+      "why": "The current promptTimelineModel.ts shows getRequestPreview/_requestPreview logic was later refactored (per-kind helper in patch 4), but the final chatAccessibilityProvider.ts file confirms getAgentMergeRequestLabel is imported and used to prefer an Agent Merge label over raw messageText for isRequestVM items, consistent with the claimed shared-helper approach; the test added in the diff explicitly asserts an Agent Merge prompt is previewed as 'Agent Merge, 1 comment, 1 check failing' rather than the raw state block.",
+      "cost": 0.0109476
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "reason": "The PR fixes a real UX bug where Agent Merge turns showed a raw machine-facing state tag in the prompt timeline instead of a readable summary, matching a reported issue, and the code changes verifiably implement the described fix.",
+      "cost": 0.1122216
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.2181,
+  "_wall_seconds": 34.1
+}

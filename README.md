@@ -196,6 +196,18 @@ We had already written down that "not merged" does not mean "bad work". Then we 
 
 It is removed from the shipped solution and kept at `agent.py`, runnable, with its saved responses, so the negative result reproduces.
 
+## Judging the work, not the decision
+
+Everything above predicts what a maintainer did. That has a flaw worth stating loudly: **if a maintainer overlooks something valuable and closes it, and this tool correctly calls the work good, our scoring marks the tool wrong.**
+
+The one case no version ever got right, pr-308696, is very likely exactly that. Real code, fixing a genuinely reported problem, confirmed against the actual source, closed anyway.
+
+So alongside the prediction we produce an **evidence card**, made only of claims that are true or false against the repository, with no human verdict involved: does it name a genuinely reported problem, does it name real files, does it carry tests, is it substantive, does the code match its description.
+
+Of 16 factual claims the agent made across the 15 cases, **16 hold up**.
+
+**The disagreement report is the point.** Well-supported work that was closed anyway is not the tool failing. It is the tool finding something a human may have missed. Run `python3 evidence.py` and it surfaces two, including pr-308696.
+
 ## Results
 
 | Measure | Simple version | Our system | Change |

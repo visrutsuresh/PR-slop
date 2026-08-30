@@ -1,0 +1,65 @@
+{
+  "bucket": 2,
+  "confidence": "low",
+  "reason": "Genuine, coherent code contribution fixing layout/context bugs with tests, but the investigator only guessed at a matching issue (#332990) with no stated certainty, so there's little real evidence it addresses an already-reported problem.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "Chat Customizations opens wrong chat session lost context",
+      "looking_for": "an issue report where a user says opening the Chat Customizations/settings from a chat title bar action loses or switches away from the chat they were in, or complains about misaligned Tools/marketplace/migration UI or MCP running status being hard to read in light theme",
+      "cost": 0.0083186
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        332990,
+        325665,
+        306497,
+        333053,
+        333119,
+        306477,
+        333017,
+        333023
+      ],
+      "decision": "stop",
+      "matched": 332990,
+      "why": "It's the only candidate touching chat customization/session context migration, matching the topic area even though wording differs.",
+      "certainty": "guess",
+      "cost": 0.0868998
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/contrib/chat/browser/aiCustomization/aiCustomizationManagement.contribution.ts",
+      "source_chars": 34034,
+      "supported": true,
+      "why": "The diff adds resolveAICustomizationManagementOpenEditorTarget which special-cases IChatViewTitleActionContext to carry through target.sessionResource (supporting claim 1), adds CSS width/margin rules aligning .tools-list-widget and migration containers to match the existing 840px plugin-list-widget layout and reworks padding to keep migration content off the scrollbar (claim 2), and adds an explicit foreground color to .mcp-runtime-status-badge.running for contrast (claim 3). The shown 'current' file is the pre-patch base (missing the new imports/exports the diff adds), consistent with it being the diff's context rather than a sign the patch wasn't applied.",
+      "cost": 0.026942999999999998
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [],
+      "reason": "Genuine, coherent code contribution fixing layout/context bugs with tests, but the investigator only guessed at a matching issue (#332990) with no stated certainty, so there's little real evidence it addresses an already-reported problem.",
+      "cost": 0.1091676
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.2313,
+  "_wall_seconds": 53.0
+}

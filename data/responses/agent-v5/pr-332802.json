@@ -1,0 +1,89 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Follow-up fix wiring supportsUnifiedCompletions into the default provider path, matching a previously reported ghost-text/completions duplication issue; code details in the diff aren't currently present in the file but that doesn't negate the reported-problem match.",
+  "citations": [
+    "#333046"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "ghost text completions still showing when unified completions model enabled default provider not joint completions",
+      "looking_for": "a report that ghost-text/inline completions from the completions or github.copilot provider still appear alongside NES for a model with unified completions support, when the joint completions provider setting is off/default",
+      "cost": 0.008246600000000001
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        325558,
+        333034,
+        325237,
+        333297,
+        333156,
+        305293,
+        332840,
+        330986
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "none of these concern ghost text completions or a unified/joint completions provider setting",
+      "cost": 0.0864698
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        333297,
+        325558,
+        333046,
+        316002,
+        230139,
+        305308,
+        333173,
+        277422
+      ],
+      "decision": "stop",
+      "matched": 333046,
+      "why": "It's about GitHub Copilot inline suggestions (ghost text) failing under certain conditions, matching the area of unified completions/inline suggestions.",
+      "cost": 0.0867838
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts",
+      "source_chars": 12175,
+      "supported": true,
+      "why": "The current file's registerProvider() only checks unificationStateValue?.modelUnification, matching the described bug (no supportsUnifiedCompletions wiring, no _modelService dependency, no _supportsUnifiedCompletions observable present) \u2014 the diff's added lines are absent from the current file, meaning the fix in the patch is not actually applied to the codebase shown.",
+      "cost": 0.01032
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#333046"
+      ],
+      "reason": "Follow-up fix wiring supportsUnifiedCompletions into the default provider path, matching a previously reported ghost-text/completions duplication issue; code details in the diff aren't currently present in the file but that doesn't negate the reported-problem match.",
+      "cost": 0.10938360000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#333046"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.3012,
+  "_wall_seconds": 42.8
+}

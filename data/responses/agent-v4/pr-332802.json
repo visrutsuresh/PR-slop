@@ -1,0 +1,70 @@
+{
+  "bucket": 2,
+  "confidence": "low",
+  "reason": "Plausible follow-up hotfix fixing a real gap in unified-completions gating, but the cited issue #322010 is only a search hit, not confirmed to describe this exact default-path bug, so it can't be confirmed as addressing an already-reported issue.",
+  "citations": [
+    "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "unified completions ghost text still showing duplicate suggestions inline edits",
+      "looking_for": "a bug report describing ghost-text/inline completions appearing alongside NES suggestions when the model should suppress the separate completions provider, i.e. duplicate suggestions not silenced despite unification/supportsUnifiedCompletions",
+      "cost": 0.0084066
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333297,
+        330986,
+        305308,
+        325558,
+        333046,
+        305322,
+        322010,
+        333207
+      ],
+      "decision": "stop",
+      "matched": 322010,
+      "why": "both concern editor completion/snippet suggestion UI misbehaving with duplicate or leftover inline suggestion state, same area as ghost text/inline edits",
+      "cost": 0.0866438
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts",
+      "source_chars": 12175,
+      "supported": true,
+      "why": "The file now declares _modelService via IInlineEditsModelService, computes _supportsUnifiedCompletions from selectedModelConfiguration().supportsUnifiedCompletions, and ORs it into modelUnification before deciding excludes\u2014matching the diff's intent to suppress completions/github.copilot on the default path even without the core modelUnification toggle.",
+      "cost": 0.01038
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [
+        "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts"
+      ],
+      "reason": "Plausible follow-up hotfix fixing a real gap in unified-completions gating, but the cited issue #322010 is only a search hit, not confirmed to describe this exact default-path bug, so it can't be confirmed as addressing an already-reported issue.",
+      "cost": 0.1086476
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "extensions/copilot/src/extension/inlineEdits/vscode-node/inlineEditProviderFeature.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.2141,
+  "_wall_seconds": 34.2
+}

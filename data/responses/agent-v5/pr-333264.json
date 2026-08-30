@@ -1,0 +1,92 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Claim checker confirms the code matches the described legacy-setting mapping, and the investigator identified this as addressing already-reported issue #309589 about auto-approval policy not being respected.",
+  "citations": [
+    "#309589",
+    "src/vs/platform/agentHost/common/agentHostManagedSettings.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "eligibleForAutoApproval setting doesn't work per tool auto approve fetch runTask ignored enterprise policy",
+      "looking_for": "a report from a user or admin saying the chat.tools.eligibleForAutoApproval setting/policy stopped working or isn't respected (e.g. after switching to the new agent host / managed settings backend), especially complaints about specific tools still being auto-approved despite being listed",
+      "cost": 0.0087124
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        305317,
+        330027,
+        305329,
+        305313,
+        305314,
+        309589,
+        331845,
+        325520
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these concern eligibleForAutoApproval, per-tool auto approve of fetch/runTask, or enterprise policy being ignored for it \u2014 closest area (#305329 AHP permission policies, #330027 policy diagnostics) is about policy infrastructure generally, not this specific auto-approval bug.",
+      "cost": 0.0873758
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        305317,
+        305329,
+        305313,
+        305314,
+        330027,
+        309589,
+        331845,
+        330986
+      ],
+      "decision": "stop",
+      "matched": 309589,
+      "why": "It's about terminal commands being auto-approved despite not going through normal permission policy checks, matching the theme of tool calls bypassing/ignoring enterprise approval policy.",
+      "cost": 0.0865618
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+      "source_chars": 14070,
+      "supported": true,
+      "why": "The current file contains ELIGIBLE_FOR_AUTO_APPROVAL_SETTING_ID imported and registered via managedPermissionsSetting with 'policyOnly' scoping, matching the diff exactly; the module header comment documents the exception as described, and the mapping falls back to disableBypassPermissionsMode when not all tool values are true, matching the claimed bypass-lock behavior.",
+      "cost": 0.01068
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#309589",
+        "src/vs/platform/agentHost/common/agentHostManagedSettings.ts"
+      ],
+      "reason": "Claim checker confirms the code matches the described legacy-setting mapping, and the investigator identified this as addressing already-reported issue #309589 about auto-approval policy not being respected.",
+      "cost": 0.11094760000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#309589",
+        "src/vs/platform/agentHost/common/agentHostManagedSettings.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.3043,
+  "_wall_seconds": 43.9
+}

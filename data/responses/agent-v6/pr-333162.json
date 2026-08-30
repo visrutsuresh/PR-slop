@@ -1,0 +1,74 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Genuine, well-tested UX fix replacing a raw machine-facing state tag with a readable summary across chat timeline surfaces, and it plausibly addresses a previously reported issue about the timeline showing raw agent_merge_state tags.",
+  "citations": [
+    "#333034",
+    "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "chat mini map prompt timeline agent merge state raw tag",
+      "looking_for": "a report describing the chat timeline/minimap/ruler/sticky header showing a raw <agent_merge_state> tag or similar unreadable machine block instead of a readable summary for merge/restored conflict-resolution turns",
+      "cost": 0.0083742
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333034,
+        305308,
+        305327,
+        328072,
+        333151,
+        333174,
+        333023,
+        305291
+      ],
+      "decision": "stop",
+      "matched": 333034,
+      "why": "It's the only candidate directly about agent_merge_state entries appearing as events in the chat mini map, matching the described area and behavior.",
+      "certainty": "likely",
+      "cost": 0.08689580000000001
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/contrib/chat/browser/accessibility/chatAccessibilityProvider.ts",
+      "source_chars": 9443,
+      "supported": true,
+      "why": "Current promptTimelineModel.ts has a _requestPreview method that calls getAgentMergeRequestLabel(item) with fallback to messageText, feeding getPromptPreview, and this is used when pushing prompt items into the timeline list \u2014 matching the claim that Agent Merge turns get summarized instead of showing the raw state block tag. chatAccessibilityProvider.ts also uses getAgentMergeRequestLabel for the same purpose, corroborating the shared-helper claim.",
+      "cost": 0.0106476
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "reason": "Genuine, well-tested UX fix replacing a raw machine-facing state tag with a readable summary across chat timeline surfaces, and it plausibly addresses a previously reported issue about the timeline showing raw agent_merge_state tags.",
+      "cost": 0.1121096
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.218,
+  "_wall_seconds": 35.1
+}

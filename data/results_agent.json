@@ -1,26 +1,26 @@
 {
   "name": "the agent: investigate, check, decide, verify",
-  "balanced_accuracy": 0.4666666666666666,
+  "balanced_accuracy": 0.6666666666666666,
   "per_bucket_recall": {
-    "1": 0.4,
-    "2": 0.6,
+    "1": 0.8,
+    "2": 0.8,
     "3": 0.4
   },
   "false_prune": [
-    4,
+    1,
     10
   ],
   "citations": {
-    "self_cited": 8,
-    "external_offered": 4,
-    "external_resolved": 4,
+    "self_cited": 18,
+    "external_offered": 9,
+    "external_resolved": 9,
     "external_rate": 1.0,
     "unknown": 0,
-    "total_offered": 12
+    "total_offered": 27
   },
-  "abstained": 1,
-  "cost_usd": 6.7455,
-  "search_rounds": 23,
-  "claims_checked": 14,
-  "sent_back": 0
+  "abstained": 0,
+  "cost_usd": 3.7015,
+  "search_rounds": 19,
+  "claims_checked": 11,
+  "sent_back": 1
 }

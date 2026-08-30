@@ -1,0 +1,83 @@
+{
+  "bucket": 2,
+  "confidence": "medium",
+  "reason": "This is a genuine, self-contained contribution (experiment gating with matching tests) but the investigator found no reported issue it answers, so it lacks the evidence needed for pile 1.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "Gemini Flash prompt experiment always-on same for all models",
+      "looking_for": "an existing issue reporting that the new Gemini Flash prompt instructions (definitions-first reading, tool batching, grep search precision) should be gated behind an experiment or restricted to specific Flash model versions rather than applied unconditionally",
+      "cost": 0.008325800000000001
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333151,
+        333306,
+        333345,
+        331011,
+        323401,
+        333039,
+        333278,
+        309608
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these results relate to prompt experiments, model configuration defaults, or Gemini Flash behavior - they're about UI/terminal/chat bugs and unrelated features.",
+      "cost": 0.0867258
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        331815,
+        305328,
+        325663,
+        331786,
+        333154,
+        333037,
+        309589,
+        305306
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these results concern a system prompt/instruction override applying incorrectly across models; they're about pets, sessions, dialogs, and unrelated confusions.",
+      "cost": 0.0864698
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/package.json",
+      "source_chars": 288529,
+      "supported": "cannot tell",
+      "why": "The provided diff itself is internally consistent and correctly implements the gating (isGeminiFlash36Or37 check combined with EnableGeminiFlashPromptAdditions experiment flag applied to all three prompt additions), and includes matching tests. But the 'current contents' file shown is package.json, not geminiPrompts.tsx or configurationService.ts, so there's no way to verify the diff was actually applied to the real codebase.",
+      "cost": 0.010663200000000001
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [],
+      "reason": "This is a genuine, self-contained contribution (experiment gating with matching tests) but the investigator found no reported issue it answers, so it lacks the evidence needed for pile 1.",
+      "cost": 0.10701759999999999
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": "cannot tell",
+  "_cost": 0.2992,
+  "_wall_seconds": 44.0
+}

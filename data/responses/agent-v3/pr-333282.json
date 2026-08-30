@@ -1,0 +1,92 @@
+{
+  "bucket": 2,
+  "confidence": "medium",
+  "reason": "Genuine interim fix for a real endpoint-scoping mismatch with tests included, but the claim checker found the code not present in the current source (may be superseded by an upstream fix), and no evidence it maps to a reported issue.",
+  "citations": [
+    "extensions/copilot/src/platform/telemetry/node/baseExperimentationService.ts",
+    "src/vs/workbench/services/assignment/common/assignmentService.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "experiment treatment assignment not applied getTreatmentVariable undefined TAS abexp.assignmentcontext shows assigned but feature not enabled",
+      "looking_for": "a bug report from a user or developer noting an experiment/feature-flag shows as assigned in telemetry but the associated feature/setting behavior never actually turns on",
+      "cost": 0.008444800000000002
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        230147,
+        325354,
+        333325,
+        331015,
+        331834,
+        333015,
+        333348,
+        316204
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these results relate to experiment/feature-flag assignment or treatment variables at all \u2014 they're about UI flicker, chat export, SQL language mode, code actions, Copilot subscription, and commit message generation.",
+      "cost": 0.08675379999999999
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        333267,
+        333266,
+        305316,
+        305320,
+        333283,
+        305319,
+        305318,
+        305326
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "All results are unrelated Copilot Harness/AHP client features, not experimentation service rollout percentage bugs.",
+      "cost": 0.0861898
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/src/platform/telemetry/node/baseExperimentationService.ts",
+      "source_chars": 12943,
+      "supported": false,
+      "why": "The current file still has the original unpatched code: getTreatmentVariable() calls _delegate.getTreatmentVariable('vscode', name) directly with no fallback, and _signalTreatmentsChangeEvent uses the same unpatched call, no _readTreatmentVariable method or ASSIGNMENTS_SCOPE_PREFIX constant exists anywhere in the file.",
+      "cost": 0.0105706
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [
+        "extensions/copilot/src/platform/telemetry/node/baseExperimentationService.ts",
+        "src/vs/workbench/services/assignment/common/assignmentService.ts"
+      ],
+      "reason": "Genuine interim fix for a real endpoint-scoping mismatch with tests included, but the claim checker found the code not present in the current source (may be superseded by an upstream fix), and no evidence it maps to a reported issue.",
+      "cost": 0.10933559999999999
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "extensions/copilot/src/platform/telemetry/node/baseExperimentationService.ts",
+        "src/vs/workbench/services/assignment/common/assignmentService.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": false,
+  "_cost": 0.3013,
+  "_wall_seconds": 45.6
+}

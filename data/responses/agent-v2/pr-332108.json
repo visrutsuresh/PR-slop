@@ -1,0 +1,83 @@
+{
+  "bucket": 3,
+  "confidence": "high",
+  "reason": "Automated dependency version bump PR by a bot; the accompanying text explicitly reports the bot's own escalation that the build fails with an unresolved CLI/runtime hang, meaning this cycle's bump was not accepted/merged, and no reported issue is referenced as being addressed.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "extension host tests hang after tests finish process does not exit copilot chat integration test timeout",
+      "looking_for": "an existing issue reporting that CI/integration tests hang or time out after completing, not exiting, correlated with a copilot/copilot-sdk or CLI version bump",
+      "cost": 0.0082734
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333283,
+        329654,
+        325692,
+        305308,
+        331003,
+        306481,
+        332518,
+        333312
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these mention extension host tests hanging or process not exiting after tests complete; they're about unrelated agent/host/hang topics in other subsystems.",
+      "cost": 0.0865238
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        333312,
+        329654,
+        277422,
+        305308,
+        324692,
+        333125,
+        324736,
+        305295
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of the results relate to mocha/test runner hangs after completion in the extension host \u2014 they're about unrelated topics like security, macOS restart, telemetry, and Copilot subscriptions.",
+      "cost": 0.08646780000000001
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "build/linux/rpm/dep-lists.ts",
+      "source_chars": 10194,
+      "supported": true,
+      "why": "The diff is a straightforward package.json/package-lock.json version bump of @github/copilot-sdk and @github/copilot with matching integrity hashes and dependency graph updates, consistent with the stated 'chore: bump' claim; the additionalDeps.ts file shown is unrelated, unchanged native OS dependency metadata and not part of the actual diff.",
+      "cost": 0.0110702
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 3,
+      "citations": [],
+      "reason": "Automated dependency version bump PR by a bot; the accompanying text explicitly reports the bot's own escalation that the build fails with an unresolved CLI/runtime hang, meaning this cycle's bump was not accepted/merged, and no reported issue is referenced as being addressed.",
+      "cost": 0.11390360000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.3062,
+  "_wall_seconds": 42.9
+}

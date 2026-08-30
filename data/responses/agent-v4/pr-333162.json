@@ -1,0 +1,73 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Change matches its description exactly (adds getAgentMergeRequestLabel preview with caching, tested), and it addresses a plausible already-reported UX issue where the timeline showed raw agent_merge_state tags.",
+  "citations": [
+    "#333034",
+    "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "chat mini map timeline shows agent_merge_state instead of summary",
+      "looking_for": "a report that restored/resumed chat sessions show a raw '<agent_merge_state>' tag in the timeline/gutter/ruler/hover/sticky header instead of a readable summary for Agent Merge turns",
+      "cost": 0.0083642
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333034,
+        333023,
+        316002,
+        230147,
+        325665,
+        328072,
+        333325,
+        333132
+      ],
+      "decision": "stop",
+      "matched": 333034,
+      "why": "It directly describes agent_merge_state appearing as events in the chat mini map/timeline instead of a summary, matching the reported behavior and area.",
+      "cost": 0.0865618
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/contrib/chat/browser/accessibility/chatAccessibilityProvider.ts",
+      "source_chars": 9443,
+      "supported": true,
+      "why": "The current promptTimelineModel.ts imports getAgentMergeRequestLabel and uses it in _requestPreview (with a caching layer added later), which feeds the prompt list text used for promptTicks/ruler/hover/sticky-header, and the accompanying test asserts an Agent Merge turn previews as 'Agent Merge, 1 comment, 1 check failing' instead of the raw state block.",
+      "cost": 0.010367600000000001
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "reason": "Change matches its description exactly (adds getAgentMergeRequestLabel preview with caching, tested), and it addresses a plausible already-reported UX issue where the timeline showed raw agent_merge_state tags.",
+      "cost": 0.11080359999999999
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.2161,
+  "_wall_seconds": 33.8
+}

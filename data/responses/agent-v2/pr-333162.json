@@ -1,0 +1,73 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Fixes a real UI bug (chat timeline showing raw agent_merge_state tag instead of a readable summary) matching a reported issue, and the code change genuinely implements the described fix with tests.",
+  "citations": [
+    "#333034",
+    "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "chat timeline restored session shows agent_merge_state tag instead of summary",
+      "looking_for": "a bug report describing that the chat prompt timeline/minimap/ruler/hover shows the raw <agent_merge_state> tag or similar unreadable text instead of a readable label for Agent Merge turns in restored sessions",
+      "cost": 0.0084242
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333034,
+        331820,
+        333325,
+        321185,
+        333023,
+        333159,
+        275289,
+        305308
+      ],
+      "decision": "stop",
+      "matched": 333034,
+      "why": "It's the only result directly about agent_merge_state appearing as a chat event/tag instead of the expected content, matching the described bug.",
+      "cost": 0.0861238
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/contrib/chat/browser/accessibility/chatAccessibilityProvider.ts",
+      "source_chars": 9443,
+      "supported": true,
+      "why": "The current promptTimelineModel.ts imports getAgentMergeRequestLabel and calls it (via the caching _requestPreview method) as a fallback before item.messageText, feeding the result through getPromptPreview and into the prompts array used for tick.text \u2014 matching the claim that Agent Merge turns are previewed with a localized summary instead of the raw message text, and the accessibility provider similarly uses getAgentMergeRequestLabel for aria labels.",
+      "cost": 0.0105676
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "reason": "Fixes a real UI bug (chat timeline showing raw agent_merge_state tag instead of a readable summary) matching a reported issue, and the code change genuinely implements the described fix with tests.",
+      "cost": 0.1098436
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.215,
+  "_wall_seconds": 35.0
+}

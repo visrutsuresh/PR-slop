@@ -1,0 +1,92 @@
+{
+  "bucket": 3,
+  "confidence": "medium",
+  "reason": "This is a maintainer-authored diagnostic/telemetry instrumentation PR ('This is to investigate what events take actually use buffer today') explicitly to gather data, not to fix a reported bug; such investigatory instrumentation typically doesn't land as-is in the mainline codebase.",
+  "citations": [
+    "src/vs/base/common/event.ts",
+    "src/vs/base/parts/ipc/common/ipc.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "buffered events not firing late listener flush onDidAddListener",
+      "looking_for": "an issue reporting that events emitted before a listener subscribes are lost/dropped, or asking whether buffered/replayed events reach listeners added after emission",
+      "cost": 0.007994000000000001
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333034,
+        333294,
+        320532,
+        306497,
+        333019,
+        331003,
+        331017,
+        333175
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "none of these are about buffered/queued events failing to flush to a listener registered after the fact (onDidAddListener timing) \u2014 they're about unrelated rendering, reconnection, and duplication bugs",
+      "cost": 0.0870118
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        333034,
+        305295,
+        277422,
+        306497,
+        321185,
+        331027,
+        320532,
+        330977
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "none of these concern event emitter replay/buffering of events to late subscribers; they're about unrelated UI/telemetry/session topics",
+      "cost": 0.0868298
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/base/common/event.ts",
+      "source_chars": 64536,
+      "supported": true,
+      "why": "event.ts adds reportBufferedOnFirstListener invoked only in onDidAddFirstListener when buffer.length > 0, matching the 'flushed to a late listener' report semantics; ipc.ts wires this through fromService with a bufferUsageReporter callback keyed by serviceName/eventName; tests confirm it fires with buffered count on late listener attach and not on empty buffer.",
+      "cost": 0.0105062
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 3,
+      "citations": [
+        "src/vs/base/common/event.ts",
+        "src/vs/base/parts/ipc/common/ipc.ts"
+      ],
+      "reason": "This is a maintainer-authored diagnostic/telemetry instrumentation PR ('This is to investigate what events take actually use buffer today') explicitly to gather data, not to fix a reported bug; such investigatory instrumentation typically doesn't land as-is in the mainline codebase.",
+      "cost": 0.1080856
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "src/vs/base/common/event.ts",
+        "src/vs/base/parts/ipc/common/ipc.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.3004,
+  "_wall_seconds": 42.8
+}

@@ -1,0 +1,103 @@
+{
+  "bucket": 2,
+  "confidence": "medium",
+  "reason": "A genuine, tested diagnostic instrumentation change to Event.buffer/ProxyChannel with no verified link to an already-reported issue (#234393 unconfirmed, #331003 only a 'likely' investigator guess).",
+  "citations": [
+    "src/vs/base/common/event.ts",
+    "src/vs/base/parts/ipc/common/ipc.ts",
+    "src/vs/base/test/common/event.test.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "buffered events not delivered until listener attaches late missed events lost",
+      "looking_for": "a report describing that events emitted before a listener subscribes are silently dropped/lost, or asking whether/what data an event buffer captures and how to inspect it",
+      "cost": 0.008004
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        322991,
+        333034,
+        306497,
+        332542,
+        331003,
+        331838,
+        333306,
+        320532
+      ],
+      "decision": "stop",
+      "matched": 331003,
+      "why": "A WebSocket emitting error without close and hanging is the same class of 'terminal event never fires so buffered/pending state never gets delivered' bug as a listener attaching late and missing buffered events.",
+      "certainty": "likely",
+      "cost": 0.08746380000000001
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/base/common/event.ts",
+      "source_chars": 64536,
+      "supported": true,
+      "why": "Event.buffer gains a reportBufferedOnFirstListener callback invoked only when a first listener attaches and buffer.length > 0 (event.ts), which is exactly 'flushed to a late listener'; ProxyChannel.fromService wires this into a process-wide bufferUsageReporter keyed by service/event name, and tests confirm the reporting-only-when-nonempty behavior.",
+      "cost": 0.0105062
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#234393",
+        "src/vs/base/common/event.ts",
+        "src/vs/base/parts/ipc/common/ipc.ts"
+      ],
+      "reason": "The submission itself references Ref #234393, indicating it addresses an already-reported issue about buffered event usage, and the claim checker confirms the code (Event.buffer callback, ProxyChannel wiring, tests) matches the stated behavior.",
+      "cost": 0.11476159999999999
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#234393",
+        "src/vs/base/common/event.ts",
+        "src/vs/base/parts/ipc/common/ipc.ts"
+      ],
+      "failures": [
+        "#234393 is not a real recorded problem in this project"
+      ],
+      "sending_back": true
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 2,
+      "bucket": 2,
+      "citations": [
+        "src/vs/base/common/event.ts",
+        "src/vs/base/parts/ipc/common/ipc.ts",
+        "src/vs/base/test/common/event.test.ts"
+      ],
+      "reason": "A genuine, tested diagnostic instrumentation change to Event.buffer/ProxyChannel with no verified link to an already-reported issue (#234393 unconfirmed, #331003 only a 'likely' investigator guess).",
+      "cost": 0.10968560000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "src/vs/base/common/event.ts",
+        "src/vs/base/parts/ipc/common/ipc.ts",
+        "src/vs/base/test/common/event.test.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.3304,
+  "_wall_seconds": 50.8
+}

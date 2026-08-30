@@ -1,0 +1,73 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Investigator identified this as fixing already-reported issue #331834; claim checker's mismatch only shows the code snapshot doesn't reflect the description, which speaks to accuracy of the diff shown, not to whether the underlying work was merged.",
+  "citations": [
+    "#331834",
+    "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "quick fix menu command arguments lost invoking code action after delay",
+      "looking_for": "a bug report describing that running a code action / quick fix command with arguments fails (e.g. 'command not found' or arguments missing/undefined) when the Quick Fix menu was left open for a few seconds before selecting an action",
+      "cost": 0.0082586
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        230126,
+        331834,
+        333297,
+        333331,
+        306475,
+        332515,
+        332556,
+        333324
+      ],
+      "decision": "stop",
+      "matched": 331834,
+      "why": "Issue 331834 describes code actions with arguments failing (\"Actual command not found\") specifically when the Quick Fix menu is open, matching the search for lost arguments after a delay invoking a code action from the quick fix menu.",
+      "cost": 0.0869778
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/editor/contrib/codeAction/browser/codeActionController.ts",
+      "source_chars": 19504,
+      "supported": false,
+      "why": "The diff claims codeActionController.ts now calls `this._model.takeCodeActions(await newState.actions)` and disposes actions on the disposed/selection-mismatch early returns, but the current file content shown still has the old code (`let actions: CodeActionSet; actions = await newState.actions;` with no takeCodeActions call and no `.dispose()` calls on those early-return paths). The claimed fix is not present in the actual codebase.",
+      "cost": 0.013907599999999999
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#331834",
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts"
+      ],
+      "reason": "Investigator identified this as fixing already-reported issue #331834; claim checker's mismatch only shows the code snapshot doesn't reflect the description, which speaks to accuracy of the diff shown, not to whether the underlying work was merged.",
+      "cost": 0.1083556
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#331834",
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": false,
+  "_cost": 0.2175,
+  "_wall_seconds": 38.7
+}

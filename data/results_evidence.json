@@ -1,0 +1,207 @@
+[
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": null,
+    "has_tests": false,
+    "lines_added": 18,
+    "files_touched": 1,
+    "substantive": true,
+    "claim_supported": true,
+    "number": 243255,
+    "strength": 2,
+    "merged_in_reality": false
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": null,
+    "has_tests": true,
+    "lines_added": 242,
+    "files_touched": 13,
+    "substantive": true,
+    "claim_supported": "cannot tell",
+    "number": 306519,
+    "strength": 2,
+    "merged_in_reality": false
+  },
+  {
+    "cites_real_problem": true,
+    "problems_cited": [
+      "#305306"
+    ],
+    "cites_real_files": true,
+    "has_tests": false,
+    "lines_added": 44,
+    "files_touched": 1,
+    "substantive": true,
+    "claim_supported": true,
+    "number": 308696,
+    "strength": 3,
+    "merged_in_reality": false
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": true,
+    "has_tests": true,
+    "lines_added": 99,
+    "files_touched": 7,
+    "substantive": true,
+    "claim_supported": true,
+    "number": 324044,
+    "strength": 3,
+    "merged_in_reality": false
+  },
+  {
+    "cites_real_problem": true,
+    "problems_cited": [
+      "#331002"
+    ],
+    "cites_real_files": true,
+    "has_tests": true,
+    "lines_added": 166,
+    "files_touched": 2,
+    "substantive": true,
+    "claim_supported": true,
+    "number": 331442,
+    "strength": 4,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": null,
+    "has_tests": true,
+    "lines_added": 137,
+    "files_touched": 9,
+    "substantive": true,
+    "claim_supported": "cannot tell",
+    "number": 332108,
+    "strength": 2,
+    "merged_in_reality": false
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": true,
+    "has_tests": false,
+    "lines_added": 17,
+    "files_touched": 1,
+    "substantive": true,
+    "claim_supported": true,
+    "number": 332802,
+    "strength": 2,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": true,
+    "has_tests": false,
+    "lines_added": 0,
+    "files_touched": 1,
+    "substantive": false,
+    "claim_supported": true,
+    "number": 332998,
+    "strength": 1,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": true,
+    "problems_cited": [
+      "#333034"
+    ],
+    "cites_real_files": true,
+    "has_tests": true,
+    "lines_added": 165,
+    "files_touched": 6,
+    "substantive": true,
+    "claim_supported": true,
+    "number": 333162,
+    "strength": 4,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": true,
+    "problems_cited": [
+      "#333149"
+    ],
+    "cites_real_files": true,
+    "has_tests": true,
+    "lines_added": 165,
+    "files_touched": 7,
+    "substantive": true,
+    "claim_supported": "cannot tell",
+    "number": 333191,
+    "strength": 3,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": true,
+    "has_tests": true,
+    "lines_added": 179,
+    "files_touched": 4,
+    "substantive": true,
+    "claim_supported": true,
+    "number": 333264,
+    "strength": 3,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": true,
+    "has_tests": true,
+    "lines_added": 118,
+    "files_touched": 5,
+    "substantive": true,
+    "claim_supported": false,
+    "number": 333281,
+    "strength": 2,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": true,
+    "problems_cited": [
+      "#333310"
+    ],
+    "cites_real_files": null,
+    "has_tests": true,
+    "lines_added": 164,
+    "files_touched": 4,
+    "substantive": true,
+    "claim_supported": "cannot tell",
+    "number": 333282,
+    "strength": 3,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": true,
+    "has_tests": true,
+    "lines_added": 197,
+    "files_touched": 3,
+    "substantive": true,
+    "claim_supported": false,
+    "number": 333295,
+    "strength": 2,
+    "merged_in_reality": true
+  },
+  {
+    "cites_real_problem": null,
+    "problems_cited": [],
+    "cites_real_files": true,
+    "has_tests": true,
+    "lines_added": 121,
+    "files_touched": 5,
+    "substantive": true,
+    "claim_supported": "cannot tell",
+    "number": 333308,
+    "strength": 2,
+    "merged_in_reality": true
+  }
+]

@@ -1,0 +1,85 @@
+{
+  "bucket": 3,
+  "confidence": "high",
+  "reason": "This is an automated dependency-bump PR whose own bot-generated status report says the SDK/CLI pair causes a process-exit hang and explicitly states no fix was pushed and the build fails \u2014 routine housekeeping that failed CI and was not merged.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "extension host tests hang after tests complete process does not exit integration test timeout",
+      "looking_for": "an existing report describing the Electron integration test suite completing but the test process hanging/never exiting, causing a timeout, especially tied to Copilot CLI/SDK child process shutdown not killing the child on stop",
+      "cost": 0.0083634
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        329654,
+        333283,
+        332518,
+        333312,
+        331003,
+        325692,
+        333268,
+        305308
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these concern extension host processes hanging or not exiting after integration tests complete; closest is #331003 but that's about WebSocket hangs, a different mechanism.",
+      "certainty": "guess",
+      "cost": 0.08740780000000001
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        333312,
+        333283,
+        329654,
+        333268,
+        306481,
+        333136,
+        320660,
+        320532
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these concern a CI/test-runner process lingering after tests complete; closest tangential item is Electron re-download in unit tests but that's a different issue.",
+      "certainty": "guess",
+      "cost": 0.0872358
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "build/linux/rpm/dep-lists.ts",
+      "source_chars": 10194,
+      "supported": false,
+      "why": "The diff only bumps @github/copilot-sdk/@github/copilot version pins in package-lock.json/package.json, but the commit message's status report is about diagnosing a CLI/runtime process-exit hang in build 466906 and explicitly states 'No VS Code-side edit pushed' \u2014 the actual dependency bump code change does not address, fix, or even directly relate to the described hang investigation.",
+      "cost": 0.011170200000000002
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 3,
+      "citations": [],
+      "reason": "This is an automated dependency-bump PR whose own bot-generated status report says the SDK/CLI pair causes a process-exit hang and explicitly states no fix was pushed and the build fails \u2014 routine housekeeping that failed CI and was not merged.",
+      "cost": 0.11597959999999999
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": false,
+  "_cost": 0.3102,
+  "_wall_seconds": 42.4
+}

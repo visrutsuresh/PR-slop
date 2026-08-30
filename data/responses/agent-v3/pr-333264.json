@@ -1,0 +1,83 @@
+{
+  "bucket": 2,
+  "confidence": "low",
+  "reason": "Substantive, well-reasoned compatibility mapping with tests, but the investigator's cited issues (e.g. #333280) don't clearly match this specific legacy-setting mapping problem, so there's no confirmed link to a reported issue.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "eligibleForAutoApproval per-tool auto approve setting not respected policy tools always ask",
+      "looking_for": "a report from a user or admin saying the chat.tools.eligibleForAutoApproval setting (or its enterprise policy) doesn't work, is ignored, or that specific tools like fetch/runTask still get auto-approved despite being configured to never be auto-approved",
+      "cost": 0.0086024
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        305317,
+        305329,
+        333280,
+        305308,
+        330027,
+        309589,
+        333134,
+        330987
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "none of these are about a per-tool auto-approval/policy setting being silently ignored so the tool always prompts for confirmation",
+      "cost": 0.0864398
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        305317,
+        305313,
+        306511,
+        325663,
+        309589,
+        333280,
+        230139,
+        305329
+      ],
+      "decision": "stop",
+      "matched": 333280,
+      "why": "It directly matches: auto-approve/wildcard rules in settings.json being ignored, forcing manual approval prompts.",
+      "cost": 0.0861998
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+      "source_chars": 14070,
+      "supported": true,
+      "why": "The current file shows ELIGIBLE_FOR_AUTO_APPROVAL_SETTING_ID imported and mapped via managedPermissionsSetting(..., 'policyOnly', contributeEligibleForAutoApprovalRestriction), and the transform function checks for all-true/empty values returning undefined vs returning {disableBypassPermissionsMode: 'disable'} otherwise, matching the described bypass-lock fallback behavior exactly.",
+      "cost": 0.01088
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [],
+      "reason": "Substantive, well-reasoned compatibility mapping with tests, but the investigator's cited issues (e.g. #333280) don't clearly match this specific legacy-setting mapping problem, so there's no confirmed link to a reported issue.",
+      "cost": 0.1095116
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.3016,
+  "_wall_seconds": 41.7
+}

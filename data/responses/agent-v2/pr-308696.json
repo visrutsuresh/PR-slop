@@ -1,0 +1,73 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "The diff plausibly implements the described fix (closing non-dirty editors when Close All is cancelled) and directly addresses issue #305306, a pre-existing reported problem.",
+  "citations": [
+    "#305306",
+    "src/vs/workbench/browser/parts/editor/editorActions.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "Close All Editors cancel does not close any files unsaved prompt",
+      "looking_for": "an issue report describing that clicking Cancel on the save/unsaved-changes prompt during Close All Editors aborts closing everything, including tabs with no unsaved changes, instead of closing only the clean ones",
+      "cost": 0.008263
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        305306,
+        333172,
+        331812,
+        325587,
+        325663,
+        306474,
+        331853,
+        333321
+      ],
+      "decision": "stop",
+      "matched": 305306,
+      "why": "The title and description exactly match the submission's fix: Cancel on the unsaved-file prompt during Close All Editors aborts the whole operation instead of just skipping that file.",
+      "cost": 0.0864078
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/browser/parts/editor/editorActions.ts",
+      "source_chars": 88969,
+      "supported": true,
+      "why": "The diff sets cancelled=true instead of returning on ConfirmResult.CANCEL, skips step 2/3/4 confirmation-dependent work when cancelled, and passes excludeConfirming: true (via cancelled) to doCloseAll, which now forwards excludeConfirming to group.closeAllEditors \u2014 matching the described behavior of closing non-confirming editors while skipping only dirty ones.",
+      "cost": 0.010542000000000001
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#305306",
+        "src/vs/workbench/browser/parts/editor/editorActions.ts"
+      ],
+      "reason": "The diff plausibly implements the described fix (closing non-dirty editors when Close All is cancelled) and directly addresses issue #305306, a pre-existing reported problem.",
+      "cost": 0.1021036
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#305306",
+        "src/vs/workbench/browser/parts/editor/editorActions.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.2073,
+  "_wall_seconds": 37.0
+}

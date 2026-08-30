@@ -1,0 +1,76 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Adds a genuine API option addressing a previously reported annoyance with the workspace-transition confirmation dialog blocking programmatic workflows; the diff is internally consistent with the described call chain even though later files weren't fully verified.",
+  "citations": [
+    "#306495",
+    "src/vs/workbench/api/common/extHost.api.impl.ts",
+    "src/vscode-dts/vscode.d.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "confirmation dialog switching workspaces extension restart annoying updateWorkspaceFolders",
+      "looking_for": "a report from a user or extension author complaining that the workspace-transition confirmation dialog interrupts a programmatic/automated workflow when updateWorkspaceFolders() causes a folder-to-multi-root switch",
+      "cost": 0.0084906
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        306495,
+        305313,
+        305317,
+        333151,
+        333160,
+        333309,
+        306511,
+        325663
+      ],
+      "decision": "stop",
+      "matched": 306495,
+      "why": "The 'suppressConfirmation option to updateWorkspaceFolders()' issue matches the reported pain of confirmation dialogs when switching workspaces via extension code.",
+      "cost": 0.0865858
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/api/browser/mainThreadWorkspace.ts",
+      "source_chars": 15122,
+      "supported": true,
+      "why": "The current file shows $updateWorkspaceFolders with the old single-arg signature calling updateFolders(...) without options, matching the diff's 'before' state exactly, and the diff coherently threads suppressConfirmation through mainThreadWorkspace.ts, extHost.protocol.ts, and extHostWorkspace.ts (overload detection in extHost.api.impl.ts, IPC boolean, forwarding into $updateWorkspaceFolders). The visible slice is internally consistent with the claimed call chain, though later files (abstractWorkspaceEditingService.ts, workspaceEditingService.ts, IExtensionService) are not shown to verify the veto-bypass claim.",
+      "cost": 0.011665
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#306495",
+        "src/vs/workbench/api/common/extHost.api.impl.ts",
+        "src/vscode-dts/vscode.d.ts"
+      ],
+      "reason": "Adds a genuine API option addressing a previously reported annoyance with the workspace-transition confirmation dialog blocking programmatic workflows; the diff is internally consistent with the described call chain even though later files weren't fully verified.",
+      "cost": 0.1127156
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#306495",
+        "src/vs/workbench/api/common/extHost.api.impl.ts",
+        "src/vscode-dts/vscode.d.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.2195,
+  "_wall_seconds": 44.8
+}

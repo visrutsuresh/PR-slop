@@ -111,3 +111,42 @@ Giving an agent a sharper sense of code quality made it WORSE at this task, beca
 **What we would keep from it.** The investigator's habit of writing its own search wording is good, and it works: it produced queries like "snippet tab stop limit 10 nested placeholders" from a title that said none of those things, using the words a person REPORTING a problem would use rather than the words a developer FIXING it would use. That idea is worth carrying into a future version. The quality judgement is not.
 
 **Honest note on the verifier.** It sent nothing back across all 15, so the loop we built never actually ran. Twice now, across two architectures, our verification stage has fired zero times. That is worth saying plainly rather than describing a mechanism that has never once been exercised.
+
+## The reframe: stop predicting the human, start producing evidence
+
+**The problem with everything above, and it was the CEO who named it.**
+
+Every version so far predicts what a maintainer did. That contains a flaw we could not argue away: **if a maintainer overlooks something valuable and closes it, and the tool correctly says the work is good, we mark the tool wrong.** The scoring fights the product. A tool built this way can never help with the failure a maintainer would most want help with.
+
+It is not hypothetical. The single case that no version out of six ever got right, pr-308696, is exactly that shape: real code, fixing a genuinely reported problem, confirmed against the actual source, closed anyway. Six versions all said "this is good work". We scored all six as mistakes.
+
+**What we changed.** We kept the merge prediction, honestly labelled as what it is, a prediction of a human decision. Alongside it we now produce an **evidence card**: claims that are true or false against the repository, with no human verdict involved.
+
+| Claim | How it is checked |
+| --- | --- |
+| Names a genuinely reported problem | the number resolves in the project |
+| Names real files | the paths are really in this change |
+| Carries tests | the change touches test paths |
+| Substantive | line and file counts, not a trivial edit |
+| Description matches the code | the claim checker read the real source |
+
+Nobody labels anything. Each is a fact.
+
+**Result on the 15 cases.** Of 16 factual claims the agent made, **16 hold up, 100%**. Eleven of fifteen submissions carry tests. Fourteen are substantive.
+
+**The disagreement report, which is the actual point.** When the evidence says a submission is well supported and the record says it was closed, that is not the tool being wrong. That is the tool finding work a human may have overlooked. Two surfaced:
+
+- **pr-308696**, "Close non-dirty editors when cancelling Close All Editors". Fixes genuinely reported problem #305306, code confirmed against the real source, 44 lines. Closed without merging.
+- **pr-324044**, "Report when buffered events are flushed to a late listener". Code confirmed, carries tests, 99 lines across 7 files. Closed without merging.
+
+The case that was our worst failure is now the headline output.
+
+## A counting error I made in this very file, caught before publishing
+
+The first run of the evidence card reported **61.5%** of factual claims holding up. That contradicted the 100% reported elsewhere, so we checked instead of publishing it.
+
+The bug: "named no problem at all" was being counted as "named a problem that does not exist". Ten of fifteen submissions named none, and all ten were being scored as false claims.
+
+**This is the exact error this project pre-registered a rule against**, in writing, before any system was run: zero offered is not zero percent correct. We wrote the rule, published it, and then broke it in a new file two days later. The real figure is 16 of 16.
+
+Recorded rather than quietly fixed, because the lesson is the useful part: writing a rule down does not make you follow it. The thing that caught this was a number looking wrong next to another number, not discipline.

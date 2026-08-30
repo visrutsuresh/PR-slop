@@ -1,0 +1,101 @@
+{
+  "bucket": 2,
+  "confidence": "low",
+  "reason": "Genuine substantive fix to a real code-action lifecycle bug, but the code in the diff doesn't match the current source (possibly already reworked or unmerged), and #330142 isn't a verifiable issue, so I can't confirm it resolves a specifically reported problem.",
+  "citations": [
+    "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+    "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "code action command arguments lost quick fix menu open Actual command not found",
+      "looking_for": "a report describing that invoking a code action's command while the Quick Fix/lightbulb menu was open (or kept open) failed with an 'Actual command not found' error, or that command arguments were lost/dropped for delayed or resolved code actions",
+      "cost": 0.008328599999999999
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        331834,
+        230126,
+        332515,
+        331016,
+        333331,
+        333119,
+        333305,
+        230169
+      ],
+      "decision": "stop",
+      "matched": 331834,
+      "why": "The title is a near-verbatim match to the search query about code actions with arguments failing with 'Actual command not found' when the Quick Fix menu is open.",
+      "cost": 0.0866778
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/editor/contrib/codeAction/browser/codeActionController.ts",
+      "source_chars": 19504,
+      "supported": false,
+      "why": "The current codeActionController.ts still shows the pre-patch code exactly (plain `actions = await newState.actions;`, no `takeCodeActions` call, no `actions.dispose()` calls on the disposed/selection-mismatch branches), meaning the diff described in the PR was not actually applied to the codebase being inspected.",
+      "cost": 0.0162476
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#331834",
+        "#330142",
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+        "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+      ],
+      "reason": "Fixes a real regression (from #330142) in code action disposal that caused delayed commands with arguments to fail with 'Actual command not found', matching a previously reported issue; code mismatch just indicates the diff shown wasn't applied to the inspected snapshot, not that it's unwanted work.",
+      "cost": 0.10760360000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#331834",
+        "#330142",
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+        "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+      ],
+      "failures": [
+        "#330142 is not a real recorded problem in this project"
+      ],
+      "sending_back": true
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 2,
+      "bucket": 2,
+      "citations": [
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+        "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+      ],
+      "reason": "Genuine substantive fix to a real code-action lifecycle bug, but the code in the diff doesn't match the current source (possibly already reworked or unmerged), and #330142 isn't a verifiable issue, so I can't confirm it resolves a specifically reported problem.",
+      "cost": 0.1080956
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "src/vs/editor/contrib/codeAction/browser/codeActionModel.ts",
+        "src/vs/editor/contrib/codeAction/browser/codeActionController.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": false,
+  "_cost": 0.327,
+  "_wall_seconds": 46.9
+}

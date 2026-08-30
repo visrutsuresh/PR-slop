@@ -1,0 +1,70 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Investigator found this addresses already-reported issue #331188 about GitHub context attachments not being openable/clickable in new sessions; the diff adds URL parsing and openable resource wiring consistent with that fix, and merged work is the base rate here.",
+  "citations": [
+    "#331188"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "GitHub issue pull request context attachment new session not clickable open link picker",
+      "looking_for": "an issue where a user reports that pasting/attaching a GitHub issue or PR link in the new chat session composer doesn't let them open it, or the picker doesn't recognize pasted GitHub URLs",
+      "cost": 0.0082722
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333147,
+        333150,
+        322991,
+        331188,
+        275289,
+        306471,
+        333160,
+        333053
+      ],
+      "decision": "stop",
+      "matched": 331188,
+      "why": "context pill weirdness on PR sessions matches the same area as issue/PR attachment click behavior being fixed",
+      "cost": 0.0863598
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/src/extension/chatSessions/vscode-node/copilotCloudSessionsProvider.ts",
+      "source_chars": 108769,
+      "supported": "cannot tell",
+      "why": "The diff adds parseGitHubContextUrl and wires it into the picker's paste-search path, matching the 'recognizes pasted GitHub URLs' claim, and adds a GITHUB_CONTEXT_ID_PREFIX-based openResource lookup in newChatContextAttachments.ts consistent with 'openable from composer'. However the diff is truncated mid-hunk (openResource assignment cuts off) and the CSS/pill 'clickable' class usage isn't shown wired into the truncated newChatContextAttachments.ts snippet, and the accessibility-help doc change (2 lines) isn't shown at all, so full support for the compound claim can't be confirmed from what's visible.",
+      "cost": 0.011865200000000001
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#331188"
+      ],
+      "reason": "Investigator found this addresses already-reported issue #331188 about GitHub context attachments not being openable/clickable in new sessions; the diff adds URL parsing and openable resource wiring consistent with that fix, and merged work is the base rate here.",
+      "cost": 0.1118276
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#331188"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": "cannot tell",
+  "_cost": 0.2183,
+  "_wall_seconds": 35.6
+}

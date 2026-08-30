@@ -1,0 +1,64 @@
+{
+  "bucket": 0,
+  "confidence": "low",
+  "reason": "No repository access to verify current source state or confirm cited issues (#331834, #330142) are real reported problems matching this fix; claim checker found the diff doesn't match actual current code, but that alone doesn't determine merge status.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "code action command arguments lost quick fix menu delayed",
+      "looking_for": "a report where invoking a code action's command from the Quick Fix/lightbulb menu after some delay fails to pass arguments or shows an 'Actual command not found' error, especially after keeping the menu open a few seconds",
+      "cost": 0.0082186
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        230126,
+        331834,
+        306475,
+        332515,
+        333324,
+        331016,
+        333331,
+        230169
+      ],
+      "decision": "stop",
+      "matched": 331834,
+      "why": "The title directly matches: code actions with arguments failing when the Quick Fix menu is open, which is exactly the delayed/lost quick fix menu argument bug described.",
+      "cost": 0.08637979999999999
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/editor/contrib/codeAction/browser/codeActionController.ts",
+      "source_chars": 19504,
+      "supported": false,
+      "why": "The diff claims codeActionController.ts now calls this._model.takeCodeActions(...), checks `if (!actions) return`, and disposes actions on the _disposed/selection-mismatch early returns, but the current file content shows the old code: plain `actions = await newState.actions;` with no takeCodeActions call and no dispose() calls on the _disposed or selection-mismatch branches. The claimed fix is not present in the actual codebase.",
+      "cost": 0.0161776
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 0,
+      "citations": [],
+      "reason": "No repository access to verify current source state or confirm cited issues (#331834, #330142) are real reported problems matching this fix; claim checker found the diff doesn't match actual current code, but that alone doesn't determine merge status.",
+      "cost": 0.1057936
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": false,
+  "_cost": 0.2166,
+  "_wall_seconds": 39.8
+}

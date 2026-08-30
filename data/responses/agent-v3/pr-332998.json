@@ -1,0 +1,73 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Small, focused fix removing an overly restrictive file filter that blocked selecting ZIP model packages, matching a reported file-picker/zip selection issue (#332537).",
+  "citations": [
+    "#332537",
+    "src/vs/workbench/contrib/chat/electron-browser/actions/installDictationModelAction.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "can't select zip file installing dictation model file picker only shows folders",
+      "looking_for": "a bug report where a user says the file picker for manually installing a speech/dictation model won't let them pick a .zip file, only directories",
+      "cost": 0.0079146
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        332537,
+        331015,
+        332840,
+        333325,
+        331845,
+        305287,
+        333037,
+        333160
+      ],
+      "decision": "stop",
+      "matched": 332537,
+      "why": "Issue #332537 is about trouble installing dictation functionality manually, which matches a file picker not letting the user select a zip file when installing a dictation model.",
+      "cost": 0.0862438
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/contrib/chat/electron-browser/actions/installDictationModelAction.ts",
+      "source_chars": 4354,
+      "supported": true,
+      "why": "The diff removes the extensions:['zip'] filter from showOpenDialog, so the native picker no longer restricts file selection, while canSelectFiles/canSelectFolders remain true and importModel is still called with the chosen path unchanged, preserving folder support and existing importer validation.",
+      "cost": 0.008744000000000002
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#332537",
+        "src/vs/workbench/contrib/chat/electron-browser/actions/installDictationModelAction.ts"
+      ],
+      "reason": "Small, focused fix removing an overly restrictive file filter that blocked selecting ZIP model packages, matching a reported file-picker/zip selection issue (#332537).",
+      "cost": 0.0935076
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#332537",
+        "src/vs/workbench/contrib/chat/electron-browser/actions/installDictationModelAction.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.1964,
+  "_wall_seconds": 39.2
+}
