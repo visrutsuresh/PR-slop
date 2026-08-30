@@ -291,7 +291,7 @@ There are six agent versions at the root because this project improved by measur
 | File | What it is |
 | --- | --- |
 | **`agent_v4.py`** | **The shipped system.** Four roles and a loop. This is what `./run.sh agent` runs. |
-| `agent.py`, `agent_v2/v3/v5/v6.py` | The other five versions, kept so `./run.sh versions` can recompute the whole table. Not shipped. |
+| `agent.py`, `agent_v2.py`, `agent_v3.py`, `agent_v5.py`, `agent_v6.py` | The other five versions, kept so `./run.sh versions` can recompute the whole table. Not shipped. |
 | `triage.py` | **The product.** The page a maintainer reads. `./run.sh triage` |
 | `retriever.py` | The search over the project's 403 recorded problems |
 | `evidence.py` | The evidence card and the second-opinion list, facts only |

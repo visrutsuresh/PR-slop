@@ -34,7 +34,9 @@ Nothing above is copied or adapted from any prior repository. It was written fro
 
 ## What gets added after kickoff (2026-08-28 15:00 UTC)
 
-Everything else: the simple first-pass solution (the "baseline"), the improved solution built on top of it (the "advanced" solution), `harness/compare.py` (which will score the two against each other), any extra dependencies added to the Dockerfile, the filled-in content of `docs/reproduction.md`, and any code adapted from elsewhere. This section gets updated once the problem is known, listing anything reused and where it came from.
+Everything else. This paragraph was written before kickoff in the future tense; it is now rewritten against what actually happened.
+
+`harness/compare.py` was planned and **never built**. `scoring.py` does that job, shared by every system so none of them gets a different yardstick. No extra dependencies were added to the Dockerfile: the whole project uses the standard library only. Nothing anywhere is adapted from another repository.
 
 `harvest.py`, `baselines/regex_rule.py`, `baselines/__init__.py`, `test_harvest.py`, and the `harvest` subcommand added to `run.sh`: the evaluation-set harvester, written from scratch after kickoff, against a design that went through three rounds of independent review before any code was written. That review is summarised in `CHANGELOG.md`. Nothing in these files is adapted from any prior repository. `data/cases/`, `data/issues.jsonl`, `data/manifest.json`, and `data/pseudonym_salt.txt` are its committed output, fetched live from `microsoft/vscode` via the authenticated `gh api` CLI.
 
