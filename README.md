@@ -19,7 +19,14 @@ The floor for three equal piles is 33.3%, so **the simple version scored exactly
 
 **Three things this write-up does that you may not expect.** It reports an experiment that made things worse and was removed, with numbers. It records three occasions where we published a figure that turned out to be made up, and how each was caught. And it explains why the evaluation itself is flawed: it scores the tool against what a human decided, so a tool that correctly spots value a maintainer overlooked gets marked wrong. There is a section on what we did about that.
 
-Everything below runs from a fresh clone with no account, no network and no cost. `PRE-EXISTING.md` lists what existed before kickoff.
+**Try it in ten seconds.** Clone, then:
+
+```bash
+./run.sh triage      # the page a maintainer reads
+./run.sh agent       # the numbers above, recomputed
+```
+
+No account, no network, no cost, from a fresh clone. Full command list under Quickstart. `PRE-EXISTING.md` lists what existed before kickoff.
 
 ## Intended user
 
