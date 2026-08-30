@@ -68,29 +68,74 @@ def esc(s):
     return html.escape(str(s or ""))
 
 
+DOT = "\u00b7"
+
+
+def declared_chip(d):
+    """The author's own closing reference, quoted rather than paraphrased.
+
+    The chip leads with the quote on purpose. The pattern proves a TEXT MATCH,
+    not intent, so "This does not fix #123" has to read correctly: "confirmed"
+    then attaches to *the issue is open*, which is the only thing we checked.
+    """
+    q = (f'fact {DOT} author\u2019s text: \u201c{esc(d["quote"])}\u201d, ')
+    where = "this repository" if d["same_repo"] else f'{esc(d["owner"])}/{esc(d["repo"])}'
+    s = d["status"]
+    if s == "open" and d["same_repo"]:
+        return f'<span class="chip ok">{q}open issue, confirmed</span>'
+    if s == "open":
+        return f'<span class="chip ok">{q}open issue in another repo, confirmed</span>'
+    if s == "closed":
+        return f'<span class="chip">{q}that issue is already closed</span>'
+    if s == "pull_request":
+        return f'<span class="chip">{q}that number is a pull request, not an issue</span>'
+    if s == "missing":
+        return (f'<span class="chip no">{q}no issue #{d["number"]} in '
+                f'{where}</span>')
+    return f'<span class="chip hm">{q}could not reach GitHub to check</span>'
+
+
 def chips(f):
-    out = []
+    """Three categories, and the prefix is on the chip so nobody has to
+    remember which is which: `fact` is re-derivable with no model at all,
+    `checked` was proposed by the model and then verified against GitHub, and
+    `judgement` is the model's opinion with nothing behind it."""
+    out = [declared_chip(d) for d in f.get("declared") or []]
     for p in f["problems"]:
-        out.append(f'<span class="chip ok">fixes {esc(p)}, confirmed real</span>')
+        out.append(f'<span class="chip ok">checked {DOT} cites {esc(p)}, '
+                   f'real open issue</span>')
+    for p in f.get("closed_refs") or []:
+        out.append(f'<span class="chip">checked {DOT} cites {esc(p)}, '
+                   f'real issue, already closed</span>')
+    for p in f.get("pr_refs") or []:
+        out.append(f'<span class="chip">checked {DOT} cites {esc(p)}, that '
+                   f'number is a pull request, not an issue</span>')
     for p in f["invented"]:
-        out.append(f'<span class="chip no">claimed {esc(p)}, does not exist</span>')
+        out.append(f'<span class="chip no">checked {DOT} cites {esc(p)}, '
+                   f'no such issue in this repository</span>')
+    for p in f.get("unresolved") or []:
+        out.append(f'<span class="chip hm">checked {DOT} cites {esc(p)}, '
+                   f'could not reach GitHub to confirm</span>')
     if f["claim"] is True:
-        out.append('<span class="chip ok">code matches its description</span>')
+        out.append(f'<span class="chip ok">judgement {DOT} code matches its '
+                   f'description</span>')
     elif f["claim"] is False:
-        out.append('<span class="chip no">code does not match its description</span>')
+        out.append(f'<span class="chip no">judgement {DOT} code does not match '
+                   f'its description</span>')
     else:
-        out.append('<span class="chip hm">could not confirm the description</span>')
+        out.append(f'<span class="chip hm">judgement {DOT} could not confirm '
+                   f'the description</span>')
     out.append(f'<span class="chip {"ok" if f["has_tests"] else ""}">'
-               f'{"has tests" if f["has_tests"] else "no tests"}</span>')
-    out.append(f'<span class="chip">{f["lines"]} lines, {f["files"]} file'
-               f'{"s" if f["files"] != 1 else ""}</span>')
+               f'fact {DOT} {"has tests" if f["has_tests"] else "no tests"}</span>')
+    out.append(f'<span class="chip">fact {DOT} {f["lines"]} lines added, '
+               f'{f["files"]} file{"s" if f["files"] != 1 else ""}</span>')
     return "".join(out)
 
 
 def card(r, repo):
     ci, v, f = r["input"], r["verdict"], r["facts"]
     n = ci["number"]
-    strong = bool(f["problems"]) and f["claim"] is True
+    strong = (bool(f["problems"]) and f["claim"] is True) or bool(f.get("declared_ok"))
     flag = ""
     if strong and v.get("bucket") == 3:
         flag = ('<div class="flag">The evidence here is stronger than the '
@@ -107,15 +152,23 @@ def card(r, repo):
 </article>"""
 
 
+# Which group a submission lands in is a PREDICTION about the merge decision,
+# which is what the model was actually asked for. The earlier headings named a
+# reading order instead ("Read these first", "Leave until last"), a different
+# claim from the one behind them.
 GROUPS = [
-    (1, "b1", "Read these first",
-     "Evidence says these fix something already reported."),
-    (2, "b2", "Normal queue",
-     "Real work that needs your eyes. No particular urgency."),
-    (3, "b3", "Leave until last",
-     "Least supported by evidence. This is NOT a verdict that they are bad."),
-    (0, "bx", "Could not judge",
-     "Not enough evidence to place these. Shown rather than hidden."),
+    (1, "b1", "Predicted merge, and it answers something already reported",
+     "A prediction about what a maintainer would decide, not a measurement. "
+     "The order inside the group is evidence strength."),
+    (2, "b2", "Predicted merge, with nothing reported to attach it to",
+     "Same prediction, minus the link to an already-reported problem. The "
+     "order inside the group is evidence strength."),
+    (3, "b3", "Predicted not merged",
+     "A prediction about a human decision, NOT a judgement that the work is "
+     "bad. Housekeeping, superseded work and duplicates all land here."),
+    (0, "bx", "Not enough evidence to predict either way",
+     "The model declined to call these rather than guess. Shown rather than "
+     "hidden."),
 ]
 
 
@@ -138,8 +191,9 @@ def write(data, path):
         if later:
             body_html += (
                 f'<details class="rest"><summary>{len(later)} more in this '
-                f'group, ordered by how much evidence supports them. Nothing '
-                f'is hidden, this is just not today\'s reading.</summary>'
+                f'group, ordered by checked evidence, then by how recent they '
+                f'are. Nothing is hidden, this is just not today\'s '
+                f'reading.</summary>'
                 + "".join(card(r, repo) for r in later) + "</details>")
         parts.append(head + body_html + "</section>")
 
@@ -158,16 +212,37 @@ def write(data, path):
 </div></header>
 <main><div class="wrap">{body}</div></main>
 <footer><div class="wrap">
+  <div><span class="k">The groups</span> Which group a submission is in is a
+  <em>prediction</em> about the decision a maintainer would make, not a
+  measurement and not a quality verdict. The order <em>inside</em> a group is a
+  different thing: evidence strength, described next.</div>
   <div><span class="k">The order</span> Within each group, by how much
-  <em>checked</em> evidence supports it: a confirmed link to a reported problem
-  first, then a confirmed description, then tests, then size. Size ranks last on
-  purpose, because a large diff is work, not value.</div>
-  <div><span class="k">How to read it</span> Every claim shows its evidence.
-  Anything unconfirmed says so rather than being dropped.</div>
+  <em>checked</em> evidence supports it: a reference the author declared and we
+  confirmed, then a confirmed link to an already-reported problem, then a
+  confirmed description. Ties break to the newer submission, which is recency,
+  not evidence. Tests and size do not affect the order; they are shown, not
+  ranked.</div>
+  <div><span class="k">How to read it</span> Chips marked <em>fact</em> you can
+  re-derive yourself from GitHub with no model involved: files changed, lines
+  added, whether test paths are touched, and any closing reference found in the
+  author's own title or body, quoted verbatim. That last one is a <b>text
+  match, not a statement of intent</b>: the tool reports the characters the
+  author wrote and whether the referenced issue is real and open. It does not
+  read the sentence around them, so a negation ("does not fix #123") or an
+  unticked template checkbox will still show a chip; a reference inside a
+  fenced code block is skipped. The quote is there so you can see which one you
+  are looking at. Chips marked <em>checked</em> were proposed by the model and
+  then verified against GitHub, so the reference is real and its state is
+  accurate, but the model chose to cite it. Chips marked <em>judgement</em> are
+  the model's opinion and nothing verified them. The order on this page puts
+  checked evidence first and breaks ties by recency, not an accuracy claim: these pull
+  requests are open, so no correct answer exists to score against.</div>
   <div><span class="k">What it cannot do</span> It does not know your roadmap,
   your release schedule, or that you already decided against an approach. Those
   are the reasons good work gets closed, and it cannot see any of them.</div>
-  <div><span class="k">Cost</span> {total:.2f} USD for {len(rs)} submissions.</div>
+  <div><span class="k">This run</span> {esc(repo)}, {len(rs)} submissions,
+  generated {esc(data['generated'])}, source read at commit
+  <code>{esc(data['sha'][:8])}</code>, {total:.2f} USD.</div>
 </div></footer></body></html>"""
     open(path, "w").write(out)
     return path
