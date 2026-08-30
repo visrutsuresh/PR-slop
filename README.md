@@ -57,6 +57,7 @@ The author is not a maintainer and does not claim to be. He is the person standi
 ./run.sh baseline    # the simple comparison version
 ./run.sh script      # the intermediate two-stage version
 ./run.sh agent       # the shipped system, four roles with a loop
+./run.sh versions    # rebuilds the six-version table from committed answers
 ./run.sh eval        # the checks
 ```
 
@@ -131,7 +132,7 @@ Second, 40.0% against a 33.3% floor is a difference of about one case at this sa
 
 ## Improvement Changelog
 
-See `CHANGELOG.md`. Every meaningful change is logged there with the evidence that drove the next decision (a failing test, a bad result, a judge-visible constraint).
+See `CHANGELOG.md`. Its central table, six versions of the agent with what each changed, is not something you have to take on trust: **`./run.sh versions` recomputes every row from the committed answers**, offline. Every meaningful change is logged there with the evidence that drove the next decision (a failing test, a bad result, a judge-visible constraint).
 
 ## Main failure mode
 

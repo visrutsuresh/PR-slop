@@ -12,7 +12,7 @@
 # committed responses are the record.
 set -euo pipefail
 
-usage() { echo "usage: $0 {triage [pr-number]|baseline|script|agent|eval|probe|harvest}" >&2; exit 1; }
+usage() { echo "usage: $0 {triage [pr-number]|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
 
 [ $# -ge 1 ] && [ $# -le 2 ] || usage
 
@@ -66,6 +66,12 @@ case "$1" in
       echo "[agent] shipped system, replaying committed responses, no credential"
       PRSLOP_AGENT_DIR=data/responses/agent-v4 python3 agent_v4.py --replay
     fi
+    ;;
+  versions)
+    # rebuilds the six-version table in CHANGELOG.md from committed answers,
+    # so the measured-improvement claim can be checked rather than trusted
+    echo "[versions] recomputing every version from the committed answers"
+    python3 versions.py
     ;;
   eval)
     echo "[eval] reads only the committed cache under data/, never the network"
