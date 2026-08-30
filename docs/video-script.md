@@ -97,15 +97,23 @@ So any triage tool built on the metadata a project records for free is measuring
 
 ---
 
-## Shot list
+## Shot list, every row is something you can literally type
 
-| Time | On screen |
-| --- | --- |
-| 0:00 | the two job adverts |
-| 0:40 | `./run.sh baseline`, the 33.3% |
-| 1:10 | `./run.sh agent`, then a `traces/agent-*.md` file |
-| 1:50 | `./run.sh triage`, the page |
-| 2:20 | the six-version table |
-| 3:10 | pr-308696 in `data/cases/`, then SECOND OPINION |
-| 4:00 | `CHANGELOG.md`, the three made-up numbers |
-| 4:35 | the 17-case breakdown |
+Open a terminal in the repo. Nothing below needs an account or a network.
+
+| Time | Type this | What to point at |
+| --- | --- | --- |
+| 0:00 | (slide) the two job adverts | the phrase "open-source contributions" in both |
+| 0:40 | `./run.sh baseline` | `balanced accuracy : 33.3%` and say the floor is 33.3 |
+| 1:10 | `./run.sh agent` | `0.60 / 0.80 / 0.80`, and `6 follow-up searches the agent chose itself` |
+| 1:30 | `cat traces/agent-*.md \| head -40` | the investigator's own query, then the claim checker reading real source |
+| 1:50 | `./run.sh triage` | the three piles, then scroll to SECOND OPINION at the bottom |
+| 2:20 | `./run.sh versions` | the whole six-version table, recomputed live |
+| 3:10 | `./run.sh triage 308696` | `NOTE: closed without merging, but the evidence above is strong` |
+| 3:40 | `./run.sh evidence` | `16 factual claims, 16 hold up`, then the two flagged submissions |
+| 4:00 | `CHANGELOG.md`, search for "made-up" | the three invented figures and how each was caught |
+| 4:35 | (slide) 17 closed submissions: 4 bots, 10 insiders, 1 slop | the single slop case |
+
+**One rehearsal note.** `./run.sh versions` and `./run.sh triage` both print more than a screen. Scroll slowly or pre-size the window, because the numbers are the point and an unreadable frame wastes the shot.
+
+**If you have time for one more thing**, run `./run.sh probe` on camera. It proves the model cannot read the answer file, and it is the single most convincing thing in the repository for anyone suspicious that the evaluation is rigged.
