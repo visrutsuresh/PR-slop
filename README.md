@@ -78,7 +78,7 @@ Four roles, and a loop. Each was added only after a measurement showed it was ne
 1. **Investigator.** Decides for itself what to search for, reads what comes back, and can search again with different wording if the first attempt was poor. It chose 6 follow-up searches on its own across the 15 cases. This is the one choosing the action, not us.
 2. **Claim checker.** Reads the actual source at a pinned commit and tests whether the submission does what it says. It ran against real source on 10 of 15.
 3. **Adjudicator.** Decides the pile from what the other two found.
-4. **Verifier.** Checks every claim and, when one does not hold up, **sends the work back** rather than deleting it quietly.
+4. **Verifier.** Checks every claim and, when one does not hold up, **sends the work back** rather than deleting it quietly. Honest frequency: it fired **once in fifteen**. In the earlier two-stage version the equivalent check fired **zero** times. We keep it because it costs nothing and the failure it guards against is documented in our own baseline output, where 2 of 3 named problems did not exist, but nobody should read this line and picture it firing often.
 
 **Why this is not one prompt.** The project has 403 recorded problems, far too many to hand a model at once, so answering "does this fix something already reported" requires going and searching. The investigator writes those searches itself, which produced queries like `snippet tab stop limit 10 nested placeholders` from a title containing none of those words, because a person reporting a problem uses different words from a developer fixing it.
 

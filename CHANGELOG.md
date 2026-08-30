@@ -88,7 +88,7 @@ So we built the real thing. Four roles, and a loop:
 - an **investigator** that writes its own search wording, reads the results, and can search again with different words if the first attempt was poor
 - a **claim checker** that reads the actual source at the pinned commit and tests whether the submission does what it says, rather than trusting the description
 - an **adjudicator** that decides the pile using what the other two found
-- a **verifier** that, when a claim does not hold up, **sends the work back** for another attempt instead of quietly deleting it
+- a **verifier** that, when a claim does not hold up, **sends the work back** for another attempt instead of quietly deleting it. Across the shipped run it fired once in fifteen; in the earlier two-stage version the equivalent check fired zero times
 
 This is genuinely agentic. The agent chose 8 follow-up searches on its own across the 15 cases. Its claim checker read real source for 14 of 15.
 
