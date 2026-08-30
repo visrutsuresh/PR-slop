@@ -71,6 +71,7 @@ case "$1" in
     echo "[eval] reads only the committed cache under data/, never the network"
     python3 test_harness.py
     python3 test_harvest.py
+    python3 check_docs.py
     python3 baselines/regex_rule.py
     ;;
   *)

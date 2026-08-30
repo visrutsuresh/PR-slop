@@ -18,7 +18,7 @@ Evidence from the real harvest run: the frozen pattern re-derives the bucket cen
 
 **Result on the fifteen cases.** Balanced accuracy **33.3%**. The floor for three equal piles is 33.3%. So the simple version performs exactly as well as guessing.
 
-Per-pile recall was 0.20, 0.40, 0.40. It declined to answer on 5 of 15, which is the honest behaviour we asked for. It wrongly called 1 of 10 merged items "not merged". Cost 1.84 USD across the fifteen.
+Per-pile recall was 0.20, 0.40, 0.40. It declined to answer on 5 of 15, which is the honest behaviour we asked for. It wrongly called 1 of 10 merged items "not merged". Cost 1.86 USD across the fifteen.
 
 **Decision.** This is the number to beat. Recorded as the starting point.
 
@@ -65,7 +65,7 @@ We keep it for two reasons and state them plainly. It costs nothing to run. And 
 | Merge-worthy work wrongly rejected | 1 of 10 | **0 of 10** | |
 | Reported problems named that really exist | 1 of 3 (33%) | **9 of 9 (100%)** | |
 | Declined to answer | 5 of 15 | 0 of 15 | |
-| Cost across 15 cases | 1.84 USD | 1.88 USD | +0.04 |
+| Cost across 15 cases | 1.86 USD | 1.88 USD | +0.04 |
 
 The floor for three equal piles is 33.3%, so the simple version performed exactly as well as guessing.
 
@@ -184,3 +184,11 @@ Done means four things: one command, every factual claim resolves, it never acts
 **The test now checks the whole input**, not just the patch, and it is proven to fail on a planted address in a body.
 
 **The pattern, which is the useful part.** This is the third leak of the same family: the declaration in a body, then identity in a patch, now identity in a body. Each time we fixed precisely the surface where the leak was found and did not ask where else that class could live. The thing that caught this one was not a test we wrote. It was walking every tracked file and asking what a hostile reader would grep for.
+
+## A guard against the thing that kept going wrong
+
+Three separate times the documents drifted from the code. The README described the wrong system. Then it published the wrong per-pile figures. Then it quoted a cost that had changed when one case was regenerated. Each time a human reading carefully was the only thing that caught it.
+
+`check_docs.py` now runs inside `./run.sh eval`. It reads what the code actually prints for all three systems, accuracy, per-pile recall and cost, and fails if any of it is missing from the README.
+
+It is deliberately dumb: no parsing of our prose, just "does this number appear". That is enough, because every drift so far has been a number that silently stopped being true, not an argument that stopped being valid.

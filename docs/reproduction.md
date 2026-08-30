@@ -102,9 +102,14 @@ REGENERATE=1 ./run.sh harvest
 
 ## Cost and time, measured not estimated
 
-| | Simple version | Our system |
-| --- | --- | --- |
-| Fifteen cases | 1.84 USD | 1.88 USD |
-| Per case | about 0.12 USD | about 0.13 USD |
+| | Simple version | Intermediate script | Shipped agent |
+| --- | --- | --- | --- |
+| Fifteen cases | 1.86 USD | 1.88 USD | 4.14 USD |
+| Per case | about 0.12 USD | about 0.13 USD | about 0.28 USD |
+
+The agent costs more because it makes several calls per submission rather than
+one: the investigator plans a search and then judges the results, the claim
+checker reads real source, the adjudicator decides, and the whole thing can go
+round again if the verifier rejects a claim.
 
 Verifying from the saved answers costs nothing and takes seconds.

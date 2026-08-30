@@ -228,7 +228,7 @@ Three systems, same 15 cases, same model, same instructions.
 | Pile 1 / 2 / 3 recall | 0.20 / 0.40 / 0.40 | 1.00 / 1.00 / **0.20** | 0.60 / 0.80 / **0.80** |
 | Merge-worthy work wrongly rejected | 1 of 10 | 0 of 10 | **0 of 10** |
 | Reported problems named that exist | 1 of 3 | 9 of 9 | **5 of 5** |
-| Cost across 15 cases | 1.84 USD | 1.88 USD | 3.88 USD |
+| Cost across 15 cases | 1.86 USD | 1.88 USD | 4.14 USD |
 
 The floor for three equal piles is 33.3%, so **the simple version scored exactly as well as guessing.**
 
