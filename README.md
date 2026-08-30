@@ -105,7 +105,7 @@ Three tools:
 | Tool | What it does | Cost |
 | --- | --- | --- |
 | `whats_new` | What changed since the last triage of this repository. Reads the memory store only. | **free, instant, no network** |
-| `triage_queue` | Sort the open queue into the three piles. `scan_all` covers every open submission, and refuses with a quoted bill until `confirm_cost` is set. | about 0.45 USD per submission |
+| `triage_queue` | Sort the open queue into the three piles. Defaults to the 100 most recent. Anything past a dozen offers you the depths with a price on each and spends nothing until you pick. | about 0.45 USD per submission |
 | `triage_pull_request` | Everything about one submission: the pile, the checked evidence, **and a judgement of the code itself**. | about 0.55 USD |
 
 **Pointed at one submission, it answers the question triage never could.** Which pile a change belongs in is useless when there is only one change. So on a single pull request the tool also reviews the work: an overall quality call, what it genuinely does well, what should be improved before merging with a file and a reason attached to each, anything that should block a merge outright, and what breaks if the judgement is wrong.
@@ -117,6 +117,22 @@ On `microsoft/vscode#333418`, a rename titled as a memory-leak fix, it returned 
 and named the real tension: *"a maintainer taking this on merges it believing it fixes memory leaks, but nothing in the visible diff changed at all"*.
 
 **The reviewer does not see our own conclusion.** It gets the diff, the source and the counts, and never the bucket, the evidence chips or the investigator search. Handing it our answer would invite it to agree with us, and a reviewer that agrees with the thing it is checking is worth nothing.
+
+**You choose the depth, and you see the bill first.** The default is the 100 most recent open submissions, which is about 45 USD and forty minutes. That is a real charge, so nothing above a dozen runs until it has been chosen. In a terminal it asks. Through MCP it hands the assistant the options so the maintainer picks:
+
+```
+How much of microsoft/vscode should be read?
+1782 pull requests are open right now.
+
+      5   about   2.25 USD,   2 min   a quick look, enough to see the shape of the queue
+     25   about  11.25 USD,  10 min   a morning's reading
+    100   about  45.00 USD,  42 min   the default depth, where the piles and the caps start to matter
+   1782   about 801.90 USD, 743 min   every open submission in the repository
+
+  whats_new is free and offline, and on most days it is the right first question.
+```
+
+A bare number is not a choice. "100" means nothing to someone who has not priced a run, so every option carries its own cost and an option larger than the repository is never offered.
 
 **Output is configurable.** `output` takes `inline`, `report` or `both`. Chat is bad at tables, so a sixty-item queue is better handed over as a path than pasted into a conversation, and a single review reads fine inline.
 

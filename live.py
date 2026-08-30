@@ -33,6 +33,11 @@ import task_spec
 
 OUT_DIR = "reports"
 
+# Above this many submissions the tool quotes the bill and waits. A judge who
+# clones this and types the obvious command should not discover the price
+# afterwards.
+CONFIRM_ABOVE = int(os.environ.get("PRSLOP_CONFIRM_ABOVE", "12"))
+
 # Off switch for the GitHub-search half of the investigator's retrieval, so the
 # same queue can be run both ways in one sitting. The open queue changes every
 # day, so a before/after taken hours apart compares two different queues.
@@ -154,6 +159,66 @@ class ResolvedIssues:
 
     def __contains__(self, n):
         return self.classify(n) in ("open", "closed")
+
+
+def depth_options(repo, open_count=None, each=0.45):
+    """The choices worth offering, with the bill attached to each.
+
+    A bare number means nothing to someone who has not priced a run. "100" is
+    45 USD and forty minutes; "5" is pocket change and two. Offering the
+    options with their cost turns an invisible decision into a visible one.
+
+    Returned as data so both surfaces can use it: the terminal prompts with it,
+    and the MCP tool hands it to the assistant to put in front of the person.
+    """
+    opts = [(5, "a quick look, enough to see the shape of the queue"),
+            (25, "a morning's reading"),
+            (100, "the default depth, where the piles and the caps start to matter")]
+    if open_count:
+        opts.append((open_count, "every open submission in the repository"))
+    out = []
+    for n, why in opts:
+        if open_count and n > open_count and n != open_count:
+            continue
+        out.append({"n": n, "why": why, "usd": round(n * each, 2),
+                    "minutes": round(n * 25 / 60)})
+    return out
+
+
+def format_options(repo, opts, open_count=None):
+    lines = [f"How much of {repo} should be read?"]
+    if open_count:
+        lines.append(f"{open_count} pull requests are open right now.")
+    lines.append("")
+    for o in opts:
+        lines.append(f'  {o["n"]:>5}   about {o["usd"]:>6.2f} USD, '
+                     f'{o["minutes"]:>3} min   {o["why"]}')
+    lines.append("")
+    lines.append("  whats_new is free and offline, and on most days it is the "
+                 "right first question.")
+    return "\n".join(lines)
+
+
+def ask_depth(repo, opts, open_count=None):
+    """Prompt on a terminal. Returns a count, or None if there is nobody to ask."""
+    if not sys.stdin.isatty():
+        return None
+    print(format_options(repo, opts, open_count), file=sys.stderr)
+    default = 25
+    try:
+        raw = input(f"How many? [{default}] ").strip()
+    except (EOFError, KeyboardInterrupt):
+        print("", file=sys.stderr)
+        return 0
+    if not raw:
+        return default
+    if raw.lower() in ("n", "no", "q", "quit", "cancel"):
+        return 0
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        print("[live] not a number, nothing was run.", file=sys.stderr)
+        return 0
 
 
 def fetch_one(repo, number):
@@ -650,7 +715,10 @@ def rank(results):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("repo", help="owner/name, e.g. microsoft/vscode")
-    ap.add_argument("--limit", type=int, default=8)
+    # 100 is the default queue depth: enough that the piles and the today-caps
+    # mean something, where 8 was a demo. It is also about 45 USD, which is why
+    # anything past CONFIRM_ABOVE quotes the bill before it spends it.
+    ap.add_argument("--limit", type=int, default=100)
     ap.add_argument("--drafts", action="store_true", help="include drafts")
     ap.add_argument("--pr", type=int, help="triage one specific pull request")
     ap.add_argument("--all", action="store_true",
@@ -669,15 +737,27 @@ if __name__ == "__main__":
         rev = True
     if a.no_review:
         rev = False
-    if a.all and not a.yes:
-        n = len(fetch_open_prs(a.repo, 10 ** 9, a.drafts))
+    if not a.pr and not a.yes:
         each = 0.45 + (0.25 if rev else 0)
-        print(f"[live] {a.repo} has {n} open pull requests. A full scan is "
-              f"about {n * each:.0f} USD and roughly {n * 25 / 60:.0f} minutes.",
-              file=sys.stderr)
-        print("[live] re-run with --yes to proceed, or use --limit N.",
-              file=sys.stderr)
-        raise SystemExit(2)
+        n = a.limit
+        open_count = None
+        if a.all:
+            open_count = len(fetch_open_prs(a.repo, 10 ** 9, a.drafts))
+            n = open_count
+        if n > CONFIRM_ABOVE:
+            opts = depth_options(a.repo, open_count, each)
+            chosen = ask_depth(a.repo, opts, open_count)
+            if chosen is None:
+                # No terminal to ask. Print the menu and spend nothing, so a
+                # script or a CI job never discovers the price afterwards.
+                print(format_options(a.repo, opts, open_count), file=sys.stderr)
+                print(f"\n[live] Nothing has been spent. Re-run with --limit N, "
+                      f"or --yes to accept {n} at about {n * each:.0f} USD.",
+                      file=sys.stderr)
+                raise SystemExit(2)
+            if not chosen:
+                raise SystemExit(0)
+            a.limit, a.all = chosen, (open_count is not None and chosen >= open_count)
     data = run(a.repo, a.limit, a.drafts, a.pr, rev, a.all)
     if not data:
         raise SystemExit(1)

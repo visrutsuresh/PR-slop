@@ -59,8 +59,11 @@ TOOLS = [
             "properties": {
                 "repo": {"type": "string",
                          "description": "owner/name, e.g. microsoft/vscode"},
-                "limit": {"type": "integer", "default": 8,
-                          "description": "how many open pull requests, 1 to 50"},
+                "limit": {"type": "integer", "default": 100,
+                          "description": "how many of the most recent open pull "
+                                         "requests to classify. Default 100, "
+                                         "which is about 45 USD, so anything "
+                                         "over 12 needs confirm_cost."},
                 "scan_all": {"type": "boolean", "default": False,
                              "description": "scan EVERY open pull request. Large "
                                             "repositories can be hundreds of "
@@ -239,18 +242,29 @@ def _mode(args):
 
 
 def tool_triage_queue(args):
+    import live
     repo = args["repo"]
     scan_all = bool(args.get("scan_all"))
-    if scan_all and not args.get("confirm_cost"):
-        import live
-        n = len(live.fetch_open_prs(repo, 10 ** 9, False))
-        return (f"{repo} has {n} open pull requests. Scanning all of them is "
-                f"about {n * 0.45:.0f} USD and roughly {n * 25 / 60:.0f} "
-                f"minutes.\n\nThat is a real bill, so this did not run. Call "
-                f"again with confirm_cost=true to proceed, or set limit=N for "
-                f"the N most recent. Most days the right answer is whats_new, "
-                f"which is free.")
-    limit = max(1, min(int(args.get("limit") or 8), 50))
+    limit = max(1, min(int(args.get("limit") or 100), 300))
+    if not args.get("confirm_cost"):
+        open_count = None
+        if scan_all:
+            open_count = len(live.fetch_open_prs(repo, 10 ** 9, False))
+            n = open_count
+        else:
+            n = limit
+        if n > live.CONFIRM_ABOVE:
+            # An MCP tool cannot ask a question itself. It CAN hand the
+            # assistant the options with the bill attached to each, so the
+            # person gets a real choice instead of an invisible charge.
+            opts = live.depth_options(repo, open_count)
+            return ("Nothing has been spent yet. This one costs real money, so "
+                    "it is worth choosing the depth deliberately.\n\n"
+                    + live.format_options(repo, opts, open_count)
+                    + "\n\nAsk the maintainer which of these they want, then "
+                      "call triage_queue again with that number as `limit` and "
+                      "`confirm_cost` set to true. If they want the whole "
+                      "queue, set scan_all as well.")
     text, path = _run_and_report(repo, limit=limit, scan_all=scan_all)
     return _shape(text, path, _mode(args))
 

@@ -415,7 +415,8 @@ def mcp_checks():
         checks += 1
 
         # a queue scan does NOT pay for a per-submission review
-        mcp_server.tool_triage_queue({"repo": "o/r", "limit": 3})
+        mcp_server.tool_triage_queue({"repo": "o/r", "limit": 3,
+                                      "confirm_cost": True})
         assert captured["review"] is None and captured["scan_all"] is False
         assert captured["limit"] == 3
         checks += 1
@@ -440,13 +441,46 @@ def mcp_checks():
     finally:
         _live.run = real_run
 
+    # the DEFAULT depth is now 100, which is a real bill, so an unconfirmed
+    # call must quote it and spend nothing. A judge typing the obvious command
+    # should not find out the price afterwards.
+    t = mcp_server.tool_triage_queue({"repo": "o/r"})
+    assert "Nothing has been spent" in t and "confirm_cost" in t, t
+    # every offered depth must carry its own price, or the choice is not a real
+    # one: "100" means nothing to someone who has not priced a run
+    for n, usd in ((5, "2.25"), (25, "11.25"), (100, "45.00")):
+        assert str(n) in t and usd in t, (n, usd, t)
+    assert "whats_new is free" in t, t
+    checks += 1
+
+    # the option set is data, so both surfaces can offer the same choice
+    import live as _l
+    opts = _l.depth_options("o/r", 1782)
+    assert [o["n"] for o in opts] == [5, 25, 100, 1782], opts
+    assert opts[-1]["usd"] == round(1782 * 0.45, 2), opts[-1]
+    # a repository smaller than an option must not be offered that option
+    small = _l.depth_options("o/r", 7)
+    assert [o["n"] for o in small] == [5, 7], small
+    checks += 1
+
+    # a small ask is under the line and runs without ceremony
+    _live2 = _live.run
+    _live.run = fake_run
+    try:
+        t = mcp_server.tool_triage_queue({"repo": "o/r", "limit": 5})
+        assert "Nothing has been spent" not in t, t
+    finally:
+        _live.run = _live2
+    checks += 1
+
     # a full scan must refuse and quote the bill before spending it
     real_fetch = _live.fetch_open_prs
     _live.fetch_open_prs = lambda repo, limit, drafts: [None] * 1782
     try:
         t = mcp_server.tool_triage_queue({"repo": "o/r", "scan_all": True})
-        assert "1782" in t and "did not run" in t, t
-        assert "confirm_cost" in t, t
+        assert "1782" in t, t                      # the real size, not a guess
+        assert "801.90" in t or "801.9" in t, t    # 1782 * 0.45, priced honestly
+        assert "Nothing has been spent" in t and "confirm_cost" in t, t
     finally:
         _live.fetch_open_prs = real_fetch
     checks += 1

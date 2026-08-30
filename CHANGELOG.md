@@ -555,3 +555,23 @@ That figure retroactively justifies two features we could not demonstrate on a n
 The MCP config used a relative path, so it only launched if the client happened to start in this directory, and every path in the project has the same dependency: the evaluation cache, the reports directory, the memory store. Started from anywhere else it either failed to launch or launched and could not find its own data.
 
 `mcp_server.py` now anchors to its own file rather than to the caller, and a new install target writes the absolute path for whatever clone you happen to have, which is the part a judge needs.
+
+
+## A number is not a choice until it has a price on it
+
+The queue depth started at 8, which was a demo rather than a default, and briefly became a silent 100. A silent 100 is about 45 USD and forty minutes, and this is a public repository: someone clones it, types the obvious command, and finds out the price afterwards. That is a bad way to meet a tool.
+
+So the depth is now chosen, not assumed. The default target is the 100 most recent open submissions, and anything past a dozen stops and offers the options with the bill attached to each:
+
+```
+      5   about   2.25 USD,   2 min   a quick look, enough to see the shape of the queue
+     25   about  11.25 USD,  10 min   a morning's reading
+    100   about  45.00 USD,  42 min   the default depth
+   1782   about 801.90 USD, 743 min   every open submission
+```
+
+**"100" means nothing to someone who has not priced a run.** That is the whole point of putting the cost on every line: it turns an invisible decision into a visible one. An option larger than the repository itself is never offered, so a small project is not asked whether it wants 100 of its 7 submissions.
+
+The options are returned as data rather than baked into a message, because two surfaces need the same choice. In a terminal the tool asks directly. An MCP tool cannot ask anything, so it hands the assistant the priced options and lets the assistant put them in front of the maintainer, then takes the answer back as `limit` plus `confirm_cost`.
+
+With no terminal and no confirmation, it prints the menu and spends nothing, so a script or a CI job can never discover the price after the fact.
