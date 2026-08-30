@@ -1,18 +1,34 @@
-# Submission Checklist
+# Submission checklist
 
-Deadline: **2026-08-30 23:59 UTC** (2026-08-30 19:59 EDT). One table in the project timeline and the deadline badge both use this earlier value; some prose, the header, and the dashboard state a later Aug 31 18:00 UTC figure instead. Plan against the earlier, safer time. See the `Meta` project note `Timeline.md` for the full record of that contradiction.
+**Deadline: Monday 2026-08-31, 18:00 UTC. That is Mon 14:00 EDT, Tue 02:00 SGT.**
 
-What counts as a valid submission, per the competition FAQ: "repository, archive, tests, README, agent-use evidence, and demo video." Each checklist item below maps to one of those.
+This was contradictory earlier and is now settled: the live page shows Aug 31 18:00 UTC in the timeline table AND in the deadline badge, and Aug 30 23:59 UTC is labelled only a checkpoint. An earlier version of this file carried the Aug 30 value. It was wrong.
 
-- [ ] **1. Solution code plus Improvement Changelog.** Done when `README.md` states the intended user, their bottleneck, why solving it matters, where the solution still fails, and one opinionated take, AND `CHANGELOG.md` has one entry per real iteration, each entry tied to actual evidence (a failing test, a bad result, a judge-visible constraint), not just a description of what changed.
-- [ ] **2. Reproduction guide.** Done when `docs/reproduction.md` lets someone with a clean checkout and no prior context run the whole thing themselves, start to finish, with no missing steps.
-- [ ] **3. Solution video, 5:00 or under.** Beat sheet (the planned outline for what the video covers, in order) is at `docs/video-script.md`. Done when the final video file exists and is linked from `README.md`.
-- [ ] **4. Agent trajectories.** A trajectory is the full step-by-step record of one agent run: what it was told to do, what it read and changed, and how it ended. Done when `traces/INDEX.md` lists every agent used in the submission, and `traces/*.md` has a readable write-up for each representative run.
-- [ ] **4a. Trajectory files are actually committed to the repo, not just present locally.** The raw per-run record (`traces/*.jsonl`) stays out of the repo on purpose, since it has not been through the redaction step yet and could still contain something sensitive. The readable versions (`traces/*.md` and `traces/INDEX.md`) ARE tracked and must be in the repo. To confirm this is actually true and not just true on your machine: clone the repo fresh into an empty folder, then run `git show HEAD:traces/INDEX.md` and `git show HEAD:traces/<any run_id>.md`. Both must print real content. If either says "not found," this item is not done.
-- [ ] **Judge access.** Done when the repo can actually be opened by the judges: either it is public, or the judges have been added as collaborators, before the deadline. Rule book item 10: "Give judges enough access to run the project and reproduce the main result." A private repo the judges cannot open gets disqualified before anyone even looks at the work.
-- [ ] **Actually submitted on the micro1 platform.** Done when the repo link, the archive, and the video have all been submitted through the micro1 portal before 2026-08-30 23:59 UTC. Only the most recent complete submission counts, so a half-finished late resubmission can overwrite a good earlier one. Double-check the final submission is the complete one.
-- [ ] **Archive.** A zip or tarball of the repo, taken at submission time. Required by the FAQ even though it is not one of the 4 main deliverable cards.
-- [ ] **Tests.** Done when `python3 test_harness.py` passes (this is the harness's own test suite, checking the logging and reporting code works), and any solution-specific tests written after kickoff also pass.
-- [ ] **Tool disclosure.** Done when `README.md`'s "Tools disclosure" section names every agent, model, and tool actually used to build the submission.
-- [ ] **PRE-EXISTING.md.** Done when this file has been updated to list anything built before kickoff that got reused after kickoff, and its source.
-- [ ] **`run.sh baseline` / `advanced` / `eval` all run clean from a fresh clone.** Done when someone with nothing set up can clone the repo and run all three commands with no errors and no missing setup steps.
+"Late or incomplete entries are not accepted", and a validation screen for reproducibility, plagiarism and trace integrity runs afterwards. **An entry that lands at 17:59 but does not run on a judge's machine still fails.** Do not plan to finish at the deadline.
+
+---
+
+## Done
+
+- [x] **1. Solution code plus Improvement Changelog.** `README.md` names the intended user, the bottleneck, why it matters, where it still fails, and the hot take. `CHANGELOG.md` has one entry per real iteration, each tied to evidence, including the experiments that were removed and the three made-up numbers that were caught.
+- [x] **2. Reproduction guide.** `docs/reproduction.md`. Verified by cloning fresh into an empty folder and running with only `/usr/bin` on the path: no account, no network, no cost, and the numbers reproduce exactly.
+- [x] **4. Agent trajectories.** 45 records in `traces/`, covering all three systems. The shipped agent's 15 are marked **captured**, written as each run happened. The other 30 are marked **reconstructed** from committed responses. `traces/INDEX.md` lists them.
+- [x] **Tests.** `python3 test_harness.py` 10/10, `python3 test_harvest.py` 15/15. Includes an anti-leak suite with a positive control, proven to fail when a leak is planted.
+- [x] **Tool disclosure.** `README.md`, naming the model, how it is called, and the isolation applied to it.
+- [x] **PRE-EXISTING.md.** Timestamp-based, so it stays true as later commits land.
+- [x] **Every command runs clean from a fresh clone.** `triage`, `baseline`, `script`, `agent`, `eval`, all offline.
+
+## Still to do
+
+- [ ] **3. Solution video, 5:00 or under.** Script and shot list at `docs/video-script.md`. Done when the file exists and is linked from `README.md`.
+- [ ] **Judge access. THIS IS THE ONE THAT DISQUALIFIES YOU.** The repository is currently **PRIVATE**. Rule 10 requires judges to be able to run it. Make it public, or add the judges as collaborators, **before** the deadline. A private repository is thrown out before anyone reads a line of the work.
+- [ ] **Archive.** A zip or tarball taken at submission time. Required by the FAQ even though it is not one of the four deliverable cards.
+- [ ] **Actually submitted on the micro1 platform.** Repository link, archive and video, all through the portal. Only the most recent complete submission counts, so a half-finished late resubmission can overwrite a good earlier one.
+
+## Final checks, five minutes, in this order
+
+1. `git push`, and confirm the remote actually has the latest commit.
+2. Flip the repository to public.
+3. Clone the public URL into a fresh empty folder, exactly as a stranger would.
+4. In that clone run `./run.sh eval`, `./run.sh agent`, `./run.sh triage`.
+5. Confirm `git show HEAD:traces/INDEX.md` prints real content, so the records are in the repository and not merely on your machine.
