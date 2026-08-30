@@ -105,8 +105,20 @@ Three tools:
 | Tool | What it does | Cost |
 | --- | --- | --- |
 | `whats_new` | What changed since the last triage of this repository. Reads the memory store only. | **free, instant, no network** |
-| `triage_queue` | Triage the open queue. Returns a chat-readable summary and writes the full page. | about 0.45 USD per submission |
-| `triage_pull_request` | The same checks on one specific submission. | about 0.45 USD |
+| `triage_queue` | Sort the open queue into the three piles. `scan_all` covers every open submission, and refuses with a quoted bill until `confirm_cost` is set. | about 0.45 USD per submission |
+| `triage_pull_request` | Everything about one submission: the pile, the checked evidence, **and a judgement of the code itself**. | about 0.55 USD |
+
+**Pointed at one submission, it answers the question triage never could.** Which pile a change belongs in is useless when there is only one change. So on a single pull request the tool also reviews the work: an overall quality call, what it genuinely does well, what should be improved before merging with a file and a reason attached to each, anything that should block a merge outright, and what breaks if the judgement is wrong.
+
+On `microsoft/vscode#333418`, a rename titled as a memory-leak fix, it returned `workable` and found a blocking problem nobody asked it to look for:
+
+> The diff contains a hand-edit to a file explicitly marked DO-NOT-MODIFY-MANUALLY (1ES pipeline auto-baselining config), this should never be included in a PR.
+
+and named the real tension: *"a maintainer taking this on merges it believing it fixes memory leaks, but nothing in the visible diff changed at all"*.
+
+**The reviewer does not see our own conclusion.** It gets the diff, the source and the counts, and never the bucket, the evidence chips or the investigator search. Handing it our answer would invite it to agree with us, and a reviewer that agrees with the thing it is checking is worth nothing.
+
+**Output is configurable.** `output` takes `inline`, `report` or `both`. Chat is bad at tables, so a sixty-item queue is better handed over as a path than pasted into a conversation, and a single review reads fine inline.
 
 **The browser page stays, on purpose.** Chat is bad at tables. Nine submissions with five evidence chips each is a grid, and a grid pasted into a conversation is unreadable. So every tool returns a short summary inline, the part a person actually reads in a chat window, and writes the full page beside it and hands back the path. Summary where you are, detail where detail belongs.
 

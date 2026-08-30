@@ -69,6 +69,23 @@ a{color:#2f5d8f}
   border-radius:0 7px 7px 0;font-size:14.5px;color:#6b5410}
 footer{border-top:1px solid var(--line);padding:26px;color:var(--muted);font-size:14px}
 .k{display:inline-block;min-width:132px;color:var(--muted)}
+.rev{margin-top:13px;padding:13px 15px;border-radius:10px;background:#f7f4ee;
+  border:1px solid var(--line)}
+.rev.q-ok{border-left:3px solid var(--green)}
+.rev.q-mid{border-left:3px solid var(--amber)}
+.rev.q-low{border-left:3px solid var(--red)}
+.rev.q-unk{border-left:3px solid var(--slate)}
+.rq{font-size:13px;color:var(--muted);letter-spacing:.01em}
+.rh{margin-top:5px;font-size:15.5px;font-weight:600}
+.rl{margin-top:9px;font-size:14.5px}
+.rk{display:inline-block;font-size:12px;font-weight:650;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--muted)}
+.rk.block{color:var(--red)}
+.rl ul{margin:4px 0 0;padding-left:19px}
+.rl li{margin:3px 0}
+.why2{display:block;color:var(--muted);font-size:13.5px}
+.rr{margin-top:9px;font-size:13.5px;color:#6b5410}
+.rev code{font:600 13px ui-monospace,Menlo,monospace;background:#efe9df;padding:1px 5px;border-radius:4px}
 .strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;
   overflow:hidden;margin:4px 0 8px}
@@ -151,6 +168,21 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--green);outline-off
   font-size:12.5px;color:#dcc994}
 footer{border-top:1px solid var(--line);padding:22px;color:var(--muted);font-size:12.5px}
 .k{display:inline-block;min-width:132px;color:#5f6a78}
+.rev{margin-top:9px;padding:10px 12px;background:#11151b;border:1px solid var(--line)}
+.rev.q-ok{border-left:2px solid var(--green)}
+.rev.q-mid{border-left:2px solid var(--amber)}
+.rev.q-low{border-left:2px solid var(--red)}
+.rev.q-unk{border-left:2px solid var(--slate)}
+.rq{font-size:12px;color:var(--muted)}
+.rh{margin-top:4px;font-size:13.5px;font-weight:600;color:#eef1f5}
+.rl{margin-top:7px;font-size:13px}
+.rk{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--muted)}
+.rk.block{color:var(--red)}
+.rl ul{margin:3px 0 0;padding-left:17px}
+.why2{display:block;color:var(--muted);font-size:12.5px}
+.rr{margin-top:7px;font-size:12.5px;color:#dcc994}
+.rev code{background:#1d222a;padding:1px 5px;color:#9fb6d0}
 @media print{body{background:#fff;color:#000}.pr{break-inside:avoid}}
 """
 
@@ -235,6 +267,47 @@ def chips(f):
     return "".join(out)
 
 
+QUALITY_CLASS = {"solid": "q-ok", "workable": "q-mid",
+                 "needs work": "q-low", "cannot tell": "q-unk"}
+
+
+def review_block(rev):
+    """The code review, when the tool was pointed at one submission.
+
+    Kept visually separate from the evidence chips on purpose. The chips are
+    checked facts; this is a judgement, and running them together would let a
+    judgement borrow the credibility of a fact.
+    """
+    if not rev:
+        return ""
+    q = rev.get("quality") or "cannot tell"
+    bits = [f'<div class="rev {QUALITY_CLASS.get(q, "q-unk")}">'
+            f'<div class="rq">Code review, a judgement and not a checked fact: '
+            f'<b>{esc(q)}</b></div>']
+    if rev.get("headline"):
+        bits.append(f'<div class="rh">{esc(rev["headline"])}</div>')
+    if rev.get("blocking"):
+        bits.append('<div class="rl"><span class="rk block">Blocking</span><ul>'
+                    + "".join(f"<li>{esc(b)}</li>" for b in rev["blocking"])
+                    + "</ul></div>")
+    if rev.get("strengths"):
+        bits.append('<div class="rl"><span class="rk">Does well</span><ul>'
+                    + "".join(f"<li>{esc(x)}</li>" for x in rev["strengths"])
+                    + "</ul></div>")
+    if rev.get("improvements"):
+        items = []
+        for i in rev["improvements"]:
+            where = (f' <code>{esc(i["where"])}</code>') if i.get("where") else ""
+            why = (f'<span class="why2">{esc(i["why"])}</span>'
+                   if i.get("why") else "")
+            items.append(f'<li>{esc(i.get("what", ""))}{where}{why}</li>')
+        bits.append('<div class="rl"><span class="rk">Could be better</span><ul>'
+                    + "".join(items) + "</ul></div>")
+    if rev.get("risk"):
+        bits.append(f'<div class="rr">If this is wrong: {esc(rev["risk"])}</div>')
+    return "".join(bits) + "</div>"
+
+
 def card(r, repo, data_has_memory=False):
     ci, v, f = r["input"], r["verdict"], r["facts"]
     n = ci["number"]
@@ -262,6 +335,7 @@ def card(r, repo, data_has_memory=False):
   <div class="why"><b>Why:</b> {esc((v.get('reason') or '')[:280])}</div>
   <div class="links"><a href="https://github.com/{repo}/pull/{n}">open on GitHub</a></div>
   {flag}
+  {review_block(r.get("review"))}
 </article>"""
 
 

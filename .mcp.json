@@ -2,8 +2,7 @@
   "mcpServers": {
     "pr-slop": {
       "command": "python3",
-      "args": ["mcp_server.py"],
-      "env": {}
+      "args": ["/Users/visrutsuresh/Documents/GitHub/PR-slop/mcp_server.py"]
     }
   }
 }

@@ -375,6 +375,82 @@ def mcp_checks():
         del mcp_server.HANDLERS["_noisy"]
     checks += 1
 
+    # --- the configurable output surface ---------------------------------
+    captured = {}
+
+    def fake_run(repo, limit, drafts, only=None, review=None, scan_all=False):
+        captured.update(repo=repo, limit=limit, only=only, review=review,
+                        scan_all=scan_all)
+        return {"repo": repo, "sha": "deadbeef1234", "corpus": 0,
+                "generated": "now", "results": [
+                    {"input": {"number": 7, "title": "t"},
+                     "verdict": {"bucket": 2, "reason": "r"},
+                     "facts": {"problems": [], "invented": [], "declared": [],
+                               "claim": True, "has_tests": True, "files": 1,
+                               "lines": 1, "test_lines": 0},
+                     "review": {"quality": "needs work",
+                                "headline": "does one thing twice",
+                                "improvements": [{"what": "dedupe it",
+                                                  "why": "it drifts",
+                                                  "where": "a.ts"}],
+                                "blocking": [], "strengths": [], "risk": "low"},
+                     "cost": 0.1, "searches": 1, "rank": 1, "group_size": 1,
+                     "today": True}]}
+
+    import live as _live
+    real_run = _live.run
+    _live.run = fake_run
+    try:
+        # single-PR mode turns the code review ON without being asked
+        t = mcp_server.tool_triage_pull_request({"repo": "o/r", "number": 7})
+        assert captured["review"] is True, captured
+        assert "CODE REVIEW: NEEDS WORK" in t, t
+        assert "dedupe it" in t and "because it drifts" in t, t
+        checks += 1
+
+        # and can be turned off explicitly
+        mcp_server.tool_triage_pull_request({"repo": "o/r", "number": 7,
+                                             "review": False})
+        assert captured["review"] is False, captured
+        checks += 1
+
+        # a queue scan does NOT pay for a per-submission review
+        mcp_server.tool_triage_queue({"repo": "o/r", "limit": 3})
+        assert captured["review"] is None and captured["scan_all"] is False
+        assert captured["limit"] == 3
+        checks += 1
+
+        # output=report hands back a path and NOT the wall of text
+        t = mcp_server.tool_triage_pull_request({"repo": "o/r", "number": 7,
+                                                 "output": "report"})
+        assert ".html" in t and "CODE REVIEW" not in t, t
+        checks += 1
+
+        # output=both carries the summary AND the path
+        t = mcp_server.tool_triage_pull_request({"repo": "o/r", "number": 7,
+                                                 "output": "both"})
+        assert "CODE REVIEW" in t and ".html" in t, t
+        checks += 1
+
+        # an unknown output mode falls back to inline rather than exploding
+        t = mcp_server.tool_triage_pull_request({"repo": "o/r", "number": 7,
+                                                 "output": "interpretive-dance"})
+        assert "CODE REVIEW" in t, t
+        checks += 1
+    finally:
+        _live.run = real_run
+
+    # a full scan must refuse and quote the bill before spending it
+    real_fetch = _live.fetch_open_prs
+    _live.fetch_open_prs = lambda repo, limit, drafts: [None] * 1782
+    try:
+        t = mcp_server.tool_triage_queue({"repo": "o/r", "scan_all": True})
+        assert "1782" in t and "did not run" in t, t
+        assert "confirm_cost" in t, t
+    finally:
+        _live.fetch_open_prs = real_fetch
+    checks += 1
+
     print(f"mcp server: {checks}/{checks} checks passed")
 
 

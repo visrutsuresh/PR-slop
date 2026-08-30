@@ -169,7 +169,11 @@ def fetch_one(repo, number):
 def fetch_open_prs(repo, limit, include_drafts=False):
     out = []
     page = 1
-    while len(out) < limit and page <= 5:
+    # 5 pages of 50 caps a bounded fetch at 250. A whole-queue scan passes a
+    # huge limit, so the page ceiling has to lift with it or "all" quietly
+    # means "the first 250".
+    max_page = 200 if limit > 250 else 5
+    while len(out) < limit and page <= max_page:
         batch = json.loads(gh(f"repos/{repo}/pulls?state=open&sort=created"
                               f"&direction=desc&per_page=50&page={page}"))
         if not batch:
@@ -459,10 +463,18 @@ class UnionSearch(LiveSearch):
         return out[:k]
 
 
-def run(repo, limit, include_drafts, only=None):
+def run(repo, limit, include_drafts, only=None, review=None, scan_all=False):
+    # Pointed at ONE submission, the maintainer's question is "is this any
+    # good", not "which pile". Review defaults on there and off for a scan,
+    # because it is a per-submission model call a queue should not pay for.
+    if review is None:
+        review = bool(only)
     if only:
         print(f"[live] fetching pull request #{only} from {repo}")
         prs = fetch_one(repo, only)
+    elif scan_all:
+        prs = fetch_open_prs(repo, 10 ** 9, include_drafts)
+        print(f"[live] scanning the WHOLE queue: {len(prs)} open pull requests")
     else:
         print(f"[live] fetching open pull requests from {repo}")
         prs = fetch_open_prs(repo, limit, include_drafts)
@@ -495,8 +507,9 @@ def run(repo, limit, include_drafts, only=None):
                                          "failure": failure}, trace, 2)
             A.verify(v, ci, known, trace)
         v["_claim_supported"] = claims.get("supported")
+        rev = review_one(ci, sha, cache, repo, trace) if review else None
         v["_cost"] = round(sum(s.get("cost") or 0 for s in trace), 4)
-        results.append({"pr": pr, "input": ci, "verdict": v,
+        results.append({"pr": pr, "input": ci, "verdict": v, "review": rev,
                         "facts": facts_for(ci, v, known, declared),
                         "cost": v["_cost"],
                         "searches": found["rounds"]})
@@ -517,6 +530,81 @@ def run(repo, limit, include_drafts, only=None):
             "prior_runs": prior_runs,
             "recalled_lookups": known.recalled,
             "results": results}
+
+
+REVIEWER = """A maintainer is deciding what to do with this submission. They have already
+been told which pile it falls in and what evidence supports it. What they do NOT
+have is a read on the WORK ITSELF.
+
+Judge the change on its merits. You are not predicting whether it was merged and
+you are not guessing at anyone's intentions. You are answering: if I merged this
+tomorrow, what am I taking on?
+
+Title: %(title)s
+
+Description:
+%(body)s
+
+Files changed (%(nfiles)d): %(files)s
+Added lines: %(adds)d, of which %(testadds)d are in test files.
+
+The change:
+%(patch)s
+
+%(source)s
+
+Ground the whole answer in what you can point at in the diff. If you cannot see
+something, say you cannot see it rather than assuming it is absent. A missing
+test you looked for is a finding; a missing test you inferred is noise.
+
+Reply as JSON:
+{"quality": "solid" | "workable" | "needs work" | "cannot tell",
+ "headline": "one sentence a maintainer could paste into a review comment",
+ "strengths": ["what this genuinely does well, each pointing at the code"],
+ "improvements": [{"what": "the concrete change to ask for",
+                   "why": "what goes wrong without it",
+                   "where": "file or function, or null if it is repo-wide"}],
+ "blocking": ["anything that should stop a merge outright, empty list if none"],
+ "risk": "what breaks if this is wrong, one sentence"}"""
+
+
+def review_one(ci, sha, cache, repo, trace):
+    """The second question a maintainer asks, which triage never answered.
+
+    Triage says WHICH pile. It never says whether the code is any good, and on a
+    single submission that is the whole question. This runs only when the tool is
+    pointed at one pull request, because it is a per-submission cost that a queue
+    scan should not pay.
+
+    It deliberately does not see the bucket, the evidence chips or the
+    investigator's search. Handing it our own conclusion invites it to agree with
+    us, and a reviewer that agrees with the thing it is checking is worthless.
+    """
+    files = ci.get("changed_files") or []
+    fa = ci.get("file_adds") or {}
+    target = A.pick_claim_file(files, fa)
+    src = A.fetch_source(target, sha, cache, repo) if target else None
+    env = A.call(REVIEWER % {
+        "title": ci.get("title"), "body": (ci.get("body") or "(none)")[:2000],
+        "nfiles": len(files),
+        "files": ", ".join(files[:20]) + (" ..." if len(files) > 20 else ""),
+        "adds": ci.get("additions") or 0,
+        "testadds": sum(v for k, v in fa.items() if TEST_PATH.search(k)),
+        "patch": (ci.get("patch") or "")[:12000],
+        "source": (f"The current contents of {target}, as the project stands:\n"
+                   + src[:12000]) if src else
+                  "(the main file could not be retrieved, judge from the diff alone)",
+    }, "adjudicator")
+    out = A.parse(env.get("result", ""), {"quality": "cannot tell",
+                                          "headline": "", "strengths": [],
+                                          "improvements": [], "blocking": [],
+                                          "risk": ""})
+    out["_cost"] = env.get("total_cost_usd") or 0
+    trace.append({"role": "reviewer", "action": "judged the work itself",
+                  "file": target, "quality": out.get("quality"),
+                  "improvements": len(out.get("improvements") or []),
+                  "cost": out["_cost"]})
+    return out
 
 
 def rank(results):
@@ -565,9 +653,32 @@ if __name__ == "__main__":
     ap.add_argument("--limit", type=int, default=8)
     ap.add_argument("--drafts", action="store_true", help="include drafts")
     ap.add_argument("--pr", type=int, help="triage one specific pull request")
+    ap.add_argument("--all", action="store_true",
+                    help="scan EVERY open pull request, not just --limit")
+    ap.add_argument("--review", action="store_true",
+                    help="also judge code quality and what to improve "
+                         "(default ON for --pr, OFF for a queue scan)")
+    ap.add_argument("--no-review", action="store_true",
+                    help="skip the quality review even on a single pull request")
+    ap.add_argument("--yes", action="store_true",
+                    help="do not stop for the cost estimate on a large scan")
     a = ap.parse_args()
     t0 = time.time()
-    data = run(a.repo, a.limit, a.drafts, a.pr)
+    rev = None
+    if a.review:
+        rev = True
+    if a.no_review:
+        rev = False
+    if a.all and not a.yes:
+        n = len(fetch_open_prs(a.repo, 10 ** 9, a.drafts))
+        each = 0.45 + (0.25 if rev else 0)
+        print(f"[live] {a.repo} has {n} open pull requests. A full scan is "
+              f"about {n * each:.0f} USD and roughly {n * 25 / 60:.0f} minutes.",
+              file=sys.stderr)
+        print("[live] re-run with --yes to proceed, or use --limit N.",
+              file=sys.stderr)
+        raise SystemExit(2)
+    data = run(a.repo, a.limit, a.drafts, a.pr, rev, a.all)
     if not data:
         raise SystemExit(1)
     os.makedirs(OUT_DIR, exist_ok=True)

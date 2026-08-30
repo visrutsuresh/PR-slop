@@ -35,6 +35,11 @@ import traceback
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
+# An MCP client starts this from ITS working directory, not ours, and every
+# path in the project is relative: data/, reports/, .prslop-memory/. Without
+# this the server either fails to launch or launches and then cannot find its
+# own evaluation cache. Anchor to the file, not to the caller.
+os.chdir(HERE)
 
 PROTOCOL = "2024-11-05"
 
@@ -55,7 +60,22 @@ TOOLS = [
                 "repo": {"type": "string",
                          "description": "owner/name, e.g. microsoft/vscode"},
                 "limit": {"type": "integer", "default": 8,
-                          "description": "how many open pull requests, 1 to 25"},
+                          "description": "how many open pull requests, 1 to 50"},
+                "scan_all": {"type": "boolean", "default": False,
+                             "description": "scan EVERY open pull request. Large "
+                                            "repositories can be hundreds of "
+                                            "dollars, so this refuses and reports "
+                                            "the estimate unless confirm_cost is "
+                                            "also true."},
+                "confirm_cost": {"type": "boolean", "default": False,
+                                 "description": "proceed with a full scan after "
+                                                "seeing the estimate"},
+                "output": {"type": "string", "default": "inline",
+                           "enum": ["inline", "report", "both"],
+                           "description": "inline returns the summary as text, "
+                                          "report writes the HTML page and "
+                                          "returns only its path, both does "
+                                          "each"},
             },
             "required": ["repo"],
         },
@@ -63,13 +83,23 @@ TOOLS = [
     {
         "name": "triage_pull_request",
         "description": (
-            "Triage ONE specific pull request. What a reviewer working a queue "
-            "by hand actually wants. Same evidence checks, one submission."),
+            "Everything known about ONE pull request: which pile it falls in, "
+            "the checked evidence behind that, AND a judgement of the code "
+            "itself, what it does well, what should be improved before merging "
+            "and anything that should block it outright. This is the tool to "
+            "reach for when a maintainer asks 'is this any good'."),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "repo": {"type": "string", "description": "owner/name"},
                 "number": {"type": "integer", "description": "pull request number"},
+                "review": {"type": "boolean", "default": True,
+                           "description": "judge the code quality and say what "
+                                          "could be improved. On by default: on "
+                                          "one submission that is usually the "
+                                          "real question."},
+                "output": {"type": "string", "default": "inline",
+                           "enum": ["inline", "report", "both"]},
             },
             "required": ["repo", "number"],
         },
@@ -118,6 +148,31 @@ def _chips(f):
     return "; ".join(bits)
 
 
+def review_text(rev):
+    """The part a maintainer reads when they asked 'is this any good'."""
+    if not rev:
+        return ""
+    out = [f'\nCODE REVIEW: {rev.get("quality", "cannot tell").upper()}']
+    if rev.get("headline"):
+        out.append(f'  {rev["headline"]}')
+    if rev.get("blocking"):
+        out.append("  BLOCKING:")
+        out += [f"    - {b}" for b in rev["blocking"]]
+    if rev.get("strengths"):
+        out.append("  Does well:")
+        out += [f"    - {x}" for x in rev["strengths"]]
+    if rev.get("improvements"):
+        out.append("  Could be better:")
+        for i in rev["improvements"]:
+            where = f' [{i["where"]}]' if i.get("where") else ""
+            out.append(f'    - {i.get("what", "")}{where}')
+            if i.get("why"):
+                out.append(f'        because {i["why"]}')
+    if rev.get("risk"):
+        out.append(f'  Risk if wrong: {rev["risk"]}')
+    return "\n".join(out)
+
+
 def summarise(data):
     """The part a person reads in a chat window. Deliberately not a table."""
     rs = data["results"]
@@ -141,15 +196,17 @@ def summarise(data):
             out.append(f'  #{n}{mark} {r["input"]["title"][:70]}')
             out.append(f'      {_chips(r["facts"])}')
             out.append(f'      why: {(r["verdict"].get("reason") or "")[:180]}')
+            if r.get("review"):
+                out.append(review_text(r["review"]).replace("\n", "\n   "))
     out.append(f'\nTotal {sum(r["cost"] for r in rs):.2f} USD. '
                f'Nothing was merged, closed, commented or labelled.')
     return "\n".join(out)
 
 
-def _run_and_report(repo, limit=None, number=None):
+def _run_and_report(repo, limit=None, number=None, review=None, scan_all=False):
     import live
     import report
-    data = live.run(repo, limit or 8, False, number)
+    data = live.run(repo, limit or 8, False, number, review, scan_all)
     if not data:
         return "No open pull requests found.", None
     os.makedirs(live.OUT_DIR, exist_ok=True)
@@ -160,15 +217,49 @@ def _run_and_report(repo, limit=None, number=None):
     return summarise(data), path
 
 
-def tool_triage_queue(args):
-    limit = max(1, min(int(args.get("limit") or 8), 25))
-    text, path = _run_and_report(args["repo"], limit=limit)
+def _shape(text, path, mode):
+    """inline, report, or both.
+
+    Chat is bad at tables, and a sixty-item queue pasted into a conversation is
+    worse than useless. `report` exists so an assistant can hand over a path
+    instead of a wall, without the maintainer having to ask twice.
+    """
+    if mode == "report":
+        return (f"Wrote the full triage page to:\n{path}\n\n"
+                f"Open it in a browser. Ask again with output=inline if you "
+                f"would rather read it here.") if path else text
+    if mode == "both":
+        return text + (f"\n\nFull page: {path}" if path else "")
     return text + (f"\n\nFull page: {path}" if path else "")
+
+
+def _mode(args):
+    m = (args.get("output") or "inline").lower()
+    return m if m in ("inline", "report", "both") else "inline"
+
+
+def tool_triage_queue(args):
+    repo = args["repo"]
+    scan_all = bool(args.get("scan_all"))
+    if scan_all and not args.get("confirm_cost"):
+        import live
+        n = len(live.fetch_open_prs(repo, 10 ** 9, False))
+        return (f"{repo} has {n} open pull requests. Scanning all of them is "
+                f"about {n * 0.45:.0f} USD and roughly {n * 25 / 60:.0f} "
+                f"minutes.\n\nThat is a real bill, so this did not run. Call "
+                f"again with confirm_cost=true to proceed, or set limit=N for "
+                f"the N most recent. Most days the right answer is whats_new, "
+                f"which is free.")
+    limit = max(1, min(int(args.get("limit") or 8), 50))
+    text, path = _run_and_report(repo, limit=limit, scan_all=scan_all)
+    return _shape(text, path, _mode(args))
 
 
 def tool_triage_pull_request(args):
-    text, path = _run_and_report(args["repo"], number=int(args["number"]))
-    return text + (f"\n\nFull page: {path}" if path else "")
+    review = args.get("review")
+    text, path = _run_and_report(args["repo"], number=int(args["number"]),
+                                 review=True if review is None else bool(review))
+    return _shape(text, path, _mode(args))
 
 
 def tool_whats_new(args):

@@ -12,7 +12,7 @@
 # committed responses are the record.
 set -euo pipefail
 
-usage() { echo "usage: $0 {live <owner/repo> [pr-number]|mcp|triage [pr-number]|evidence|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
+usage() { echo "usage: $0 {live <owner/repo> [pr-number]|mcp|mcp-install|triage [pr-number]|evidence|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
 
 [ $# -ge 1 ] && [ $# -le 3 ] || usage
 
@@ -78,6 +78,16 @@ case "$1" in
       echo "[agent] shipped system, replaying committed responses, no credential"
       PRSLOP_AGENT_DIR=data/responses/agent-v4 python3 agent_v4.py --replay
     fi
+    ;;
+  mcp-install)
+    # Writes .mcp.json with the ABSOLUTE path of THIS clone. The committed
+    # relative form only works when the client happens to start in this
+    # directory, which is true for "cd PR-slop && claude" and false for
+    # everything else.
+    here="$(cd "$(dirname "$0")" && pwd)"
+    printf '{\n  "mcpServers": {\n    "pr-slop": {\n      "command": "python3",\n      "args": ["%s/mcp_server.py"]\n    }\n  }\n}\n' "$here" > .mcp.json
+    echo "[mcp] .mcp.json now points at $here/mcp_server.py"
+    echo "[mcp] restart your assistant, or: claude mcp add pr-slop -- python3 $here/mcp_server.py"
     ;;
   mcp)
     # The same triage, exposed to the maintainer's own assistant over the Model

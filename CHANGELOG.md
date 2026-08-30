@@ -528,3 +528,30 @@ The first triage call from any real client would have corrupted the session. The
 That is three tests in this project written so they could not fail, all with the same shape: **asserting on a channel the failure cannot reach**. The vacuous test in the union-search set was the same mistake, and so was citing `./run.sh agent` as proof that a change to `check_claims` was safe when the replay path never calls it.
 
 **The lesson, and it is the one we would carry to the next agent we build.** A test you have not seen fail is a decoration. Every check added since is verified by breaking the code first and watching the assertion fire, and the ones that could not be made to fail were deleted rather than kept for the count. The specific trap for agent work is that the seam you mock is usually the seam the bug lives in: mock the model and you stop testing the plumbing, hand the server a private stream and you stop testing the transport. Writing the harness is not the same as writing a test, and passing is not the same as working.
+
+
+## Which pile is a useless answer when there is only one submission
+
+Everything in this project sorts a queue. Pointed at a single pull request that framing collapses: a maintainer looking at one change does not want to know which of three piles it falls in, they want to know whether it is any good and what to ask for before merging.
+
+So on a single submission the tool now also reviews the work. Overall quality, what it genuinely does well, what should be improved with a file and a reason attached to each, anything that should block a merge outright, and what breaks if the judgement is wrong.
+
+**It is kept blind to our own conclusion, and that is the design.** The reviewer gets the diff, the source at a pinned commit and the line counts. It never sees the bucket, the evidence chips or what the investigator found. Handing a reviewer the answer we already reached invites it to agree with us, and a reviewer that agrees with the thing it is checking is worth nothing. It is rendered in its own block on the page, visually separate from the chips, because the chips are checked facts and this is a judgement, and running them together would let a judgement borrow the credibility of a fact.
+
+On `microsoft/vscode#333418`, a rename titled as a memory-leak fix, it returned `workable` and found something nobody asked it to look for: a hand-edit to a pipeline config file whose own header forbids editing it by hand. It also named the real tension, that the title promises a leak fix while the visible diff is a pure rename, so a maintainer merging it takes on a false narrative. 0.55 USD.
+
+Review is ON by default for one submission and OFF for a queue scan, because it is a per-submission model call and a scan should not pay for it on every card.
+
+## Scanning the whole queue, and what that actually costs
+
+The scan-all flag does what it says: every open submission, not the most recent handful. The page cap that bounded a normal fetch lifts with the limit, so "all" does not quietly mean "the first 250".
+
+The number that came back is the point. **microsoft/vscode has 1,782 open pull requests.** A full scan is roughly 800 USD and twelve hours. So both the flag and the MCP tool refuse and quote the bill first, and only proceed once it is confirmed.
+
+That figure retroactively justifies two features we could not demonstrate on a nine-item queue. The today-caps of 5 and 8 never fired in any test run and looked like dead weight; at 1,782 they are the difference between a reading list and the original problem. And memory stops being a nicety: the gap between re-reading 1,782 cards and reading the handful that are new is the entire product.
+
+## The server could not start
+
+The MCP config used a relative path, so it only launched if the client happened to start in this directory, and every path in the project has the same dependency: the evaluation cache, the reports directory, the memory store. Started from anywhere else it either failed to launch or launched and could not find its own data.
+
+`mcp_server.py` now anchors to its own file rather than to the caller, and a new install target writes the absolute path for whatever clone you happen to have, which is the part a judge needs.
