@@ -1,60 +1,111 @@
 # Video script, five minutes
 
-Timings are a guide. Everything below is on screen from the real project.
+Everything on screen is real and in this repository. Timings are a guide.
 
-## 0:00 to 0:45, the problem, and why I am the one telling you about it
+---
 
-Open source maintainers are drowning in machine-written pull requests. The curl project says it is "effectively being DDoSed" by them. Around a fifth of its submissions last year were slop. OCaml maintainers rejected a single AI-generated pull request of thirteen thousand lines.
+## 0:00 to 0:40 — the problem, and why I am the one telling you
 
-But here is the part most people skip: **why does the slop exist?**
+Volunteers maintain free software. They are buried in machine-written submissions. The curl project says it is "effectively being DDoSed" by them. Roughly one in five of its submissions last year were slop. OCaml maintainers rejected a single AI-written pull request of thirteen thousand lines.
 
-Show two real job adverts I collected during my own internship search.
+But the interesting question is why the slop exists.
 
-- Chubb, desirable: "Contribution to open-source AI projects"
-- Singtel: "Public portfolio, hackathon wins, open-source contributions"
+**On screen: two real job adverts.**
 
-Employers ask for open source contributions. People who want that line on a CV are pushed to produce volume, and machines make volume nearly free. The slop is not vandalism. It is a rational answer to a hiring signal.
+- Chubb, desirable: *"Contribution to open-source AI projects"*
+- Singtel: *"Public portfolio, hackathon wins, open-source contributions"*
 
-I am not a maintainer. I am the person standing under that pressure, which is why I picked this problem.
+I collected both during my own internship search. Employers ask for open source contributions. People who need that line produce volume, and machines make volume free. Nobody is being malicious.
 
-## 0:45 to 1:30, the simple version, and its score
+I am not a maintainer. I am the person standing under that pressure. That is why I picked this.
 
-Show `./run.sh baseline`.
+---
 
-One prompt per pull request. No tools. This is the comparison the competition brief itself suggests, and I used it rather than a weaker one on purpose.
+## 0:40 to 1:10 — the baseline, and its score
 
-Result on screen: **33.3 percent**. The floor for three piles is 33.3 percent. It does exactly as well as guessing.
+**On screen: `./run.sh baseline`**
 
-## 1:30 to 3:00, one real run end to end
+One prompt per submission, no tools. This is the comparison micro1's own brief suggests. I used it rather than something weaker on purpose.
 
-Take one case. Show the pull request as the system sees it: five fields, nothing else.
+**33.3%.** The floor for three piles is 33.3%. It does exactly as well as guessing.
 
-Show stage one searching 403 reported problems and returning the correct one first.
+---
 
-Show the model's verdict, with a real reported problem number cited.
+## 1:10 to 2:20 — one real run, end to end
 
-Show stage two resolving that number against the project.
+**On screen: `./run.sh agent`, then open one trace in `traces/`.**
 
-Show the human checkpoint. **This tool never posts, comments, closes or merges anything.** It writes a report and a person decides.
+Four roles, and a loop.
 
-## 3:00 to 3:45, the comparison
+The **investigator** decides what to search for. Watch this: from a title that says none of these words, it wrote `snippet tab stop limit 10 nested placeholders`. It is using the words a person *reporting* a problem would use, not the words a developer *fixing* it uses. It found the right one. It can also search again if the first attempt was poor, and it chose to do that six times across fifteen cases.
 
-Show the table.
+The **claim checker** then reads the real source at a pinned commit and tests whether the code does what the description says.
 
-33.3 to **73.3 percent**. Merge-worthy work wrongly rejected: one in ten, down to zero in ten. Reported problems named that actually exist: one in three, up to nine in nine.
+The **adjudicator** decides the pile. The **verifier** checks every claim and can send the work back.
 
-## 3:45 to 4:30, the change that mattered, and the one I removed
+Then the product itself: **`./run.sh triage`**. One page. What to read first and why, the normal queue, what to leave. Every number on it resolves against the repository. Nothing is posted, closed or merged. A human decides.
 
-**What mattered: search.** Nothing clever. Word overlap, rare words weighted higher. It finds the right reported problem first 78 percent of the time. That single stage is the whole gap.
+---
 
-**What I would have removed: the checking stage.** It struck nothing. Zero across all fifteen. It had nothing to catch, because once search gave the model real problems to point at, it stopped inventing them. I kept it because it costs nothing and the failure it guards against is documented in my own baseline output, but on this evidence stage one did the work, and I am not going to claim otherwise.
+## 2:20 to 3:10 — six versions, including two I broke myself
 
-**And a mistake I caught in my own measurement.** My first scoring said the simple version cited real evidence 86.7 percent of the time, which appeared to disprove a prediction I had written down in advance. It did not. Twelve of its thirteen valid citations were file paths copied out of the case it had just been handed. That is free. Counting only things that require actually checking, it scored one in three, and my prediction stood. A measure you can satisfy by echoing your own input is not measuring anything.
+**On screen: the version table.**
 
-## 4:30 to 5:00, the honest limit and the hot take
+The first agent scored **46.7%**, far worse than a simple script. Its claim checker said "the code does not match the description" on three submissions, and the decider binned all three. All three had actually been merged.
 
-**Where it still fails.** It catches one in five of the not-merged pile, which is the pile the tool exists to find. Accuracy of 73 percent hides that, which is why the per-pile numbers sit next to it everywhere.
+It had confused *"I do not rate this code"* with *"this was not accepted"*.
 
-**The hot take.** "Closed without merging" looks like it should mean "rejected as bad". On vscode it mostly does not. Of seventeen I inspected, four were bots and about ten were maintainers closing their own real work in favour of another approach. Exactly one looked like slop.
+Version 3 fixed that and reached 73.3. Version 4 fixed two handover faults between the agents, and this is the part I would tell another builder: **every worker behaved sensibly on its own. The system still got it wrong because information was lost between them.** The searcher's answer arrived at the decider as a bare number with no explanation, so the decider ignored it.
 
-So any triage tool built on free GitHub metadata measures maintainer **behaviour**, not maintainer **judgment of quality**. That is enough to build something useful. It is not the same claim as "this detects AI slop", and I would rather say so than let the number imply otherwise.
+Version 5 was mine. I made the searcher's verdict binding, having loosened it the version before. Loose plus binding means everything lands in one pile. **73.3 down to 46.7.**
+
+I stopped at six, because one case is worth 6.7 points on fifteen cases, and past that I am fitting noise, not improving anything.
+
+---
+
+## 3:10 to 4:00 — the flaw in the whole idea, and what I did about it
+
+Here is the uncomfortable part.
+
+Every version predicts what a maintainer *did*. So if a maintainer overlooks something good and closes it, and my tool correctly says the work is good, **I mark my own tool wrong.** The scoring fights the product.
+
+**On screen: pr-308696.** The one case no version out of six ever got right. Real code. Fixes a genuinely reported problem. Confirmed against the actual source. Closed anyway. Six versions all said "this is good work" and I scored all six as mistakes.
+
+So I added a second output that judges the work rather than the decision: does it name a genuinely reported problem, does it carry tests, does the code match its description. All facts, no human verdict. Sixteen factual claims, sixteen hold up.
+
+**On screen: the SECOND OPINION section of the triage page.**
+
+And now the failure becomes the feature. That section lists well-supported work that was closed anyway. pr-308696 is the top line. That is not my tool being wrong. **That is my tool finding something a human may have missed**, which is the thing a maintainer would most want.
+
+---
+
+## 4:00 to 4:35 — what I removed, and three numbers I made up
+
+**Removed:** the fully agentic version scored 46.7 against 73.3 and cost three and a half times as much. It is still in the repo, runnable, with its saved answers, so the negative result reproduces.
+
+**And three times today I published a number with no basis, and caught each one.** A citation score of 86.7% that was really twelve file paths copied out of the question. An evidence figure of 61.5% that counted "made no claim" as "lied". And "roughly 31 minutes of reading" from a formula I invented on the spot, in a project that had *already* dropped a made-up time metric an hour earlier.
+
+All three are in the changelog. Writing a rule against it after the first one did not stop the second or the third. What caught them was a number sitting oddly next to another number.
+
+---
+
+## 4:35 to 5:00 — the hot take
+
+"Closed without merging" looks like it should mean "rejected as bad". On vscode it mostly does not. Of seventeen I inspected: four were bots, about ten were maintainers closing their own real work in favour of another approach, and **exactly one** looked like slop.
+
+So any triage tool built on the metadata a project records for free is measuring maintainer **behaviour**, not maintainer **judgment of quality**. That is enough to build something genuinely useful. It is not the same claim as "this detects AI slop", and I would rather say so than let a good-looking number imply it.
+
+---
+
+## Shot list
+
+| Time | On screen |
+| --- | --- |
+| 0:00 | the two job adverts |
+| 0:40 | `./run.sh baseline`, the 33.3% |
+| 1:10 | `./run.sh agent`, then a `traces/agent-*.md` file |
+| 1:50 | `./run.sh triage`, the page |
+| 2:20 | the six-version table |
+| 3:10 | pr-308696 in `data/cases/`, then SECOND OPINION |
+| 4:00 | `CHANGELOG.md`, the three made-up numbers |
+| 4:35 | the 17-case breakdown |
