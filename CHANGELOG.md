@@ -112,6 +112,32 @@ Giving an agent a sharper sense of code quality made it WORSE at this task, beca
 
 **Honest note on the verifier.** It sent nothing back across all 15, so the loop we built never actually ran. Twice now, across two architectures, our verification stage has fired zero times. That is worth saying plainly rather than describing a mechanism that has never once been exercised.
 
+## Six versions of the agent, including two I broke myself
+
+The agent was removed above at 46.7%. Rather than leave it there, it was rebuilt six times, each version changing exactly one thing so the effect could be attributed. Every version's saved answers are committed under `data/responses/`.
+
+| Version | What changed | Score | Piles 1 / 2 / 3 | Good work wrongly binned |
+| --- | --- | --- | --- | --- |
+| Simple script | (for comparison) | 73.3% | 1.00 / 1.00 / **0.20** | 0 of 10 |
+| v1 | first real agent, four roles | 46.7% | 0.40 / 0.60 / 0.40 | **4 of 10** |
+| v2 | told it a code judgement is not a merge judgement | 46.7% | 0.40 / 0.60 / 0.40 | 1 of 10 |
+| v3 | must commit to a pile; given the true base rate | 73.3% | 0.60 / 1.00 / 0.60 | 1 of 10 |
+| **v4** | **fixed the handover between roles** | **73.3%** | 0.60 / 0.80 / **0.80** | **0 of 10** |
+| v5 | made the investigator's verdict binding | 46.7% | 1.00 / 0.20 / 0.20 | 0 of 10 |
+| v6 | investigator rates its own certainty | 66.7% | 0.80 / 0.80 / 0.40 | 1 of 10 |
+
+**v2, the fix that worked and did not help.** Wrong rejections fell from 4 to 1. The headline did not move, because it stopped rejecting and started shrugging: three answers of "cannot tell", which score as wrong.
+
+**v3, the biggest single jump, and it was not cleverness.** Two changes. It must commit to a pile, because a sorting tool that refuses to sort leaves the maintainer reading everything. And it was told a true fact it had never been given: roughly nine in ten closed submissions on this project were merged. It had been treating the three piles as equally likely, so every flicker of doubt pushed work into reject. 46.7 to 73.3.
+
+**v4, and the finding worth carrying elsewhere.** Two defects, both found by reading the run records rather than guessing at wording. The investigator's conclusion reached the adjudicator as a bare number with no framing, so the adjudicator ignored it. And the investigator was discarding correct matches for not being worded closely enough. **Both were handover failures. Every role behaved sensibly on its own; the system still got the answer wrong because information was lost between them.**
+
+**v5, my own overcorrection, kept because it is the most instructive result here.** I told the adjudicator to accept the investigator's conclusion. It fell from 73.3 to **46.7**. The cause: I had loosened the investigator in v4 so it accepts near-matches, then in v5 made it the final word. Loose plus binding means nearly everything lands in one pile. Pile 1 went to a perfect 1.00 and the other two collapsed to 0.20. A change that sounded obviously right cost 27 points.
+
+**v6, and where we stopped.** Letting the investigator grade its own certainty recovered to 66.7%, still below v4. We stopped there. One case is worth 6.7 points on fifteen, and six attempts against the same fifteen answers is the point where a better number stops indicating a better system. Continuing would have produced a nicer figure and a worse tool.
+
+**Decision: v4 ships, and the argument is not the headline.** It ties the simple script at 73.3%. But it catches **0.80 of the not-merged pile against the script's 0.20**, four times better at the one job the tool exists to do, while matching the script's zero wrongly-binned good work. The script earns its 73.3% by being uniformly generous, which is useless for finding the pile you want to skip.
+
 ## The reframe: stop predicting the human, start producing evidence
 
 **The problem with everything above, and it was the CEO who named it.**
