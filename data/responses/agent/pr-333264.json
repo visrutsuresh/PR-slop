@@ -1,0 +1,92 @@
+{
+  "bucket": 2,
+  "confidence": "low",
+  "reason": "The diff is a real, well-reasoned contribution with tests, but the investigator's own judgement picked issue #333280 without a confirmed link, and I cannot verify that issue's content against this PR's specific setting mapping.",
+  "citations": [
+    "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+    "src/vs/platform/agentHost/common/agentHostSchema.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "chat.tools.eligibleForAutoApproval per-tool auto approve setting not working policy",
+      "looking_for": "a report from a user or admin that the chat.tools.eligibleForAutoApproval setting (or ChatToolsEligibleForAutoApproval policy) doesn't work, is ignored, or has no effect, especially in the context of the new agentHost/Copilot SDK managed settings replacing/bridging legacy chat settings",
+      "cost": 0.0896498
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        305317,
+        305329,
+        305308,
+        305331,
+        330027,
+        309589,
+        333280,
+        333023
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these are about a per-tool auto-approval policy config setting failing to apply; they're about confirmation dialogs, MCP config, and terminal-only auto-approve wildcard matching.",
+      "cost": 0.0865058
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        305317,
+        305329,
+        330027,
+        309589,
+        330986,
+        333280,
+        230139,
+        305308
+      ],
+      "decision": "stop",
+      "matched": 333280,
+      "why": "Terminal Auto-Approve ignoring wildcard/regex rules in settings.json is exactly an auto-approve policy being ignored/not applied.",
+      "cost": 0.08630579999999999
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+      "source_chars": 14070,
+      "supported": true,
+      "why": "The current file matches the diff exactly: ELIGIBLE_FOR_AUTO_APPROVAL_SETTING_ID is imported, contributeEligibleForAutoApprovalRestriction is defined checking for a non-true/malformed value and returning the bypass lock, it's registered via managedPermissionsSetting(..., 'policyOnly', ...) in managedPermissionsSettings, and the module header comment documents the exception as described.",
+      "cost": 0.1263718
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [
+        "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+        "src/vs/platform/agentHost/common/agentHostSchema.ts"
+      ],
+      "reason": "The diff is a real, well-reasoned contribution with tests, but the investigator's own judgement picked issue #333280 without a confirmed link, and I cannot verify that issue's content against this PR's specific setting mapping.",
+      "cost": 0.1080416
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
+        "src/vs/platform/agentHost/common/agentHostSchema.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.4969,
+  "_wall_seconds": 32.1
+}

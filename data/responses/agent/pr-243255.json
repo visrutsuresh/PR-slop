@@ -1,0 +1,73 @@
+{
+  "bucket": 3,
+  "confidence": "medium",
+  "reason": "Genuine bug-fix attempt tied to a reported issue, but the approach is a partial/hacky fix (author admits it doesn't solve the floating-point issue beyond 14 merges) and reindexing logic looks fragile, making it unlikely to be merged as-is.",
+  "citations": [
+    "src/vs/editor/contrib/snippet/browser/snippetSession.ts",
+    "#230149"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "snippet tabstop limit 10 nested placeholder matrix latex",
+      "looking_for": "an issue report describing that snippets with more than 10 tabstops/placeholders break or get mis-numbered, e.g. when nesting/merging snippets like a LaTeX matrix with many tabstops",
+      "cost": 0.0865518
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        230149,
+        322010,
+        87226,
+        333297,
+        306479,
+        239862,
+        332830,
+        333294
+      ],
+      "decision": "stop",
+      "matched": 230149,
+      "why": "Direct terminology match on nested tabstops exceeding placeholder limit, exactly the described bug.",
+      "cost": 0.0861718
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/editor/contrib/snippet/browser/snippetSession.ts",
+      "source_chars": 35390,
+      "supported": true,
+      "why": "The diff computes nestingLevel dynamically (Math.max(8, ...) + 2) instead of the hardcoded '*=10', uses it consistently for both index calcs, and adds a reindexing pass that reassigns integer indices per placeholder group afterward, matching the stated goal of scaling nesting by snippet count and reordering to mitigate float precision loss. It does not claim to fully solve floats beyond 14 merges, consistent with the description's own caveat.",
+      "cost": 0.1144158
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 3,
+      "citations": [
+        "src/vs/editor/contrib/snippet/browser/snippetSession.ts",
+        "#230149"
+      ],
+      "reason": "Genuine bug-fix attempt tied to a reported issue, but the approach is a partial/hacky fix (author admits it doesn't solve the floating-point issue beyond 14 merges) and reindexing logic looks fragile, making it unlikely to be merged as-is.",
+      "cost": 0.0943736
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "src/vs/editor/contrib/snippet/browser/snippetSession.ts",
+        "#230149"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.3815,
+  "_wall_seconds": 22.4
+}

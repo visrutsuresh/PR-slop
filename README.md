@@ -184,6 +184,18 @@ The simple version receives no such section, because having no way to search the
 
 > You answer with JSON only. No preamble, no markdown fences.
 
+## The experiment we removed
+
+We also built the fully agentic version: an investigator that writes its own search wording and can search again, a claim checker that reads the real source and tests the submission's claims, an adjudicator, and a verifier that sends failed work back to be redone.
+
+**It scored 46.7%, against 73.3% for the simpler two-stage version, and it wrongly rejected merge-worthy work 4 times out of 10 instead of zero.** It cost three and a half times as much.
+
+The reason is precise. Its claim checker judged three submissions as not supported by their own code. The adjudicator moved all three to the not-merged pile. **All three had actually been merged.** The claim checker may well have been right about the code; the maintainer merged the work regardless.
+
+We had already written down that "not merged" does not mean "bad work". Then we built a system whose extra ability is judging whether work is good, and used it to predict whether work was merged. Sharper judgement of quality made it worse, because the task is not about quality.
+
+It is removed from the shipped solution and kept at `agent.py`, runnable, with its saved responses, so the negative result reproduces.
+
 ## Results
 
 | Measure | Simple version | Our system | Change |

@@ -1,0 +1,64 @@
+{
+  "bucket": 3,
+  "confidence": "high",
+  "reason": "The claim checker confirmed the actual codebase still has the unpatched code, meaning this diff was never applied/merged despite the PR description's claims.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "code action Quick Fix menu command not found disposed arguments",
+      "looking_for": "a report describing invoking a code action/quick fix command with arguments failing or showing 'command not found' when the menu was left open, especially after a delay, or a report referencing regression from PR #330142",
+      "cost": 0.08739380000000001
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        331834,
+        230126,
+        306475,
+        332515,
+        331016,
+        333331,
+        230162,
+        141761
+      ],
+      "decision": "stop",
+      "matched": 331834,
+      "why": "Title exactly matches the bug: code actions with arguments fail with 'command not found' when the Quick Fix menu is open/disposed.",
+      "cost": 0.0863858
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/editor/contrib/codeAction/browser/codeActionController.ts",
+      "source_chars": 19504,
+      "supported": true,
+      "why": "The current codeActionController.ts still has 'let actions: CodeActionSet;' and 'actions = await newState.actions;' unmodified from the pre-patch state, not the patched 'this._model.takeCodeActions(...)' with dispose-on-fallthrough logic shown in the diff \u2014 meaning the diff has not actually been applied to this file, so the claimed fix is not present in the current codebase.",
+      "cost": 0.1253938
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 3,
+      "citations": [],
+      "reason": "The claim checker confirmed the actual codebase still has the unpatched code, meaning this diff was never applied/merged despite the PR description's claims.",
+      "cost": 0.1043456
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.4035,
+  "_wall_seconds": 32.3
+}

@@ -1,0 +1,73 @@
+{
+  "bucket": 1,
+  "confidence": "medium",
+  "reason": "Fixes a concrete, reported UI bug (Agent Merge turns showing raw state tags instead of a readable summary in the prompt timeline), with a real code change and test that the claim checker verified against source.",
+  "citations": [
+    "#333034",
+    "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+  ],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "chat prompt timeline agent merge state tag shows up instead of summary",
+      "looking_for": "an issue report describing the chat mini-map/timeline/gutter showing a raw <agent_merge_state> tag or garbled/unreadable text instead of a readable summary for merge/repair turns",
+      "cost": 0.0893758
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333034,
+        305308,
+        305327,
+        333151,
+        305299,
+        331820,
+        333023,
+        305291
+      ],
+      "decision": "stop",
+      "matched": 333034,
+      "why": "#333034 directly matches: agent_merge_state tags appearing as chat timeline events instead of a proper summary.",
+      "cost": 0.08607580000000001
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/workbench/contrib/chat/browser/accessibility/chatAccessibilityProvider.ts",
+      "source_chars": 9443,
+      "supported": true,
+      "why": "The current promptTimelineModel.ts imports getAgentMergeRequestLabel and uses it in a caching _requestPreview helper (falling back to item.messageText) feeding into the prompt list used for ticks; the diff also adds a test asserting an Agent Merge turn previews as 'Agent Merge, 1 comment, 1 check failing' instead of the raw state tag, and chatAccessibilityProvider.ts likewise uses getAgentMergeRequestLabel as the aria label for request items, matching the claim that all rails derive from this shared summary.",
+      "cost": 0.1207038
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 1,
+      "citations": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "reason": "Fixes a concrete, reported UI bug (Agent Merge turns showing raw state tags instead of a readable summary in the prompt timeline), with a real code change and test that the claim checker verified against source.",
+      "cost": 0.1088396
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [
+        "#333034",
+        "src/vs/workbench/contrib/chat/browser/promptTimeline/promptTimelineModel.ts"
+      ],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": true,
+  "_cost": 0.405,
+  "_wall_seconds": 26.5
+}

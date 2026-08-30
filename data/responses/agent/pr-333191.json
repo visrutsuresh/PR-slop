@@ -1,0 +1,64 @@
+{
+  "bucket": 3,
+  "confidence": "high",
+  "reason": "The claim checker found the diff does not match the actual current file contents, indicating this is a fabricated or hallucinated patch rather than a real merged contribution.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "GitHub issue pull request link paste new chat session attach not working can't open",
+      "looking_for": "an issue report where a user says pasting a GitHub issue/PR URL into the new chat session composer doesn't get recognized as context, or that a GitHub issue/PR attachment pill in the composer isn't clickable/openable",
+      "cost": 0.0882258
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333149,
+        332542,
+        333151,
+        306471,
+        325796,
+        330996,
+        330997,
+        333033
+      ],
+      "decision": "stop",
+      "matched": 333149,
+      "why": "It directly matches: pasting a GitHub issue/PR URL to open a new chat session doesn't work from the agents window landing page.",
+      "cost": 0.08607379999999999
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/src/extension/chatSessions/vscode-node/copilotCloudSessionsProvider.ts",
+      "source_chars": 108769,
+      "supported": false,
+      "why": "The diff claims to add an exported parseGitHubContextUrl function and wire it into the quick pick search handler in copilotCloudSessionsProvider.ts, but the current file contents provided for that exact file contain no such function or usage anywhere \u2014 the file's actual content around the referenced constants (OPEN_PULL_REQUEST_COMMAND_ID, CAN_CREATE_PULL_REQUEST_CONTEXT_KEY, etc.) matches only the unchanged context, not the patched result.",
+      "cost": 0.1359158
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 3,
+      "citations": [],
+      "reason": "The claim checker found the diff does not match the actual current file contents, indicating this is a fabricated or hallucinated patch rather than a real merged contribution.",
+      "cost": 0.1079216
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 1,
+  "_claim_supported": false,
+  "_cost": 0.4181,
+  "_wall_seconds": 30.9
+}

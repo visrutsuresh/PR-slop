@@ -1,0 +1,83 @@
+{
+  "bucket": 2,
+  "confidence": "medium",
+  "reason": "Genuine, well-tested experiment-gated prompt change for specific Gemini Flash versions, but no evidence it addresses an already-reported issue rather than internal prompt-engineering trials.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "Gemini Flash prompt instructions grep_search too broad slow terminal commands not batched",
+      "looking_for": "an existing issue where a user reports Gemini Flash agent behaves poorly by not reading config/definitions first, running unbatched terminal commands, or issuing overly broad grep_search queries",
+      "cost": 0.0874578
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        309589,
+        230129,
+        333151,
+        230126,
+        305327,
+        306511,
+        331856,
+        230162
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these relate to Gemini Flash, prompt instructions, grep_search scope, or batching terminal commands \u2014 they're about terminal UI/session/approval mechanics.",
+      "cost": 0.0865978
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        305293,
+        305282,
+        333267,
+        333168,
+        331845,
+        325237,
+        305319,
+        277422
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "none of these relate to Gemini tool calling or search scope/performance\u2014they're about Copilot infra, UI, or unrelated telemetry",
+      "cost": 0.0862438
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "extensions/copilot/package.json",
+      "source_chars": 288529,
+      "supported": true,
+      "why": "The diff adds isGeminiFlash36Or37 checking modelFamily for 'gemini-3.6-flash'/'gemini-3.7-flash', gates enableFlashPromptAdditions on both that family check and a new ConfigKey.EnableGeminiFlashPromptAdditions experiment flag, and wraps the three new instruction snippets (Read ast/definitions first, Tool Batching, Search Precision) behind that flag; tests confirm additions appear only for 3.6/3.7 with the flag enabled and are omitted otherwise (e.g. gemini-2.0-flash).",
+      "cost": 0.1241558
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [],
+      "reason": "Genuine, well-tested experiment-gated prompt change for specific Gemini Flash versions, but no evidence it addresses an already-reported issue rather than internal prompt-engineering trials.",
+      "cost": 0.10535560000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.4898,
+  "_wall_seconds": 31.6
+}

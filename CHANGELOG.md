@@ -72,3 +72,42 @@ The floor for three equal piles is 33.3%, so the simple version performed exactl
 **Where our system still fails, stated rather than buried.** It catches only **1 of 5** not-merged items. It is good at recognising work that was accepted and poor at recognising work that was not. Given that finding the not-merged pile is the entire point of the tool, this is the real limitation and no amount of headline accuracy hides it.
 
 The likely reason is in our own evaluation design, and we wrote it down before running anything: "not merged" on this project mostly does not mean bad work. Most of that pile is automated housekeeping or maintainers closing their own work in favour of another approach. Our system reads those as real contributions, because they are.
+
+## The full agent, built and then REMOVED
+
+**What we tried and why.** A fair criticism of everything above is that it is a script, not an agent. Search runs once, a model is asked once, a check runs over the answer. Nothing ever decides anything.
+
+So we built the real thing. Four roles, and a loop:
+
+- an **investigator** that writes its own search wording, reads the results, and can search again with different words if the first attempt was poor
+- a **claim checker** that reads the actual source at the pinned commit and tests whether the submission does what it says, rather than trusting the description
+- an **adjudicator** that decides the pile using what the other two found
+- a **verifier** that, when a claim does not hold up, **sends the work back** for another attempt instead of quietly deleting it
+
+This is genuinely agentic. The agent chose 8 follow-up searches on its own across the 15 cases. Its claim checker read real source for 14 of 15.
+
+**Result: it is worse. Much worse.**
+
+| | Two-stage version | Full agent |
+| --- | --- | --- |
+| Balanced accuracy | **73.3%** | 46.7% |
+| Merge-worthy work wrongly rejected | **0 of 10** | 4 of 10 |
+| Cost for 15 cases | **1.88 USD** | 6.75 USD |
+
+It broke five cases the simpler version had right, and fixed one.
+
+**Why, precisely.** This is not noise, it has a mechanism, and we found it.
+
+The claim checker judged three submissions as "the code does not support the claim". In all three the adjudicator moved them to pile 3, not merged. **All three had in fact been merged by the maintainer.**
+
+The claim checker may even have been correct about the code. It did not matter. The maintainer merged the work anyway.
+
+**What it taught us, and this is the real lesson of the project.** We had already written down that "not merged" does not mean "bad work". Then we built a system whose whole extra capability is judging whether work is good, and wired that judgement into predicting whether it was merged. We conflated the exact two things our own evaluation design says are different.
+
+Giving an agent a sharper sense of code quality made it WORSE at this task, because the task is not about quality. Every extra reasoning step pulled it further toward answering a question nobody asked.
+
+**Decision: REMOVED.** The two-stage version ships. The agent is kept in the repository at `agent.py`, runnable, with its 15 saved responses, so anyone can reproduce this negative result.
+
+**What we would keep from it.** The investigator's habit of writing its own search wording is good, and it works: it produced queries like "snippet tab stop limit 10 nested placeholders" from a title that said none of those things, using the words a person REPORTING a problem would use rather than the words a developer FIXING it would use. That idea is worth carrying into a future version. The quality judgement is not.
+
+**Honest note on the verifier.** It sent nothing back across all 15, so the loop we built never actually ran. Twice now, across two architectures, our verification stage has fired zero times. That is worth saying plainly rather than describing a mechanism that has never once been exercised.

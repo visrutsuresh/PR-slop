@@ -1,0 +1,83 @@
+{
+  "bucket": 2,
+  "confidence": "medium",
+  "reason": "A genuine diagnostic/telemetry contribution with tests, but described as investigatory ('to investigate what events actually use buffer today') and referencing an internal issue not confirmed as a reported bug matching this fix.",
+  "citations": [],
+  "_trace": [
+    {
+      "role": "investigator",
+      "action": "chose a search",
+      "round": 1,
+      "query": "buffered events lost late listener onWillAddFirstListener",
+      "looking_for": "an issue reporting that events fired before a listener subscribes are silently dropped/lost, or asking for visibility into which events use event buffering",
+      "cost": 0.0863318
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 1,
+      "returned": [
+        333034,
+        320532,
+        306497,
+        333324,
+        230169,
+        333019,
+        331003,
+        333017
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "None of these concern a buffered-event emitter dropping events for a listener that attaches late via onWillAddFirstListener.",
+      "cost": 0.0864178
+    },
+    {
+      "role": "investigator",
+      "action": "judged the results",
+      "round": 2,
+      "returned": [
+        333019,
+        331188,
+        333034,
+        32856,
+        331812,
+        320532,
+        333294,
+        331003
+      ],
+      "decision": "search_again",
+      "matched": null,
+      "why": "none of these concern an Emitter/event-buffering-before-listener-attached bug, they're about revival cancellation, PR context pills, chat mini map events, word wrapping, editor sorting, Copilot output duplication, automations rerender, and websocket hang",
+      "cost": 0.0868358
+    },
+    {
+      "role": "claim_checker",
+      "action": "read the real source and judged",
+      "file": "src/vs/base/common/event.ts",
+      "source_chars": 64536,
+      "supported": true,
+      "why": "event.ts adds a reportBufferedOnFirstListener callback invoked only when onDidAddFirstListener fires with buffer.length>0, i.e. exactly when a late listener causes a non-empty buffer flush; tests confirm it fires with the buffered count on late attach and not on empty buffer. ipc.ts wires this into fromService via a settable bufferUsageReporter that reports (serviceName, eventName, bufferedCount), and app.ts installs it via installProxyChannelBufferUsageTelemetry for telemetry reporting, matching the stated investigative goal.",
+      "cost": 0.12415580000000001
+    },
+    {
+      "role": "adjudicator",
+      "action": "decided the pile",
+      "attempt": 1,
+      "bucket": 2,
+      "citations": [],
+      "reason": "A genuine diagnostic/telemetry contribution with tests, but described as investigatory ('to investigate what events actually use buffer today') and referencing an internal issue not confirmed as a reported bug matching this fix.",
+      "cost": 0.10548160000000001
+    },
+    {
+      "role": "verifier",
+      "action": "checked every claim",
+      "claims": [],
+      "failures": [],
+      "sending_back": false
+    }
+  ],
+  "_investigator_rounds": 2,
+  "_claim_supported": true,
+  "_cost": 0.4892,
+  "_wall_seconds": 27.0
+}
