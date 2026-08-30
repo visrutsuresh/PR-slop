@@ -150,44 +150,55 @@
 <!-- 4 HOW -->
 <section>
   <div class="step">4 &middot; How it works</div>
-  <h2>Two steps. Neither is clever.</h2>
+  <h2>Four workers, and they can go back for more.</h2>
 
-  <svg viewBox="0 0 800 200" role="img" aria-label="Two stages, search then check">
-    <g font-size="15">
-      <rect x="10" y="55" width="150" height="84" rx="12" fill="#fff" stroke="#e3ddd3"/>
-      <text x="85" y="90" text-anchor="middle" font-weight="700">A submission</text>
-      <text x="85" y="112" text-anchor="middle" fill="#6b6560">arrives</text>
+  <svg viewBox="0 0 800 210" role="img" aria-label="Four roles with a loop">
+    <g font-size="14">
+      <rect x="10" y="60" width="140" height="76" rx="12" fill="#eef3fa" stroke="#cfdcec"/>
+      <text x="80" y="90" text-anchor="middle" font-weight="700">Investigator</text>
+      <text x="80" y="110" text-anchor="middle" fill="#5a6b80">writes its own</text>
+      <text x="80" y="126" text-anchor="middle" fill="#5a6b80">searches</text>
 
-      <rect x="230" y="55" width="180" height="84" rx="12" fill="#eef3fa" stroke="#cfdcec"/>
-      <text x="320" y="88" text-anchor="middle" font-weight="700">Step 1 &middot; Search</text>
-      <text x="320" y="110" text-anchor="middle" fill="#5a6b80">403 past complaints</text>
+      <rect x="190" y="60" width="140" height="76" rx="12" fill="#f2eefa" stroke="#dcd0ec"/>
+      <text x="260" y="90" text-anchor="middle" font-weight="700">Claim checker</text>
+      <text x="260" y="110" text-anchor="middle" fill="#6b5a80">reads the real</text>
+      <text x="260" y="126" text-anchor="middle" fill="#6b5a80">source code</text>
 
-      <rect x="475" y="55" width="180" height="84" rx="12" fill="#f2eefa" stroke="#dcd0ec"/>
-      <text x="565" y="88" text-anchor="middle" font-weight="700">Step 2 &middot; Check</text>
-      <text x="565" y="110" text-anchor="middle" fill="#6b5a80">is that real?</text>
+      <rect x="370" y="60" width="140" height="76" rx="12" fill="#fff" stroke="#e3ddd3"/>
+      <text x="440" y="90" text-anchor="middle" font-weight="700">Decider</text>
+      <text x="440" y="110" text-anchor="middle" fill="#6b6560">picks the pile</text>
 
-      <rect x="700" y="55" width="90" height="84" rx="12" fill="#12100e"/>
-      <text x="745" y="90" text-anchor="middle" font-weight="700" fill="#fff">A note</text>
-      <text x="745" y="112" text-anchor="middle" fill="#bdb4a8">for a human</text>
+      <rect x="550" y="60" width="140" height="76" rx="12" fill="#fdf3dc" stroke="#f0e0bb"/>
+      <text x="620" y="90" text-anchor="middle" font-weight="700">Verifier</text>
+      <text x="620" y="110" text-anchor="middle" fill="#8a6f22">checks it, and can</text>
+      <text x="620" y="126" text-anchor="middle" fill="#8a6f22">send it back</text>
+
+      <rect x="730" y="60" width="60" height="76" rx="12" fill="#12100e"/>
+      <text x="760" y="98" text-anchor="middle" font-weight="700" fill="#fff">Page</text>
+      <text x="760" y="118" text-anchor="middle" fill="#bdb4a8" font-size="12">for a human</text>
     </g>
     <g stroke="#6b6560" stroke-width="2" fill="none">
-      <path d="M168 97 L222 97"/><path d="M214 91 l8 6 -8 6"/>
-      <path d="M418 97 L467 97"/><path d="M459 91 l8 6 -8 6"/>
-      <path d="M663 97 L692 97"/><path d="M684 91 l8 6 -8 6"/>
+      <path d="M158 98 L182 98"/><path d="M174 92 l8 6 -8 6"/>
+      <path d="M338 98 L362 98"/><path d="M354 92 l8 6 -8 6"/>
+      <path d="M518 98 L542 98"/><path d="M534 92 l8 6 -8 6"/>
+      <path d="M698 98 L722 98"/><path d="M714 92 l8 6 -8 6"/>
     </g>
+    <g stroke="#c98a12" stroke-width="2" fill="none" stroke-dasharray="5 4">
+      <path d="M620 140 L620 175 L440 175 L440 140"/><path d="M434 148 l6 -8 6 8"/>
+    </g>
+    <text x="530" y="196" text-anchor="middle" font-size="14" fill="#c98a12">if a claim does not hold up, it goes back</text>
   </svg>
 
   <div class="grid g2">
     <div class="card">
-      <p style="margin:0 0 8px"><strong>Step 1, search.</strong></p>
-      <p class="quiet" style="margin:0">The project has <strong>403</strong> past complaints written down. Far too many to hand to a computer all at once. So we go and look, and put the eight closest ones in front of it.</p>
+      <p style="margin:0 0 8px"><strong>The bit that makes it an agent, not a form.</strong></p>
+      <p class="quiet" style="margin:0">The investigator chooses what to search for. From a title containing none of those words it wrote <code>snippet tab stop limit 10 nested placeholders</code>, using the words a person <em>reporting</em> a problem would use rather than a developer <em>fixing</em> one. It found the right complaint. It chose to search a second time 6 times out of 15.</p>
     </div>
     <div class="card">
-      <p style="margin:0 0 8px"><strong>Step 2, check.</strong></p>
-      <p class="quiet" style="margin:0">If it claims &ldquo;this fixes complaint #4102&rdquo;, we go and see whether #4102 exists. If it does not, we cross it out.</p>
+      <p style="margin:0 0 8px"><strong>Why not just one question?</strong></p>
+      <p class="quiet" style="margin:0">The project has 403 recorded complaints. Far too many to hand over at once. Answering &ldquo;does this fix something already reported?&rdquo; means going and looking, then judging what came back.</p>
     </div>
   </div>
-</section>
 
 <!-- 5 TEST -->
 <section>
@@ -245,12 +256,16 @@
   </div>
 
   <table>
-    <tr><th></th><th>Simple</th><th>Ours</th></tr>
-    <tr><td>Overall</td><td class="n">33.3%</td><td class="n win">73.3%</td></tr>
-    <tr><td>Good work wrongly binned</td><td class="n">1 of 10</td><td class="n win">0 of 10</td></tr>
-    <tr><td>Complaints it named that really exist</td><td class="n">1 of 3</td><td class="n win">9 of 9</td></tr>
-    <tr><td>Cost for all 15</td><td class="n">$1.84</td><td class="n">$1.88</td></tr>
+    <tr><th></th><th>Simple</th><th>Script</th><th>Agent (shipped)</th></tr>
+    <tr><td>Overall</td><td class="n">33.3%</td><td class="n">73.3%</td><td class="n win">73.3%</td></tr>
+    <tr><td>Finds the reject pile</td><td class="n">0.40</td><td class="n down">0.20</td><td class="n win">0.80</td></tr>
+    <tr><td>Good work wrongly binned</td><td class="n">1 of 10</td><td class="n">0 of 10</td><td class="n win">0 of 10</td></tr>
+    <tr><td>Cost for all 15</td><td class="n">$1.84</td><td class="n">$1.88</td><td class="n">$3.88</td></tr>
   </table>
+
+  <div class="card good">
+    <p style="margin:0"><strong>The two 73.3% figures are not the same thing.</strong> The middle one gets there by being generous to everything, so it finds <strong>one in five</strong> of the pile you wanted to skip. The agent finds <strong>four in five</strong>. Same headline, four times better at the job.</p>
+  </div>
 </section>
 
 <!-- 8 HONEST -->
