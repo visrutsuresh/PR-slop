@@ -26,6 +26,7 @@ write one HTML file. That is the entire blast radius, and it is deliberate:
 ground rule 4 wants consequential actions behind a human, and the safest way
 to satisfy that is to have no consequential action to gate.
 """
+import contextlib
 import json
 import os
 import sys
@@ -218,7 +219,14 @@ def handle(msg):
             return {"jsonrpc": "2.0", "id": mid,
                     "error": {"code": -32601, "message": f"no tool named {name}"}}
         try:
-            text = fn(params.get("arguments") or {})
+            # STDOUT IS THE PROTOCOL. live.run() prints progress with plain
+            # print(), which lands on stdout and injects raw text straight into
+            # the JSON-RPC stream, so the first triage call corrupts the
+            # session for a real client. Unit tests never saw it because they
+            # exercise handlers that do not reach live.run(). Everything a tool
+            # prints goes to stderr, where a client shows it as server log.
+            with contextlib.redirect_stdout(sys.stderr):
+                text = fn(params.get("arguments") or {})
             ok = True
         except Exception:
             # An error is content, not a transport failure: the assistant should

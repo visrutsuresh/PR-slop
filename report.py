@@ -17,7 +17,12 @@ import html
 import json
 import os
 
-CSS = """
+THEME = os.environ.get("PRSLOP_THEME", "paper")
+
+# Direction A, "paper". A printed triage sheet. Warm ground, one accent, wide
+# measure, generous leading. Optimised for reading a reason paragraph and for
+# printing to hand to someone. Quiet on purpose: the evidence is the loud part.
+CSS_PAPER = """
 :root{--ink:#12100e;--paper:#faf8f4;--card:#fff;--muted:#6f6862;--line:#e6e0d6;
       --green:#1c7a4b;--amber:#b8830f;--slate:#5a6b80;--red:#b5382b}
 *{box-sizing:border-box}
@@ -64,7 +69,92 @@ a{color:#2f5d8f}
   border-radius:0 7px 7px 0;font-size:14.5px;color:#6b5410}
 footer{border-top:1px solid var(--line);padding:26px;color:var(--muted);font-size:14px}
 .k{display:inline-block;min-width:132px;color:var(--muted)}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;margin:4px 0 8px}
+.cell{background:var(--card);padding:18px 20px}
+.cell .n{font:650 30px/1 ui-sans-serif,system-ui;letter-spacing:-.03em}
+.cell .lab{margin-top:5px;font-weight:600;font-size:14.5px}
+.cell .sub{color:var(--muted);font-size:13.5px}
+.group h2{position:sticky;top:0;background:var(--paper);padding:6px 0;z-index:2}
+.pr:hover{border-color:#d3cabb}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--green);
+  outline-offset:3px;border-radius:4px}
+@media print{
+  header{background:#fff;color:#000;border-bottom:2px solid #000}
+  header .sub,header .warn{color:#333;background:#fff;border-color:#999}
+  .pr{break-inside:avoid;border-color:#bbb}
+  .rest[open] summary{display:none}
+  .rest:not([open]){display:none}
+  footer{border-color:#999}
+}
 """
+
+# Direction B, "console". Built for a maintainer who lives in a terminal and
+# has sixty open submissions, not nine. Dark, monospaced, one line per
+# submission with the evidence inline, so a long queue is scannable by eye
+# without scrolling past card after card. Same data, opposite density.
+CSS_CONSOLE = """
+:root{--ink:#d7dae0;--paper:#0e1014;--card:#15181e;--muted:#7d8794;--line:#242932;
+      --green:#4ec98a;--amber:#e0b341;--slate:#7f93ad;--red:#ef6a5c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 14px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  -webkit-font-smoothing:antialiased}
+header{background:#090b0e;color:var(--ink);padding:26px;border-bottom:1px solid var(--line)}
+.wrap{max-width:1180px;margin:0 auto}
+h1{margin:0 0 5px;font-size:20px;letter-spacing:-.01em;font-weight:600}
+header .sub{color:var(--muted);font-size:13px}
+header .warn{margin-top:14px;background:#12161c;border-left:2px solid var(--amber);
+  padding:10px 13px;color:#b9c2cd;font-size:13px}
+main{padding:22px 26px 80px}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 22px}
+.cell{background:var(--card);padding:14px 16px}
+.cell .n{font:600 26px/1 ui-monospace,Menlo,monospace;color:var(--green)}
+.cell .lab{margin-top:4px;font-size:13px;color:var(--ink)}
+.cell .sub{color:var(--muted);font-size:12px}
+.group{margin:26px 0 8px}
+.group h2{margin:0 0 2px;font-size:13px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--muted);position:sticky;top:0;
+  background:var(--paper);padding:6px 0;z-index:2}
+.group p{margin:0 0 10px;color:var(--muted);font-size:12.5px}
+.bar{height:2px;margin-bottom:12px}
+.b1 .bar{background:var(--green)}.b2 .bar{background:var(--amber)}
+.b3 .bar{background:#39414d}.bx .bar{background:var(--slate)}
+.pr{background:var(--card);border:1px solid var(--line);border-left:2px solid var(--line);
+  padding:10px 14px;margin-bottom:5px}
+.b1 .pr{border-left-color:var(--green)}.b2 .pr{border-left-color:var(--amber)}
+.b3 .pr{border-left-color:#39414d}
+.pr:hover{background:#1a1e26}
+.pr .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.num{font-size:13px;color:var(--muted)}
+.title{font-weight:600;font-size:14px;flex:1;min-width:220px;color:#eef1f5}
+.rank{font-size:11px;color:var(--muted);background:#1d222a;padding:1px 7px}
+.rest{margin-top:6px}
+.rest summary{cursor:pointer;color:var(--muted);font-size:12.5px;padding:7px 2px}
+.rest summary:hover{color:var(--ink)}
+.chips{margin:7px 0 0;display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-size:12px;padding:1px 8px;background:#1d222a;color:#98a3b1}
+.chip.ok{background:#12291e;color:var(--green)}
+.chip.no{background:#2c1614;color:var(--red)}
+.chip.hm{background:#2a2312;color:var(--amber)}
+.why{margin:7px 0 0;color:#aab3bf;font-size:13px}
+.why b{color:var(--ink);font-weight:600}
+.links{margin:7px 0 0;font-size:12.5px}
+a{color:#6fb2f0}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.new{display:inline-block;margin-top:6px;font-size:12px;font-weight:600;
+  color:var(--green);background:#12291e;padding:1px 8px}
+.seen{display:inline-block;margin-top:6px;font-size:12px;color:var(--muted)}
+.flag{margin-top:8px;padding:8px 11px;background:#221d10;border-left:2px solid var(--amber);
+  font-size:12.5px;color:#dcc994}
+footer{border-top:1px solid var(--line);padding:22px;color:var(--muted);font-size:12.5px}
+.k{display:inline-block;min-width:132px;color:#5f6a78}
+@media print{body{background:#fff;color:#000}.pr{break-inside:avoid}}
+"""
+
+CSS = CSS_CONSOLE if THEME == "console" else CSS_PAPER
 
 
 def esc(s):
@@ -228,6 +318,27 @@ def write(data, path):
         parts.append(head + body_html + "</section>")
 
     body = "\n".join(parts)
+
+    # The one thing a maintainer wants before reading anything: how much of
+    # this is actually mine to do today, and what changed since last time.
+    first = [r for r in rs if (r["verdict"].get("bucket") or 0) == 1]
+    fresh = [r for r in rs if r.get("is_new")] if has_mem else []
+    weak = [r for r in rs
+            if any(d["status"] == "missing" for d in (r["facts"].get("declared") or []))
+            or r["facts"].get("invented")]
+    cells = [("Read first", len(first), "answer a reported problem"),
+             ("In the queue", len(rs), "open right now")]
+    if has_mem:
+        cells.insert(1, ("New since last visit", len(fresh),
+                         f'visit {data.get("prior_runs", 0) + 1}'))
+    if weak:
+        cells.append(("Cite an issue that does not exist", len(weak),
+                      "worth a closer look"))
+    strip = '<div class="strip">' + "".join(
+        f'<div class="cell"><div class="n">{v}</div>'
+        f'<div class="lab">{esc(k)}</div><div class="sub">{esc(sub)}</div></div>'
+        for k, v, sub in cells) + "</div>"
+    body = strip + body
     out = f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Triage, {esc(repo)}</title><style>{CSS}</style></head><body>

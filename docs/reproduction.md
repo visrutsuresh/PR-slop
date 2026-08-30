@@ -105,6 +105,47 @@ Recollecting the fifteen cases needs the GitHub command line tool and will produ
 REGENERATE=1 ./run.sh harvest
 ```
 
+## Using it from your own assistant, over MCP
+
+The repository carries a project-scoped `.mcp.json`, so an MCP-aware assistant started in this directory picks the server up with no setup:
+
+```
+cd PR-slop
+claude          # the pr-slop server is offered automatically
+```
+
+If your client needs an explicit registration instead:
+
+```
+claude mcp add pr-slop -- python3 /absolute/path/to/mcp_server.py
+```
+
+Then ask in plain language. Three tools are exposed:
+
+| Tool | Needs | Cost |
+| --- | --- | --- |
+| `whats_new` | nothing, reads the local memory store | **free, offline, instant** |
+| `triage_pull_request` | `gh` authenticated, the model | about 0.45 USD |
+| `triage_queue` | `gh` authenticated, the model | about 0.45 USD per submission |
+
+**Start with `whats_new`.** It costs nothing and tells you whether anything changed since the last triage, which on a quiet day is the whole answer.
+
+**Driving it without an assistant.** It speaks newline-delimited JSON-RPC 2.0 on stdin and stdout, so you can exercise it from a shell and see exactly what a client would see:
+
+```
+printf '%s\n' \
+ '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
+ '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+ '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+ | python3 mcp_server.py
+```
+
+Expect the handshake, then the three tool definitions. `./run.sh mcp` runs the same server and prints the registration line first. Running it by hand and seeing it wait is correct: it is reading stdin, not hanging.
+
+**No install step, deliberately.** There is no MCP SDK here. The transport is written against the standard library so that this section does not introduce the project's first dependency and does not put an install wall in front of the offline reproduction above.
+
+**It cannot act.** The tools read, and they write one HTML file. No merge, no close, no comment, no label.
+
 ## Cost and time, measured not estimated
 
 | | Simple version | Intermediate script | Shipped agent |

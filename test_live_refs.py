@@ -273,7 +273,7 @@ def memory_checks():
 
 def mcp_checks():
     """The protocol surface, exercised without a network call or a model call."""
-    import io, json as J, mcp_server
+    import io, sys, json as J, mcp_server
     checks = 0
 
     def rpc(*msgs):
@@ -339,6 +339,40 @@ def mcp_checks():
         assert "USD" in text
     finally:
         memory.MEM_DIR = old
+    checks += 1
+
+    # STDOUT IS THE PROTOCOL. A tool that prints progress with plain print()
+    # injects raw text into the JSON-RPC stream and corrupts the session on the
+    # first real call. This shipped broken: the handler tests above all passed
+    # because none of them reaches the code that prints. Every line stdout
+    # carries must be valid JSON.
+    def noisy(args):
+        print("[live] fetching open pull requests from somewhere")
+        print("[live] 300 recorded problems")
+        return "done"
+    mcp_server.HANDLERS["_noisy"] = noisy
+    try:
+        # In production serve() writes to sys.stdout and print() ALSO goes to
+        # sys.stdout, which is why they collide. An earlier version of this
+        # check passed a separate StringIO, so the two never shared a stream
+        # and the check could not fail. Bind them to the same stream, the way
+        # the real server runs.
+        out = io.StringIO()
+        real = sys.stdout
+        sys.stdout = out
+        try:
+            mcp_server.serve(io.StringIO(J.dumps(
+                {"jsonrpc": "2.0", "id": 5, "method": "tools/call",
+                 "params": {"name": "_noisy", "arguments": {}}})), out)
+        finally:
+            sys.stdout = real
+        lines = [l for l in out.getvalue().splitlines() if l.strip()]
+        for l in lines:
+            J.loads(l)   # raises if a tool leaked plain text onto stdout
+        assert len(lines) == 1, f"tool output leaked onto the protocol: {lines}"
+        assert J.loads(lines[0])["result"]["content"][0]["text"] == "done"
+    finally:
+        del mcp_server.HANDLERS["_noisy"]
     checks += 1
 
     print(f"mcp server: {checks}/{checks} checks passed")
