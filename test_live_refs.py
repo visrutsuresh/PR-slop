@@ -521,8 +521,28 @@ def mcp_checks():
         _live.count_open_prs = real_count
     checks += 1
 
-    # typing 0 means none, not "one submission"
-    assert _live.ask_depth.__doc__
+    # typing 0 means NONE, not a paid one-submission run. The check that used
+    # to sit here asserted only that ask_depth had a docstring, which is the
+    # fifth decoration found in this project and the reason every check now
+    # gets broken on purpose before it is believed.
+    import io as _io
+    real_stdin, real_in = sys.stdin, __builtins__.input if hasattr(__builtins__, "input") else None
+    class _TTY(_io.StringIO):
+        def isatty(self):
+            return True
+    cases = {"0": 0, " 0 ": 0, "-5": 0, "n": 0, "cancel": 0,
+             "garbage": 0, "": 25, "7": 7}
+    try:
+        for typed, want in cases.items():
+            sys.stdin = _TTY()
+            import builtins
+            builtins.input = lambda _p="", _t=typed: _t
+            got = _live.ask_depth("o/r", _live.depth_options("o/r", 100), 100)
+            assert got == want, f"typed {typed!r} -> {got}, wanted {want}"
+    finally:
+        sys.stdin = real_stdin
+        import builtins
+        builtins.input = real_in or builtins.input
     checks += 1
 
     # the size is fetched in ONE call, not by paginating the whole queue. That

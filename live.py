@@ -40,7 +40,14 @@ SECONDS_EACH = 29
 # Above this many submissions the tool quotes the bill and waits. A judge who
 # clones this and types the obvious command should not discover the price
 # afterwards.
-CONFIRM_ABOVE = int(os.environ.get("PRSLOP_CONFIRM_ABOVE", "12"))
+try:
+    CONFIRM_ABOVE = int(os.environ.get("PRSLOP_CONFIRM_ABOVE", "12"))
+except ValueError:
+    # A typo in an override must not take the whole test suite down with a
+    # traceback at import. Fall back to the default and say so.
+    print("[live] PRSLOP_CONFIRM_ABOVE is not a number, using 12",
+          file=sys.stderr)
+    CONFIRM_ABOVE = 12
 
 # Off switch for the GitHub-search half of the investigator's retrieval, so the
 # same queue can be run both ways in one sitting. The open queue changes every
@@ -168,7 +175,7 @@ class ResolvedIssues:
 def count_open_prs(repo, include_drafts=False):
     """How many are open, in ONE call.
 
-    Counting by pagination meant about 36 API calls and the better part of a
+    Counting by pagination meant about fifty API calls and the better part of a
     minute spent purely to say "this is too expensive to run". A pause that
     long before a refusal reads as a hang, and it is the same bill of API
     calls we then pay again for real. Search returns the total directly.

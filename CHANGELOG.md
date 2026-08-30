@@ -596,9 +596,9 @@ Two numbers were also wrong in the safe direction and are now right. The 1,782 f
 
 ## Forty-eight seconds to say no
 
-The size check counted the queue by paginating it: about thirty-six API calls and the better part of a minute, spent entirely to reach the answer "this is too expensive to run". A pause that long before a refusal reads as a hang, and it is the same bill of calls the real run then pays again.
+The size check counted the queue by paginating it: about fifty API calls and the better part of a minute, spent entirely to reach the answer "this is too expensive to run". A pause that long before a refusal reads as a hang, and it is the same bill of calls the real run then pays again.
 
-One search query returns the total directly. 0.45 seconds instead of 48, one call instead of thirty-six, same 1,782. It falls back to pagination if search is unavailable, because the count exists to inform a choice and must never be able to stop the tool working.
+One search query returns the total directly. 0.45 seconds instead of 48, one call instead of about fifty, same 1,782. (An earlier draft of this entry said thirty-six, which is 1,782 divided by 50. Wrong: drafts are filtered on our side, so pagination has to walk all 2,443 open submissions, not the 1,782 that survive the filter.) It falls back to pagination if search is unavailable, because the count exists to inform a choice and must never be able to stop the tool working.
 
 ## A quotation is not ours to tidy
 
