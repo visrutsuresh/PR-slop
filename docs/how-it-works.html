@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How the solution actually works</title>
+<style>
+ :root{--ink:#12100e;--paper:#faf7f2;--muted:#6b6560;--red:#c0392b;--green:#1e7a4d;--amber:#c98a12;--blue:#3a5f8a;--line:#e3ddd3}
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 19px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+ section{max-width:940px;margin:0 auto;padding:84px 26px;border-bottom:1px solid var(--line)}
+ section:last-of-type{border-bottom:0}
+ .step{font:600 13px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+ h1{font-size:clamp(38px,6.5vw,70px);line-height:1.02;letter-spacing:-.03em;margin:0 0 18px;font-weight:800}
+ h2{font-size:clamp(27px,4.2vw,44px);line-height:1.1;letter-spacing:-.02em;margin:0 0 20px;font-weight:750}
+ h3{font-size:21px;margin:0 0 8px;font-weight:700}
+ p{margin:0 0 18px;max-width:66ch}
+ .lead{font-size:23px;color:#3a3531}
+ .quiet{color:var(--muted)}
+ .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 26px;margin:14px 0}
+ .hero{background:var(--ink);color:#f7f3ec;border-bottom:0}.hero h1{color:#fff}.hero p{color:#bdb4a8}
+ svg{display:block;width:100%;height:auto}
+ code{font:500 15px ui-monospace,Menlo,monospace;background:#f1ece4;padding:2px 7px;border-radius:5px}
+ .grid{display:grid;gap:16px}
+ @media(min-width:760px){.g2{grid-template-columns:1fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}}
+ .good{border-left:4px solid var(--green);padding-left:18px;background:#f8fdfa}
+ .warn{border-left:4px solid var(--amber);padding-left:18px;background:#fffdf6}
+ .bad{border-left:4px solid var(--red);padding-left:18px;background:#fffaf9}
+ .pill{display:inline-block;padding:4px 12px;border-radius:999px;font:600 13px inherit;margin-bottom:10px}
+ .r1{background:#eaf1f9;color:var(--blue)}
+ .r2{background:#f2eefa;color:#6b5a80}
+ .r3{background:#f1ece4;color:#6b5a2a}
+ .r4{background:#fdf3dc;color:var(--amber)}
+ .num{font:800 40px/1 inherit;letter-spacing:-.03em}
+ table{width:100%;border-collapse:collapse;font-size:17px;margin:10px 0}
+ th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--line)}
+ th{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+ td.n{font-variant-numeric:tabular-nums;font-weight:700}
+ .win{color:var(--green)}
+ .term{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;font:500 15px/1.6 ui-monospace,Menlo,monospace;white-space:pre-wrap;color:#2a2622}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="step" style="color:#8a8078">PR-slop &middot; how it works</div>
+  <h1>Four helpers, one page, nothing touched.</h1>
+  <p class="lead">What the thing we built actually does, in order, with nothing left out.</p>
+</section>
+
+<!-- PROBLEM RECAP -->
+<section>
+  <div class="step">The job</div>
+  <h2>A volunteer has a pile. Which ones matter?</h2>
+
+  <svg viewBox="0 0 800 170" role="img" aria-label="A pile of submissions sorted into three groups">
+    <g fill="#c0392b" opacity=".8">
+      <rect x="20" y="30" width="150" height="14" rx="3"/><rect x="20" y="50" width="130" height="14" rx="3"/>
+      <rect x="20" y="70" width="155" height="14" rx="3"/><rect x="20" y="90" width="120" height="14" rx="3"/>
+      <rect x="20" y="110" width="145" height="14" rx="3"/>
+    </g>
+    <text x="20" y="145" font-size="14" fill="#6b6560">submissions, mostly machine-written</text>
+    <path d="M195 75 L290 75" stroke="#6b6560" stroke-width="2" fill="none"/>
+    <path d="M282 69 l8 6 -8 6" stroke="#6b6560" stroke-width="2" fill="none"/>
+    <g font-size="14">
+      <rect x="310" y="18" width="220" height="38" rx="9" fill="#e8f3ec" stroke="#c5e2d1"/>
+      <text x="325" y="42" fill="#1e7a4d" font-weight="700">read these first</text>
+      <rect x="310" y="66" width="220" height="38" rx="9" fill="#fdf3dc" stroke="#f0e0bb"/>
+      <text x="325" y="90" fill="#8a6f22" font-weight="700">normal queue</text>
+      <rect x="310" y="114" width="220" height="38" rx="9" fill="#f1ece4" stroke="#e0d7c8"/>
+      <text x="325" y="138" fill="#6b6560" font-weight="700">leave until last</text>
+      <rect x="560" y="60" width="220" height="50" rx="9" fill="#12100e"/>
+      <text x="575" y="82" fill="#fff" font-weight="700">a page</text>
+      <text x="575" y="100" fill="#bdb4a8" font-size="13">a human decides</text>
+    </g>
+    <path d="M540 75 L552 75" stroke="#6b6560" stroke-width="2" fill="none"/>
+  </svg>
+
+  <div class="card good">
+    <p style="margin:0"><strong>It never touches anything.</strong> It cannot accept, reject, close or comment. It writes a page. That is on purpose, not a missing feature: closing someone's work affects a real person.</p>
+  </div>
+</section>
+
+<!-- THE FOUR HELPERS -->
+<section>
+  <div class="step">The machine</div>
+  <h2>One submission goes in. Four helpers look at it in turn.</h2>
+
+  <svg viewBox="0 0 800 250" role="img" aria-label="Four roles in sequence with a loop back">
+    <g font-size="14">
+      <rect x="8" y="70" width="176" height="86" rx="13" fill="#eaf1f9" stroke="#cfdcec"/>
+      <text x="96" y="100" text-anchor="middle" font-weight="700">1 &middot; Investigator</text>
+      <text x="96" y="122" text-anchor="middle" fill="#3a5f8a">searches the</text>
+      <text x="96" y="139" text-anchor="middle" fill="#3a5f8a">old complaints</text>
+
+      <rect x="204" y="70" width="176" height="86" rx="13" fill="#f2eefa" stroke="#dcd0ec"/>
+      <text x="292" y="100" text-anchor="middle" font-weight="700">2 &middot; Fact checker</text>
+      <text x="292" y="122" text-anchor="middle" fill="#6b5a80">reads the real</text>
+      <text x="292" y="139" text-anchor="middle" fill="#6b5a80">source code</text>
+
+      <rect x="400" y="70" width="176" height="86" rx="13" fill="#f1ece4" stroke="#e0d7c8"/>
+      <text x="488" y="100" text-anchor="middle" font-weight="700">3 &middot; Decider</text>
+      <text x="488" y="122" text-anchor="middle" fill="#6b5a2a">picks one of</text>
+      <text x="488" y="139" text-anchor="middle" fill="#6b5a2a">the three piles</text>
+
+      <rect x="596" y="70" width="176" height="86" rx="13" fill="#fdf3dc" stroke="#f0e0bb"/>
+      <text x="684" y="100" text-anchor="middle" font-weight="700">4 &middot; Checker</text>
+      <text x="684" y="122" text-anchor="middle" fill="#8a6f22">is any of that</text>
+      <text x="684" y="139" text-anchor="middle" fill="#8a6f22">actually true?</text>
+    </g>
+    <g stroke="#6b6560" stroke-width="2" fill="none">
+      <path d="M192 113 L198 113"/><path d="M190 107 l8 6 -8 6"/>
+      <path d="M388 113 L394 113"/><path d="M386 107 l8 6 -8 6"/>
+      <path d="M584 113 L590 113"/><path d="M582 107 l8 6 -8 6"/>
+    </g>
+    <g stroke="#c98a12" stroke-width="2.5" fill="none" stroke-dasharray="6 5">
+      <path d="M684 160 L684 205 L488 205 L488 160"/>
+      <path d="M482 168 l6 -8 6 8"/>
+    </g>
+    <text x="586" y="228" text-anchor="middle" font-size="14" fill="#c98a12">if something is not true, it goes back and the decider tries again</text>
+  </svg>
+
+  <div class="grid g2" style="margin-top:26px">
+    <div class="card">
+      <span class="pill r1">1 &middot; Investigator</span>
+      <p style="margin:0 0 10px"><strong>Has somebody already complained about this?</strong></p>
+      <p class="quiet" style="margin:0 0 10px">The project has <strong>403</strong> old complaints written down. Far too many to hand over at once. So this helper decides what words to search for, reads what comes back, and judges whether any of it is really the same problem.</p>
+      <p class="quiet" style="margin:0"><strong>It writes its own search.</strong> From a title with none of these words it asked for <code>snippet tab stop limit 10 nested placeholders</code>, because a person complaining uses different words from a developer fixing. It chose to go back and search again <strong>6 times out of 15</strong>.</p>
+    </div>
+    <div class="card">
+      <span class="pill r2">2 &middot; Fact checker</span>
+      <p style="margin:0 0 10px"><strong>Does the code do what the note says it does?</strong></p>
+      <p class="quiet" style="margin:0 0 10px">It reads the project's <em>actual</em> source, not the description. We fetch the file and hand it over, so the helper still cannot go rummaging for answers.</p>
+      <p class="quiet" style="margin:0">It looks at the source <strong>every time</strong>. On 5 of 15 it answered <em>"cannot tell"</em> instead of guessing.</p>
+    </div>
+    <div class="card">
+      <span class="pill r3">3 &middot; Decider</span>
+      <p style="margin:0 0 10px"><strong>Which pile?</strong></p>
+      <p class="quiet" style="margin:0">It sees what the other two found and picks. It is not allowed to shrug: a sorting tool that refuses to sort leaves the volunteer reading everything anyway.</p>
+    </div>
+    <div class="card">
+      <span class="pill r4">4 &middot; Checker</span>
+      <p style="margin:0 0 10px"><strong>Is any of this made up?</strong></p>
+      <p class="quiet" style="margin:0">Every complaint number it mentions gets looked up. If it does not exist, the answer <strong>goes back</strong> to be redone. Honest count: this fired <strong>once in fifteen</strong>. We keep it because it is free and the simple version really did invent two references out of three.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY NOT ONE QUESTION -->
+<section>
+  <div class="step">The obvious question</div>
+  <h2>Why not just ask a computer once?</h2>
+
+  <p class="lead">We tried. It scored <strong>33.3%</strong>. With three piles, guessing scores 33.3%.</p>
+
+  <div class="card bad">
+    <p style="margin:0 0 8px"><strong>It cannot look anything up.</strong></p>
+    <p class="quiet" style="margin:0">Asked which old complaint a submission fixes, it named three. <strong>Two did not exist.</strong> It was not lying on purpose. It had no way to check, and it had been asked for an answer.</p>
+  </div>
+
+  <div class="card good">
+    <p style="margin:0 0 8px"><strong>Ours names five and all five are real.</strong></p>
+    <p class="quiet" style="margin:0">And on four submissions it named nothing at all, because it had nothing solid. Saying nothing is allowed. Inventing is not.</p>
+  </div>
+</section>
+
+<!-- WHAT COMES OUT -->
+<section>
+  <div class="step">What you get</div>
+  <h2>One page. Type <code>./run.sh triage</code>.</h2>
+
+  <div class="term">  PULL REQUEST TRIAGE                       microsoft/vscode
+  ==============================================================
+
+  10 open, 5 recently closed.
+  Nothing has been touched. This is a reading list, not an action.
+
+  READ THESE FIRST  (4)
+  Close something already reported. 19 files, 660 lines added.
+
+    #331442  Enforce custom agent subagent allowlists
+      fixes reported #331002 | code matches its description |
+      has tests | 166 lines, 2 files
+      https://github.com/microsoft/vscode/pull/331442</div>
+
+  <p style="margin-top:20px">Every fact on that line was checked. The complaint number is real. "Code matches its description" came from reading the source. The size is counted.</p>
+</section>
+
+<!-- SECOND OPINION -->
+<section>
+  <div class="step">The part we are proudest of</div>
+  <h2>It also says: &ldquo;you may have thrown away something good.&rdquo;</h2>
+
+  <p>Here is a problem we could not argue away. We taught it by showing it what volunteers <em>did</em>. So if a volunteer misses something valuable and bins it, and our tool correctly says the work is good, <strong>we mark our own tool wrong.</strong></p>
+
+  <div class="card warn">
+    <p style="margin:0"><strong>One submission proved it.</strong> Out of six attempts at building this, not one ever got <code>#308696</code> right. Real code. Fixes a genuinely reported complaint. We checked it against the actual source. Binned anyway. Every version said &ldquo;this is good work&rdquo; and we scored every version as wrong.</p>
+  </div>
+
+  <p>So we added a second output that judges <strong>the work</strong> instead of the decision. Only things that are true or false: is the complaint real, does the code match, are there tests, is it substantial.</p>
+
+  <div class="term">  SECOND OPINION
+  ==============================================================
+  Closed without merging, but the evidence says otherwise.
+  Not an accusation. Worth thirty seconds each.
+
+    #308696  Close non-dirty editors when cancelling Close All
+      fixes a genuinely reported problem #305306
+      code confirmed to match its description
+      44 lines added
+      -&gt; closed without merging. Worth a second look.</div>
+
+  <div class="card good" style="margin-top:18px">
+    <p style="margin:0"><strong>Our worst failure became the headline feature.</strong> The one case nothing could ever get right is now the top line of the most useful thing the tool produces.</p>
+  </div>
+</section>
+
+<!-- PROOF IT IS NOT RIGGED -->
+<section>
+  <div class="step">Why you can believe the numbers</div>
+  <h2>We caught ourselves cheating, before anyone else could.</h2>
+
+  <div class="card bad">
+    <p style="margin:0 0 8px"><strong>It could open the answer sheet.</strong></p>
+    <p class="quiet" style="margin:0">We asked it for the answer to one case. It found the file and read it out. Every score after that would have been worthless.</p>
+  </div>
+
+  <p><strong>Now it runs in an empty room with the door locked.</strong> No file reading, no searching, no internet. A test has to prove it is blind before anything else is allowed to run. You can watch that test: <code>./run.sh probe</code>.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <p style="margin:0 0 6px"><strong>Nothing to install, nothing to pay.</strong></p>
+      <p class="quiet" style="margin:0">Every answer it ever gave is saved in the project. The commands add the scores back up from those files. Same numbers, any machine, no account.</p>
+    </div>
+    <div class="card">
+      <p style="margin:0 0 6px"><strong>Check the workings.</strong></p>
+      <p class="quiet" style="margin:0"><code>./run.sh versions</code> rebuilds our whole results table in front of you, including the two versions we made worse.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCORE -->
+<section>
+  <div class="step">Does it work</div>
+  <h2>Yes, and here is the honest shape of it.</h2>
+
+  <table>
+    <tr><th></th><th>Ask once</th><th>Simple script</th><th>This</th></tr>
+    <tr><td>Overall</td><td class="n">33.3%</td><td class="n">73.3%</td><td class="n win">73.3%</td></tr>
+    <tr><td>Finds the leave-till-last pile</td><td class="n">0.40</td><td class="n" style="color:#c0392b">0.20</td><td class="n win">0.80</td></tr>
+    <tr><td>Good work wrongly binned</td><td class="n">1 of 10</td><td class="n">0 of 10</td><td class="n win">0 of 10</td></tr>
+    <tr><td>Complaints named that are real</td><td class="n">1 of 3</td><td class="n">9 of 9</td><td class="n win">5 of 5</td></tr>
+  </table>
+
+  <div class="card good">
+    <p style="margin:0"><strong>The two 73.3% are not the same thing.</strong> The middle one gets there by being kind to everything, so it finds only <strong>one in five</strong> of the pile you wanted to skip. Ours finds <strong>four in five</strong>. Same headline. Four times better at the actual job.</p>
+  </div>
+
+  <div class="card warn">
+    <p style="margin:0"><strong>And what it still gets wrong.</strong> The decider sometimes overrules the investigator when the investigator was right. Twice out of fifteen. We tried to fix it and made things dramatically worse, so it ships with the flaw written down rather than hidden.</p>
+  </div>
+</section>
+
+<section>
+  <div class="step">In one line</div>
+  <h2>It reads the pile so a volunteer does not have to, and it shows its working.</h2>
+  <p class="lead">Four helpers, one page, every claim checked, nothing touched, and an honest note when it thinks a human got one wrong.</p>
+</section>
+
+</body>
+</html>
