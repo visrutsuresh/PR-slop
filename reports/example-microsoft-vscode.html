@@ -1,0 +1,155 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Triage, microsoft/vscode</title><style>
+:root{--ink:#12100e;--paper:#faf8f4;--card:#fff;--muted:#6f6862;--line:#e6e0d6;
+      --green:#1c7a4b;--amber:#b8830f;--slate:#5a6b80;--red:#b5382b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased}
+header{background:var(--ink);color:#f6f2ec;padding:34px 26px}
+.wrap{max-width:1060px;margin:0 auto}
+h1{margin:0 0 6px;font-size:27px;letter-spacing:-.02em}
+header .sub{color:#a9a096;font-size:15px}
+header .warn{margin-top:16px;background:#241f1a;border-left:3px solid #b8830f;
+  padding:11px 15px;border-radius:0 8px 8px 0;color:#d8cfc3;font-size:14.5px}
+main{padding:30px 26px 90px}
+.group{margin:34px 0 10px}
+.group h2{margin:0 0 3px;font-size:20px;letter-spacing:-.01em}
+.group p{margin:0 0 14px;color:var(--muted);font-size:14.5px}
+.bar{height:3px;border-radius:2px;margin-bottom:16px}
+.b1 .bar{background:var(--green)}.b2 .bar{background:var(--amber)}
+.b3 .bar{background:#c3bbb0}.bx .bar{background:var(--slate)}
+.pr{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;margin-bottom:11px}
+.pr .top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.num{font:600 14px ui-monospace,Menlo,monospace;color:var(--muted)}
+.title{font-weight:650;font-size:17px;flex:1;min-width:240px}
+.rank{font:600 12px ui-monospace,Menlo,monospace;color:#8a8078;background:#f2ede5;
+  padding:2px 8px;border-radius:6px}
+.rest{margin-top:8px}
+.rest summary{cursor:pointer;color:var(--muted);font-size:14.5px;padding:9px 2px;
+  list-style:revert}
+.rest summary:hover{color:var(--ink)}
+.chips{margin:11px 0 0;display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-size:13px;padding:3px 10px;border-radius:999px;background:#f2ede5;color:#5c554e}
+.chip.ok{background:#e6f4ec;color:var(--green)}
+.chip.no{background:#f6ece9;color:var(--red)}
+.chip.hm{background:#f7f0dd;color:var(--amber)}
+.why{margin:11px 0 0;color:#463f39;font-size:15px}
+.why b{font-weight:650}
+.links{margin:11px 0 0;font-size:14px}
+a{color:#2f5d8f}
+.flag{margin-top:11px;padding:10px 13px;background:#fbf6e8;border-left:3px solid var(--amber);
+  border-radius:0 7px 7px 0;font-size:14.5px;color:#6b5410}
+footer{border-top:1px solid var(--line);padding:26px;color:var(--muted);font-size:14px}
+.k{display:inline-block;min-width:132px;color:var(--muted)}
+</style></head><body>
+<header><div class="wrap">
+  <h1>microsoft/vscode, 9 open pull requests</h1>
+  <div class="sub">A suggested reading order. Generated 2026-08-30 21:00 UTC.</div>
+  <div class="warn"><b>Nothing here has been acted on.</b> This tool cannot
+  merge, close, comment or label. It read 300 of your recorded
+  problems and the code at commit <code>e3ce07e8</code>, and
+  every reference below was checked before you saw it. The order is a
+  suggestion; you decide.</div>
+</div></header>
+<main><div class="wrap"><section class="group b1"><div class="bar"></div><h2>Predicted merge, and it answers something already reported <span class="num">3</span></h2><p>A prediction about what a maintainer would decide, not a measurement. The order inside the group is evidence strength.</p><article class="pr">
+  <div class="top"><span class="num">#333390</span><span class="rank">1 of 3</span>
+    <span class="title">Fix #231076: Restore NODE_OPTIONS environment variable on Windows</span></div>
+  <div class="chips"><span class="chip ok">fact · author’s text: “Fix #231076”, open issue, confirmed</span><span class="chip ok">checked · cites #333316, real open issue</span><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 54 lines added, 4 files</span></div>
+  <div class="why"><b>Why:</b> Code matches description and fixes a real, reproducible Windows terminal NODE_OPTIONS inheritance bug that mirrors an existing macOS workaround and multiple reported issues.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333390">open on GitHub</a></div>
+  
+</article><article class="pr">
+  <div class="top"><span class="num">#333399</span><span class="rank">2 of 3</span>
+    <span class="title">Fix Copilot memory tool infinite loop with empty old_str in str_replace</span></div>
+  <div class="chips"><span class="chip ok">fact · author’s text: “This PR fixes #333395”, open issue, confirmed</span><span class="chip ok">checked · cites #333395, real open issue</span><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 26 lines added, 2 files</span></div>
+  <div class="why"><b>Why:</b> Small, targeted fix for a real infinite-loop bug in str_replace with empty old_str, includes a regression test, and matches an already-reported issue about the tool hanging.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333399">open on GitHub</a></div>
+  
+</article><article class="pr">
+  <div class="top"><span class="num">#333423</span><span class="rank">3 of 3</span>
+    <span class="title">nes: let settings and experiments override baked strategy values</span></div>
+  <div class="chips"><span class="chip ok">checked · cites #333154, real open issue</span><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 608 lines added, 24 files</span></div>
+  <div class="why"><b>Why:</b> Substantive precedence-order fix across many files that plausibly addresses a reported settings/experiment override bug, but I cannot verify #333154 or the merge outcome from source alone.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333423">open on GitHub</a></div>
+  
+</article></section>
+<section class="group b2"><div class="bar"></div><h2>Predicted merge, with nothing reported to attach it to <span class="num">5</span></h2><p>Same prediction, minus the link to an already-reported problem. The order inside the group is evidence strength.</p><article class="pr">
+  <div class="top"><span class="num">#333404</span><span class="rank">1 of 5</span>
+    <span class="title">editor: show session homes in breadcrumbs</span></div>
+  <div class="chips"><span class="chip ok">fact · author’s text: “Fixes #330410”, open issue, confirmed</span><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 566 lines added, 21 files</span></div>
+  <div class="why"><b>Why:</b> Genuine substantive contribution touching label service and session providers with tests, but no confirmed link to an already-reported issue found in search.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333404">open on GitHub</a></div>
+  
+</article><article class="pr">
+  <div class="top"><span class="num">#333428</span><span class="rank">2 of 5</span>
+    <span class="title">Agents: refine pull request input banners</span></div>
+  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 369 lines added, 23 files</span></div>
+  <div class="why"><b>Why:</b> Substantial, coherent refactor touching PR banners and feedback attribution with tests, but the cited issue #333189 and the investigator&#x27;s #333217 cannot be verified as real reported problems tied to this change, so it&#x27;s treated as a genuine contribution without confirmed prior-r</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333428">open on GitHub</a></div>
+  
+</article><article class="pr">
+  <div class="top"><span class="num">#333397</span><span class="rank">3 of 5</span>
+    <span class="title">fix: memory leak in extension host pseudoterminals</span></div>
+  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 90 lines added, 2 files</span></div>
+  <div class="why"><b>Why:</b> Genuine memory-leak fix with a matching regression test and no evidence it corresponds to any already-filed issue in the search results provided.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333397">open on GitHub</a></div>
+  
+</article><article class="pr">
+  <div class="top"><span class="num">#333391</span><span class="rank">4 of 5</span>
+    <span class="title">Fix workspace symbol search with double-colon qualifiers</span></div>
+  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 70 lines added, 2 files</span></div>
+  <div class="why"><b>Why:</b> Genuine, well-tested contribution addressing a real fuzzy-matching gap for qualified symbol queries, but no evidence it maps to an already-reported issue (the cited #308102 wasn&#x27;t confirmed and the search found no clear match).</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333391">open on GitHub</a></div>
+  
+</article><article class="pr">
+  <div class="top"><span class="num">#333426</span><span class="rank">5 of 5</span>
+    <span class="title">Show action icons on title bar buttons again</span></div>
+  <div class="chips"><span class="chip no">judgement · code does not match its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 544 lines added, 8 files</span></div>
+  <div class="why"><b>Why:</b> The claim checker&#x27;s verdict is about description-vs-diff mismatch, not evidence about maintainer acceptance; the change itself is a plausible genuine UI fix, but the investigator&#x27;s claim that #333002 is the matching reported issue is not verifiable here.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333426">open on GitHub</a></div>
+  
+</article></section>
+<section class="group b3"><div class="bar"></div><h2>Predicted not merged <span class="num">1</span></h2><p>A prediction about a human decision, NOT a judgement that the work is bad. Housekeeping, superseded work and duplicates all land here.</p><article class="pr">
+  <div class="top"><span class="num">#333418</span>
+    <span class="title">refactor: migrate AsyncIterableObject to AsyncIterableProducer to fix memory leaks</span></div>
+  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 15 lines added, 7 files</span></div>
+  <div class="why"><b>Why:</b> The change is a pure mechanical rename (AsyncIterableObject -&gt; AsyncIterableProducer) with no actual memory-leak fix logic, plus unrelated noise: deleting a build artifact and touching a file explicitly marked &#x27;DO NOT MODIFY THIS FILE MANUALLY&#x27; with only a whitespace change — hal</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333418">open on GitHub</a></div>
+  
+</article></section></div></main>
+<footer><div class="wrap">
+  <div><span class="k">The groups</span> Which group a submission is in is a
+  <em>prediction</em> about the decision a maintainer would make, not a
+  measurement and not a quality verdict. The order <em>inside</em> a group is a
+  different thing: evidence strength, described next.</div>
+  <div><span class="k">The order</span> Within each group, by how much
+  <em>checked</em> evidence supports it: a reference the author declared and we
+  confirmed, then a confirmed link to an already-reported problem, then a
+  confirmed description. Ties break to the newer submission, which is recency,
+  not evidence. Tests and size do not affect the order; they are shown, not
+  ranked.</div>
+  <div><span class="k">How to read it</span> Chips marked <em>fact</em> you can
+  re-derive yourself from GitHub with no model involved: files changed, lines
+  added, whether test paths are touched, and any closing reference found in the
+  author's own title or body, quoted verbatim. That last one is a <b>text
+  match, not a statement of intent</b>: the tool reports the characters the
+  author wrote and whether the referenced issue is real and open. It does not
+  read the sentence around them, so a negation ("does not fix #123") or an
+  unticked template checkbox will still show a chip; a reference inside a
+  fenced code block is skipped. The quote is there so you can see which one you
+  are looking at. Chips marked <em>checked</em> were proposed by the model and
+  then verified against GitHub, so the reference is real and its state is
+  accurate, but the model chose to cite it. Chips marked <em>judgement</em> are
+  the model's opinion and nothing verified them. The order on this page puts
+  checked evidence first and breaks ties by recency, not an accuracy claim: these pull
+  requests are open, so no correct answer exists to score against.</div>
+  <div><span class="k">What it cannot do</span> It does not know your roadmap,
+  your release schedule, or that you already decided against an approach. Those
+  are the reasons good work gets closed, and it cannot see any of them.</div>
+  <div><span class="k">This run</span> microsoft/vscode, 9 submissions,
+  generated 2026-08-30 21:00 UTC, source read at commit
+  <code>e3ce07e8</code>, 3.39 USD.</div>
+</div></footer></body></html>

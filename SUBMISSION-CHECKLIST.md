@@ -32,3 +32,4 @@ This was contradictory earlier and is now settled: the live page shows Aug 31 18
 3. Clone the public URL into a fresh empty folder, exactly as a stranger would.
 4. In that clone run `./run.sh eval`, `./run.sh agent`, `./run.sh triage`.
 5. Confirm `git show HEAD:traces/INDEX.md` prints real content, so the records are in the repository and not merely on your machine.
+6. Open `reports/example-microsoft-vscode.html` in the fresh clone. This is the live tool's output, committed on purpose, because `./run.sh live` needs a GitHub login and about 2.79 USD.

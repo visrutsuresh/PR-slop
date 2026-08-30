@@ -95,8 +95,19 @@ case "$1" in
     echo "[eval] reads only the committed cache under data/, never the network"
     python3 test_harness.py
     python3 test_harvest.py
+    python3 test_live_refs.py
     python3 check_docs.py
     python3 baselines/regex_rule.py
+    # The one live-report check we can make offline: the example page a judge
+    # opens without a GitHub login is actually tracked. Deliberately skipped
+    # when there is no .git, which is a tarball or the Docker image, because
+    # `git ls-files` exits 128 there and `set -e` would kill the whole target.
+    # A git worktree, where .git is a FILE, also skips. That is on purpose:
+    # fail open, exactly like the tarball. Do NOT "fix" this to [ -e .git ].
+    if [ -d .git ] && command -v git >/dev/null 2>&1; then
+      git ls-files --error-unmatch reports/example-microsoft-vscode.html >/dev/null \
+        || { echo "[eval] example live report is not tracked, see .gitignore" >&2; exit 1; }
+    fi
     ;;
   *)
     usage

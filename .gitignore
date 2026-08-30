@@ -8,4 +8,5 @@ traces/*.jsonl
 traces_test/
 results/
 .DS_Store
-reports/
+reports/*
+!reports/example-microsoft-vscode.html
