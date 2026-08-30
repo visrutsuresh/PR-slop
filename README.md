@@ -150,13 +150,17 @@ In both cases a specialised role did its job and the role above it redid that jo
 
 ## Hot take
 
-**DRAFT. Confirm against the real 15-case results before finalising.**
+**"Closed without merging" almost never means "bad work", and that quietly breaks every tool built on it.**
 
-"Closed without merging" looks like it should mean "rejected as low quality". On `microsoft/vscode` it mostly does not. Of 17 such pull requests inspected while building this eval set, 4 were bots doing routine housekeeping, roughly 10 were the vscode team closing their OWN large and real work in favour of a different approach, one case being a refactor of over 7,700 added lines, and only 1 looked like actual AI slop.
+On `microsoft/vscode` we inspected 17 such pull requests one at a time. Four were bots doing routine housekeeping. Roughly ten were the vscode team closing their **own** large, real work in favour of a different approach, one of them a refactor of over 7,700 added lines. **Exactly one** looked like actual machine-written filler.
 
-The practical lesson: any triage system built from GitHub's free mechanical metadata, merged or not, linked issue or not, is measuring maintainer BEHAVIOUR, not maintainer JUDGMENT of quality. That is enough to build and evaluate a working system. It is not the same claim as "this detects AI slop". Detecting slop specifically would need a narrower, probably human-labelled oracle.
+**This was confirmed, not assumed.** Three results in this project point the same way. The one case no version out of six ever got right, pr-308696, is real code that fixes a genuinely reported problem, confirmed against the actual source, and was closed anyway. Our evidence card, which judges the work rather than the decision, flags two closed submissions as well supported. And version 1 of the agent failed precisely by confusing "I do not rate this code" with "this was not accepted", losing 27 points to that single confusion.
 
-Anyone reproducing a maintainer-behaviour triage tool on a different repository should expect the same gap and disclose it the same way, rather than assuming their own repo's bots and insiders average out to the label they hoped to measure.
+**The practical lesson.** Any triage system built from the metadata a project records for free is measuring maintainer **behaviour**, not maintainer **judgment of quality**. That is enough to build something genuinely useful, and this one is. It is not the same claim as "this detects slop", and the difference is not pedantic: a system optimised against merge outcomes will learn to predict organisational decisions, not code quality, and will confidently mistake the two.
+
+**The consequence we did something about.** If the label is "what a human decided", then a tool that correctly spots value a maintainer overlooked is marked **wrong**. The scoring fights the product. That is why this repository also produces an evidence card of facts checkable against the code, and a second-opinion list of well-supported work that was closed anyway. Our worst failure case is the top entry on that list.
+
+Anyone building this on another repository should expect the same gap and state it, rather than assuming their own project's bots and insiders average out into the label they hoped to measure.
 
 ## Agent instructions
 
