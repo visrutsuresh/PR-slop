@@ -49,16 +49,18 @@ All of these replay from committed responses. No account, no network, no cost. S
 
 ## How it works
 
-Four stages, built incrementally, each one added only after a measurement showed it was needed.
+Four roles, and a loop. Each was added only after a measurement showed it was needed; the six versions and their numbers are in `CHANGELOG.md`.
 
-1. **Retriever.** Fetches the pull request, the repository's contributing guidelines, and searches the existing issue corpus for near-duplicates and for the issue this pull request may be addressing.
-2. **Claim checker.** Pulls out each factual assertion in the submission ("this crashes on empty input") and checks it against the actual source.
-3. **Adjudicator.** Weighs the retrieved evidence into a bucket and a disposition.
-4. **Verifier.** A separate pass that resolves every citation against the real repository and downgrades anything that does not resolve to "cannot determine".
+1. **Investigator.** Decides for itself what to search for, reads what comes back, and can search again with different wording if the first attempt was poor. It chose 6 follow-up searches on its own across the 15 cases. This is the one choosing the action, not us.
+2. **Claim checker.** Reads the actual source at a pinned commit and tests whether the submission does what it says. It ran against real source on 10 of 15.
+3. **Adjudicator.** Decides the pile from what the other two found.
+4. **Verifier.** Checks every claim and, when one does not hold up, **sends the work back** rather than deleting it quietly.
 
-**Multi-agent, but NOT autonomous.** It performs no consequential action of any kind. It never posts, comments, closes, merges or labels anything on any real repository. It writes a report and a human decides. Closing a real contributor's pull request affects a real person, so a qualified human reviewer stays in the loop by design.
+**Why this is not one prompt.** The project has 403 recorded problems, far too many to hand a model at once, so answering "does this fix something already reported" requires going and searching. The investigator writes those searches itself, which produced queries like `snippet tab stop limit 10 nested placeholders` from a title containing none of those words, because a person reporting a problem uses different words from a developer fixing it.
 
-There is also a single-pull-request mode, because real reviewers work sequentially. It is deliberately NOT part of the evaluation: single-item triage is close to what one prompt already does, and scoring it would misrepresent where the system's value actually is.
+**Multi-agent, but NOT autonomous.** It performs no consequential action of any kind. It never posts, comments, closes, merges or labels anything on any real repository. It writes a page and a human decides. Closing a real contributor's pull request affects a real person, so a qualified human reviewer stays in the loop by design.
+
+There is also a single-pull-request mode, because real reviewers work sequentially. It is deliberately NOT part of the evaluation: single-item triage is close to what one prompt already does, and scoring it would misrepresent where the value is.
 
 ## Evaluation
 
@@ -212,20 +214,25 @@ Of 16 factual claims the agent made across the 15 cases, **16 hold up**.
 
 ## Results
 
-| Measure | Simple version | Our system | Change |
+Three systems, same 15 cases, same model, same instructions.
+
+| Measure | Simple version | Intermediate script | **Shipped agent** |
 | --- | --- | --- | --- |
-| Balanced accuracy | 33.3% | **73.3%** | +40.0 points |
-| Per-pile recall | 0.20 / 0.40 / 0.40 | 1.00 / 1.00 / 0.20 | |
-| Merge-worthy work wrongly rejected | 1 of 10 | **0 of 10** | |
-| Reported problems named that really exist | 1 of 3 (33%) | **9 of 9 (100%)** | |
-| Declined to answer | 5 of 15 | 0 of 15 | |
-| Cost across 15 cases | 1.84 USD | 1.88 USD | +0.04 |
+| Balanced accuracy | 33.3% | 73.3% | **73.3%** |
+| Pile 1 / 2 / 3 recall | 0.20 / 0.40 / 0.40 | 1.00 / 1.00 / **0.20** | 0.60 / 0.80 / **0.80** |
+| Merge-worthy work wrongly rejected | 1 of 10 | 0 of 10 | **0 of 10** |
+| Reported problems named that exist | 1 of 3 | 9 of 9 | **5 of 5** |
+| Cost across 15 cases | 1.84 USD | 1.88 USD | 3.88 USD |
 
-The floor for three equal piles is 33.3%, so the simple version scored exactly as well as guessing.
+The floor for three equal piles is 33.3%, so **the simple version scored exactly as well as guessing.**
 
-**What we can and cannot claim from fifteen cases.** One case moves balanced accuracy by 6.7 points, so two systems within about two cases of each other cannot be told apart by this. A 40-point gap is well clear of that. The false-rejection figure is a different matter: 0 out of 10 still carries a 95% upper bound of about 26%, so we **cannot** demonstrate our promised "under 10%" at this sample size, and we are not going to claim we did.
+**Read the two 73.3% figures carefully, because they are not the same thing.** The intermediate script reaches that number by being uniformly generous: perfect on both accepted piles, and **0.20** on the not-merged pile. It finds one in five of the pile you actually wanted to stop reading. The agent finds **four in five** of it, while still never binning good work.
 
-**Citations are counted in two groups on purpose.** A file path copied out of the case the system was just handed is free and proves nothing. Only a reported-problem number, which cannot be known without going and checking, is informative. The table uses those only. Counting both together is what produced a misleading 86.7% for the simple version in our first scoring pass, described in the changelog.
+Tied on the headline. Four times better at the job.
+
+**What fifteen cases can and cannot tell you.** One case moves balanced accuracy by 6.7 points, so two systems within about two cases of each other are not distinguishable here. The 40-point gap over guessing is well clear of that; the tie between the script and the agent is not a real tie in shape, but it IS a real tie in headline and we are not going to claim otherwise. The false-rejection figure is weaker still: 0 out of 10 carries a 95% upper bound of about 26%, so we **cannot** demonstrate our pre-registered "under 10%" at this sample size, and we do not claim to have.
+
+**Citations are counted in two groups on purpose.** A file path copied out of the case the system was just handed is free and proves nothing. Only a reported-problem number, which cannot be known without checking, is informative. The table uses those only. Counting both together is what produced a misleading 86.7% in our first scoring pass, written up in the changelog.
 
 ## Tools disclosure
 
