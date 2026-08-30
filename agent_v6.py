@@ -424,7 +424,7 @@ def replay():
                          pred, cites, truth, by_num)
     print("searches decided  : %d rounds across %d cases (%d follow-up searches "
           "the agent chose itself)" % (rounds, len(pred), rounds - len(pred)))
-    print("claims tested     : %d/%d against the real source" % (checked, len(pred)))
+    print("claim checks      : %d/%d reached a definite yes or no\n                    (it reads the real source on every case; the rest\n                     it honestly returned 'cannot tell')" % (checked, len(pred)))
     print("sent back to redo : %d" % back)
     print("measured cost     : %.4f usd" % cost)
     res.update({"cost_usd": round(cost, 4), "search_rounds": rounds,

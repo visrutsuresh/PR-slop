@@ -234,3 +234,13 @@ The README opened with "every claim carries a citation checked against the real 
 The accurate version is narrower and, we think, better: **every citation it does give you resolves**, and where it has no evidence it says nothing rather than inventing a reference. Five reported problems named, five real, four silences.
 
 Worth noting how this was found. We took the strongest sentence in the document and asked whether the data supported it, rather than waiting for a reader to do that. That is now the last check before anything ships: read your own headline as a hostile reviewer would.
+
+## A metric whose label did not match what it counted
+
+`claims tested : 10/15 against the real source` implied the claim checker only reached source on two thirds of submissions, and the README repeated it.
+
+Checking the run records: **it read real source on all fifteen.** On five it returned "cannot tell" rather than a yes or no. The counter was measuring "reached a definite verdict" and calling it "reached the source". Those are different things, and the label understated a capability while sounding like a limitation.
+
+Relabelled in every version of the agent and corrected in the README. The honest version is also the better one: it reads the source every time, and where the code does not settle the question it says so instead of guessing.
+
+**Fifth time now** that a number in this project meant something other than what it was labelled. The others: a citation rate counting free self-quotes, an evidence rate counting silence as a lie, an invented reading time, and a verifier capability stated without its frequency. The common thread is never arithmetic. It is a label written once, early, and then trusted.

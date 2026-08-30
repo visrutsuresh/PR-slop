@@ -76,7 +76,7 @@ All of these replay from committed responses. No account, no network, no cost. S
 Four roles, and a loop. Each was added only after a measurement showed it was needed; the six versions and their numbers are in `CHANGELOG.md`.
 
 1. **Investigator.** Decides for itself what to search for, reads what comes back, and can search again with different wording if the first attempt was poor. It chose 6 follow-up searches on its own across the 15 cases. This is the one choosing the action, not us.
-2. **Claim checker.** Reads the actual source at a pinned commit and tests whether the submission does what it says. It ran against real source on 10 of 15.
+2. **Claim checker.** Reads the actual source at a pinned commit and tests whether the submission does what it says. It reads the real source on **every** submission. On 10 of 15 it reached a definite yes or no; on the other 5 it returned "cannot tell" rather than guess, which is the behaviour we wanted.
 3. **Adjudicator.** Decides the pile from what the other two found.
 4. **Verifier.** Checks every claim and, when one does not hold up, **sends the work back** rather than deleting it quietly. Honest frequency: it fired **once in fifteen**. In the earlier two-stage version the equivalent check fired **zero** times. We keep it because it costs nothing and the failure it guards against is documented in our own baseline output, where 2 of 3 named problems did not exist, but nobody should read this line and picture it firing often.
 
