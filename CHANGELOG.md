@@ -508,3 +508,23 @@ Every command in this project assumes the maintainer opens a terminal, remembers
 **Nothing it exposes can act.** The tools read, and they write one HTML file. No merge, no close, no comment, no label, and every summary says so in its final line.
 
 Seven checks drive the server over its real transport with no network and no model, including the two failures that would be invisible in a demo and fatal in use: replying to a notification, which corrupts the stream, and a raising tool killing the transport instead of returning readable error content. Registration could not be exercised on the build machine, where local policy blocks adding MCP servers, so the protocol is tested directly, which is the stronger evidence anyway.
+
+## The MCP server shipped broken, with seven passing tests over it
+
+Worth its own entry because the bug is boring and the reason it survived is not.
+
+`stdout` is the protocol. MCP over stdio is newline-delimited JSON-RPC on standard output, and `live.run()` prints its progress with plain `print()`, which also goes to standard output. So every progress line was injected into the protocol stream as raw text:
+
+```
+{"jsonrpc": "2.0", "id": 1, "result": {...}}
+[live] fetching pull request #333390 from microsoft/vscode
+[live] 300 recorded problems
+```
+
+The first triage call from any real client would have corrupted the session. The server was committed with seven passing checks over it, and not one could see this, because every one of them exercised a handler that never reaches `live.run()`. The tests covered the protocol surface. The bug was underneath it.
+
+**Then the regression test for it was also written unable to fail.** The first version passed a fresh `StringIO` to `serve()`, so the tool's `print()` and the protocol writer never shared a stream, which is exactly the condition that produces the bug. It passed with the fix removed. It only means anything when both are bound to one stream the way the real server runs, and it is now verified by deleting the fix and confirming a `JSONDecodeError`.
+
+That is three tests in this project written so they could not fail, all with the same shape: **asserting on a channel the failure cannot reach**. The vacuous test in the union-search set was the same mistake, and so was citing `./run.sh agent` as proof that a change to `check_claims` was safe when the replay path never calls it.
+
+**The lesson, and it is the one we would carry to the next agent we build.** A test you have not seen fail is a decoration. Every check added since is verified by breaking the code first and watching the assertion fire, and the ones that could not be made to fail were deleted rather than kept for the count. The specific trap for agent work is that the seam you mock is usually the seam the bug lives in: mock the model and you stop testing the plumbing, hand the server a private stream and you stop testing the transport. Writing the harness is not the same as writing a test, and passing is not the same as working.
