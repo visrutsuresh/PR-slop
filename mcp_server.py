@@ -258,7 +258,12 @@ def tool_triage_queue(args):
             n = open_count
         else:
             n = limit
-        if n > live.CONFIRM_ABOVE:
+        # `or scan_all`: the size comes from the search index, the paid run
+        # paginates REST, and the two can disagree. A search index that lags,
+        # errors soft, or returns 0 must never be able to wave through a full
+        # scan. An explicit request for the whole queue is always confirmed,
+        # whatever the count says.
+        if scan_all or n > live.CONFIRM_ABOVE:
             # An MCP tool cannot ask a question itself. It CAN hand the
             # assistant the options with the bill attached to each, so the
             # person gets a real choice instead of an invisible charge.

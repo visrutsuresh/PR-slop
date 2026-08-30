@@ -120,16 +120,16 @@ and named the real tension: *"a maintainer taking this on merges it believing it
 
 **The reviewer does not see our own conclusion.** It gets the diff, the source and the counts, and never the bucket, the evidence chips or the investigator search. Handing it our answer would invite it to agree with us, and a reviewer that agrees with the thing it is checking is worth nothing.
 
-**You choose the depth, and you see the bill first.** The default is the 100 most recent open submissions, which is about 45 USD and forty minutes. That is a real charge, so nothing above a dozen runs until it has been chosen. In a terminal it asks. Through MCP it hands the assistant the options so the maintainer picks:
+**You choose the depth, and you see the bill first.** The default is the 100 most recent open submissions, which is about 45 USD and forty-eight minutes. That is a real charge, so nothing above a dozen runs until it has been chosen. In a terminal it asks. Through MCP it hands the assistant the options so the maintainer picks:
 
 ```
 How much of microsoft/vscode should be read?
 1782 non-draft pull requests are open right now.
 
       5   about   2.25 USD,   2 min   a quick look, enough to see the shape of the queue
-     25   about  11.25 USD,  10 min   a morning's reading
-    100   about  45.00 USD,  42 min   the default depth, where the piles and the caps start to matter
-   1782   about 801.90 USD, 743 min   every open submission in the repository
+     25   about  11.25 USD,  12 min   a morning's reading
+    100   about  45.00 USD,  48 min   the default depth, where the piles and the caps start to matter
+   1782   about 801.90 USD, 861 min   every open submission in the repository
 
   whats_new is free and offline, and on most days it is the right first question.
 ```

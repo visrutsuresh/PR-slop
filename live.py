@@ -195,7 +195,7 @@ def depth_options(repo, open_count=None, each=0.45):
     """The choices worth offering, with the bill attached to each.
 
     A bare number means nothing to someone who has not priced a run. "100" is
-    45 USD and forty minutes; "5" is pocket change and two. Offering the
+    45 USD and forty-eight minutes; "5" is pocket change and two. Offering the
     options with their cost turns an invisible decision into a visible one.
 
     Returned as data so both surfaces can use it: the terminal prompts with it,
@@ -218,7 +218,7 @@ def depth_options(repo, open_count=None, each=0.45):
 def format_options(repo, opts, open_count=None):
     lines = [f"How much of {repo} should be read?"]
     if open_count:
-        lines.append(f"{open_count} pull requests are open right now.")
+        lines.append(f"{open_count} non-draft pull requests are open right now.")
     lines.append("")
     for o in opts:
         lines.append(f'  {o["n"]:>5}   about {o["usd"]:>6.2f} USD, '
@@ -245,7 +245,8 @@ def ask_depth(repo, opts, open_count=None):
     if raw.lower() in ("n", "no", "q", "quit", "cancel"):
         return 0
     try:
-        return max(1, int(raw))
+        n = int(raw)
+        return max(0, n)   # 0 is the natural way to say none, and must mean it
     except ValueError:
         print("[live] not a number, nothing was run.", file=sys.stderr)
         return 0
@@ -774,7 +775,10 @@ if __name__ == "__main__":
         if a.all:
             open_count = count_open_prs(a.repo, a.drafts)
             n = open_count
-        if n > CONFIRM_ABOVE:
+        # See mcp_server: an explicit --all is confirmed regardless of what
+        # the count came back as, because the count and the run use different
+        # oracles and only one of them is the one that spends money.
+        if a.all or n > CONFIRM_ABOVE:
             opts = depth_options(a.repo, open_count, each)
             chosen = ask_depth(a.repo, opts, open_count)
             if chosen is None:

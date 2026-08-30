@@ -546,7 +546,7 @@ Review is ON by default for one submission and OFF for a queue scan, because it 
 
 The scan-all flag does what it says: every open submission, not the most recent handful. The page cap that bounded a normal fetch lifts with the limit, so "all" does not quietly mean "the first 250".
 
-The number that came back is the point. **microsoft/vscode has 1,782 open non-draft pull requests.** (GitHub's own counter says 2,442, which includes 660 drafts; the tool skips drafts, so 1,782 is the number it would actually read.) A full scan is roughly 800 USD and twelve hours. So both the flag and the MCP tool refuse and quote the bill first, and only proceed once it is confirmed.
+The number that came back is the point. **microsoft/vscode has 1,782 open non-draft pull requests.** (GitHub's own counter says 2,442, which includes 660 drafts; the tool skips drafts, so 1,782 is the number it would actually read.) A full scan is roughly 800 USD and fourteen hours. So both the flag and the MCP tool refuse and quote the bill first, and only proceed once it is confirmed.
 
 That figure retroactively justifies two features we could not demonstrate on a nine-item queue. The today-caps of 5 and 8 never fired in any test run and looked like dead weight; at 1,782 they are the difference between a reading list and the original problem. And memory stops being a nicety: the gap between re-reading 1,782 cards and reading the handful that are new is the entire product.
 
@@ -559,15 +559,15 @@ The MCP config used a relative path, so it only launched if the client happened 
 
 ## A number is not a choice until it has a price on it
 
-The queue depth started at 8, which was a demo rather than a default, and briefly became a silent 100. A silent 100 is about 45 USD and forty minutes, and this is a public repository: someone clones it, types the obvious command, and finds out the price afterwards. That is a bad way to meet a tool.
+The queue depth started at 8, which was a demo rather than a default, and briefly became a silent 100. A silent 100 is about 45 USD and forty-eight minutes, and this is a public repository: someone clones it, types the obvious command, and finds out the price afterwards. That is a bad way to meet a tool.
 
 So the depth is now chosen, not assumed. The default target is the 100 most recent open submissions, and anything past a dozen stops and offers the options with the bill attached to each:
 
 ```
       5   about   2.25 USD,   2 min   a quick look, enough to see the shape of the queue
-     25   about  11.25 USD,  10 min   a morning's reading
-    100   about  45.00 USD,  42 min   the default depth
-   1782   about 801.90 USD, 743 min   every open submission
+     25   about  11.25 USD,  12 min   a morning's reading
+    100   about  45.00 USD,  48 min   the default depth, where the piles and the caps start to matter
+   1782   about 801.90 USD, 861 min   every open submission in the repository
 ```
 
 **"100" means nothing to someone who has not priced a run.** That is the whole point of putting the cost on every line: it turns an invisible decision into a visible one. An option larger than the repository itself is never offered, so a small project is not asked whether it wants 100 of its 7 submissions.
@@ -605,3 +605,26 @@ One search query returns the total directly. 0.45 seconds instead of 48, one cal
 Two pull-quotes in the README had been altered inside their quote marks: an em dash swapped for a comma to satisfy our own house style, and a parenthetical dropped with no ellipsis. Both changes were cosmetic and neither changed the meaning, which is exactly the argument someone makes before doing it again with something that does.
 
 The dropped clause is restored, the substituted character is marked, and the edit is disclosed under the quotations. A project that keeps a running list of its own invented numbers does not get to silently improve a quotation.
+
+
+## The optimisation opened a hole in the money guard
+
+The previous entry made the size check one call instead of fifty. It also made the size come from GitHub's search index while the paid run still paginates the REST queue, which is two oracles that can disagree. Before that change a disagreement was impossible, because one call produced both numbers.
+
+The guard only fired when the count exceeded twelve. So a search index that lagged, soft-errored, or returned zero skipped the confirmation entirely, and the run then paginated REST and found all 1,782 submissions. Roughly 800 USD, no bill quoted, on a path whose whole job is quoting the bill. Probed at three counts, 0, 10 and 12: refused nothing, called the paid path every time.
+
+An explicit request for the whole queue is now always confirmed, whatever the count says. The count informs the choice; it is not allowed to remove it.
+
+Two documents were also false while that was live, both stating the refusal as unconditional. This is the second time an entry in this file has described a guarantee the code did not give.
+
+## Four of nine published lines were stale, in the entry that said they were fixed
+
+The depth menu printed in the README and in this file carried the old 25-second estimate: 10, 42 and 743 minutes where the code says 12, 48 and 861. The commit that corrected the constant also claimed the correction was done, twenty-four lines from a block still showing the uncorrected numbers.
+
+`check_docs.py` did not catch it because it only ever checked accuracy, per-pile recall and cost. It now regenerates the depth menu from the code and fails if any published row differs. It caught two more truncated rows on its first run, which is the entire argument for writing it.
+
+## The command in the README did not do what the README said
+
+`./run.sh live owner/repo` passed `--limit 8`. Twelve is the confirmation threshold, so the documented command sat permanently underneath it: no menu, no bill, about 3.60 USD spent silently, four lines below a paragraph promising that nothing over a dozen runs until it has been chosen.
+
+The cap is gone. `PRSLOP_LIMIT` still overrides for a scripted run. This one mattered beyond the honesty of it, because it is the command a demo types on camera, and the feature would not have appeared.

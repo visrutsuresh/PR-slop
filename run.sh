@@ -26,7 +26,16 @@ case "$1" in
     if [ -n "${3:-}" ]; then
       python3 live.py "$2" --pr "$3"
     else
-      python3 live.py "$2" --limit "${PRSLOP_LIMIT:-8}"
+      # No --limit here. live.py defaults to 100 and asks how deep to go,
+      # which is the behaviour the README describes. Passing 8 silently kept
+      # every run under the confirmation threshold, so the documented command
+      # spent money without ever showing the menu it is documented as showing.
+      # PRSLOP_LIMIT still overrides for a scripted run.
+      if [ -n "${PRSLOP_LIMIT:-}" ]; then
+        python3 live.py "$2" --limit "$PRSLOP_LIMIT"
+      else
+        python3 live.py "$2"
+      fi
     fi
     ;;
   triage)

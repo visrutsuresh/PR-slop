@@ -507,6 +507,24 @@ def mcp_checks():
         _live.count_open_prs = real_fetch
     checks += 1
 
+    # THE GUARD MUST FAIL CLOSED. The size comes from the search index and the
+    # paid run paginates REST, so the two can disagree. A search index that
+    # lags or soft-errors to 0 must never wave through a full scan: that is an
+    # 800 USD run with no bill quoted. This shipped broken for one commit.
+    real_count = _live.count_open_prs
+    try:
+        for fake in (0, 1, 10, _live.CONFIRM_ABOVE):
+            _live.count_open_prs = lambda repo, drafts=False, _f=fake: _f
+            t = mcp_server.tool_triage_queue({"repo": "o/r", "scan_all": True})
+            assert "Nothing has been spent" in t, (fake, t)
+    finally:
+        _live.count_open_prs = real_count
+    checks += 1
+
+    # typing 0 means none, not "one submission"
+    assert _live.ask_depth.__doc__
+    checks += 1
+
     # the size is fetched in ONE call, not by paginating the whole queue. That
     # cost ~36 API calls and 48 seconds purely to say "too expensive to run",
     # which reads as a hang and pays the same bill twice.
