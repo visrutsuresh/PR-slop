@@ -33,6 +33,10 @@ import task_spec
 
 OUT_DIR = "reports"
 
+# Measured, not guessed: the recorded five-submission run took 145 seconds,
+# which is 29 each. An earlier estimate used 25 and ran about 16% optimistic.
+SECONDS_EACH = 29
+
 # Above this many submissions the tool quotes the bill and waits. A judge who
 # clones this and types the obvious command should not discover the price
 # afterwards.
@@ -181,7 +185,7 @@ def depth_options(repo, open_count=None, each=0.45):
         if open_count and n > open_count and n != open_count:
             continue
         out.append({"n": n, "why": why, "usd": round(n * each, 2),
-                    "minutes": round(n * 25 / 60)})
+                    "minutes": round(n * SECONDS_EACH / 60)})
     return out
 
 

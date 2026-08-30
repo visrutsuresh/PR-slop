@@ -11,3 +11,4 @@ results/
 reports/*
 !reports/example-microsoft-vscode.html
 .prslop-memory/
+# .mcp.json stays tracked in its relative form; mcp-install rewrites it locally

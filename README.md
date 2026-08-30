@@ -122,7 +122,7 @@ and named the real tension: *"a maintainer taking this on merges it believing it
 
 ```
 How much of microsoft/vscode should be read?
-1782 pull requests are open right now.
+1782 non-draft pull requests are open right now.
 
       5   about   2.25 USD,   2 min   a quick look, enough to see the shape of the queue
      25   about  11.25 USD,  10 min   a morning's reading

@@ -546,7 +546,7 @@ Review is ON by default for one submission and OFF for a queue scan, because it 
 
 The scan-all flag does what it says: every open submission, not the most recent handful. The page cap that bounded a normal fetch lifts with the limit, so "all" does not quietly mean "the first 250".
 
-The number that came back is the point. **microsoft/vscode has 1,782 open pull requests.** A full scan is roughly 800 USD and twelve hours. So both the flag and the MCP tool refuse and quote the bill first, and only proceed once it is confirmed.
+The number that came back is the point. **microsoft/vscode has 1,782 open non-draft pull requests.** (GitHub's own counter says 2,442, which includes 660 drafts; the tool skips drafts, so 1,782 is the number it would actually read.) A full scan is roughly 800 USD and twelve hours. So both the flag and the MCP tool refuse and quote the bill first, and only proceed once it is confirmed.
 
 That figure retroactively justifies two features we could not demonstrate on a nine-item queue. The today-caps of 5 and 8 never fired in any test run and looked like dead weight; at 1,782 they are the difference between a reading list and the original problem. And memory stops being a nicety: the gap between re-reading 1,782 cards and reading the handful that are new is the entire product.
 
@@ -575,3 +575,20 @@ So the depth is now chosen, not assumed. The default target is the 100 most rece
 The options are returned as data rather than baked into a message, because two surfaces need the same choice. In a terminal the tool asks directly. An MCP tool cannot ask anything, so it hands the assistant the priced options and lets the assistant put them in front of the maintainer, then takes the answer back as `limit` plus `confirm_cost`.
 
 With no terminal and no confirmation, it prints the menu and spends nothing, so a script or a CI job can never discover the price after the fact.
+
+
+## The first command a judge runs crashed on their machine and passed on ours
+
+`./run.sh eval` read its fixture from `reports/microsoft-vscode.json`. That directory is gitignored, so the file exists only on a machine that has already paid for a live run. On a fresh clone the whole target died with `FileNotFoundError`, and because `run.sh` uses `set -euo pipefail`, everything after it went down too: the twenty protocol checks, the documentation guard and the reference baseline. The suite passed here for the worst possible reason, which is that we were not the audience.
+
+The fixture now comes from `data/live-record-prefix.json`, which is tracked. Verified the way it should have been from the start: copy only the tracked files into an empty directory, no `.git`, no artifacts, and run the command a judge would run. Exit 0, twenty of twenty.
+
+Three more things the same review found, all of the same family, a claim that was true only where it was written.
+
+**The committed MCP config named one machine.** `mcp-install` wrote an absolute path into `.mcp.json` and that got committed, so the file worked on exactly one computer and published a home directory into a public repository. It is back to the relative form, which is what `cd PR-slop && claude` needs, and the installer stays as the local override.
+
+**The isolation probe pointed at a path that only exists here.** It proves the model cannot read the answer key by asking it to open the answer key. The path was hardcoded absolute, so on anybody else's clone the negative control asked for a file that does not exist. It failed closed rather than open, so no published number is wrong, but the proof was only a proof on one machine. Resolved at run time now.
+
+**Three output modes were two.** `inline` appended the report path exactly like `both`, so they were byte-identical, and the check covering it asserted on a string every branch produced. Fourth unfalsifiable test in this project. The modes are now distinct and the check compares all three against each other. The redundant whitelist behind it was deleted rather than kept: `_shape` already fell through correctly, so the guard was unreachable and the test could not tell the difference.
+
+Two numbers were also wrong in the safe direction and are now right. The 1,782 figure is non-draft submissions; GitHub's own counter says 2,442 because it includes 660 drafts, which this tool skips. And the time estimate used 25 seconds per submission against our own recorded 29, running about 16% optimistic.

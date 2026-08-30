@@ -75,10 +75,10 @@ TOOLS = [
                                                 "seeing the estimate"},
                 "output": {"type": "string", "default": "inline",
                            "enum": ["inline", "report", "both"],
-                           "description": "inline returns the summary as text, "
-                                          "report writes the HTML page and "
-                                          "returns only its path, both does "
-                                          "each"},
+                           "description": "inline returns only the summary "
+                                          "text, report writes the HTML page "
+                                          "and returns only its path, both "
+                                          "returns the summary and the path"},
             },
             "required": ["repo"],
         },
@@ -227,18 +227,23 @@ def _shape(text, path, mode):
     worse than useless. `report` exists so an assistant can hand over a path
     instead of a wall, without the maintainer having to ask twice.
     """
-    if mode == "report":
+    if mode == "report" and path:
         return (f"Wrote the full triage page to:\n{path}\n\n"
                 f"Open it in a browser. Ask again with output=inline if you "
-                f"would rather read it here.") if path else text
-    if mode == "both":
-        return text + (f"\n\nFull page: {path}" if path else "")
-    return text + (f"\n\nFull page: {path}" if path else "")
+                f"would rather read it here.")
+    if mode == "both" and path:
+        return text + f"\n\nFull page: {path}"
+    # inline is the summary and nothing else. An earlier version appended the
+    # path here too, which made inline byte-identical to both and quietly
+    # reduced three advertised modes to two.
+    return text
 
 
 def _mode(args):
-    m = (args.get("output") or "inline").lower()
-    return m if m in ("inline", "report", "both") else "inline"
+    # No whitelist. _shape() falls through to inline for anything it does not
+    # recognise, so a second guard here was dead code that a test appeared to
+    # cover and could not. One of the two had to go.
+    return (args.get("output") or "inline").lower()
 
 
 def tool_triage_queue(args):

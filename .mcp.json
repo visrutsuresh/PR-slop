@@ -1,8 +1,9 @@
 {
+  "_comment": "Relative on purpose: this file is committed, and an absolute path would name one machine. Works as-is for `cd PR-slop && claude`. From anywhere else run ./run.sh mcp-install, which rewrites this with the absolute path of your clone.",
   "mcpServers": {
     "pr-slop": {
       "command": "python3",
-      "args": ["/Users/visrutsuresh/Documents/GitHub/PR-slop/mcp_server.py"]
+      "args": ["mcp_server.py"]
     }
   }
 }

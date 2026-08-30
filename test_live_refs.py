@@ -333,7 +333,10 @@ def mcp_checks():
     old = memory.MEM_DIR
     memory.MEM_DIR = tempfile.mkdtemp()
     try:
-        data = J.load(open("reports/microsoft-vscode.json"))
+        # data/, not reports/. reports/* is gitignored, so reading from there
+        # passes on a machine that has paid for a live run and crashes on a
+        # fresh clone, taking every check below it down with set -e.
+        data = J.load(open("data/live-record-prefix.json"))
         text = mcp_server.summarise(data)
         assert "Nothing was merged, closed, commented or labelled." in text
         assert "USD" in text
@@ -433,10 +436,29 @@ def mcp_checks():
         assert "CODE REVIEW" in t and ".html" in t, t
         checks += 1
 
-        # an unknown output mode falls back to inline rather than exploding
+        # inline is the summary and NOTHING else. This assertion existed
+        # before and could not fail, because inline appended the path exactly
+        # like both, so the two modes were one and the check asserted on a
+        # string every branch produced.
+        t = mcp_server.tool_triage_pull_request({"repo": "o/r", "number": 7,
+                                                 "output": "inline"})
+        assert "CODE REVIEW" in t and ".html" not in t, t
+        checks += 1
+
+        # the three advertised modes must be three distinct outputs
+        a, b, c = (mcp_server.tool_triage_pull_request(
+            {"repo": "o/r", "number": 7, "output": m})
+            for m in ("inline", "report", "both"))
+        assert a != b and b != c and a != c, (a, b, c)
+        checks += 1
+
+        # an unknown mode degrades to inline rather than exploding. This is
+        # _shape's fallthrough, not a whitelist: the whitelist that used to sit
+        # in _mode was deleted because it was unreachable and this check could
+        # not tell the difference.
         t = mcp_server.tool_triage_pull_request({"repo": "o/r", "number": 7,
                                                  "output": "interpretive-dance"})
-        assert "CODE REVIEW" in t, t
+        assert t == a, (t, a)
         checks += 1
     finally:
         _live.run = real_run

@@ -12,6 +12,7 @@ tool switched off, and this probe must pass first. It asks for an answer that
 is only obtainable by reading a file. The only acceptable reply is NOTOOLS.
 """
 import json
+import os
 import subprocess
 import sys
 
@@ -20,11 +21,18 @@ MODEL = "claude-sonnet-5"
 DISALLOWED = "Read,Glob,Grep,Bash,WebFetch,WebSearch,Edit,Write,NotebookEdit,Task"
 SYSTEM = "You answer exactly what is asked, with no preamble."
 
+# The path is resolved at run time, from THIS file. Hardcoding an absolute
+# path made the negative control point at nothing on anybody else's clone, so
+# the probe proved isolation by asking the model to read a file that did not
+# exist. It failed closed rather than open, so no published number was wrong,
+# but the proof was only a proof on one machine.
+CASE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                    "data", "cases", "pr-243255.json")
+
 PROMPT = (
-    "Open the file /Users/visrutsuresh/Documents/GitHub/PR-slop/data/cases/"
-    "pr-243255.json and reply with the value at truth.bucket, a single digit. "
-    "If you have no tool available that can read a file, reply with exactly "
-    "NOTOOLS and nothing else."
+    f"Open the file {CASE} and reply with the value at truth.bucket, a single "
+    "digit. If you have no tool available that can read a file, reply with "
+    "exactly NOTOOLS and nothing else."
 )
 
 
