@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PR-slop, explained simply</title>
+<style>
+  :root{
+    --ink:#12100e; --paper:#faf7f2; --muted:#6b6560;
+    --red:#c0392b; --green:#1e7a4d; --amber:#c98a12; --line:#e3ddd3;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font:400 19px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  section{max-width:900px;margin:0 auto;padding:88px 28px;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:0}
+  .step{font:600 13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+  h1{font-size:clamp(40px,7vw,76px);line-height:1.02;letter-spacing:-.03em;margin:0 0 20px;font-weight:800}
+  h2{font-size:clamp(28px,4.4vw,46px);line-height:1.1;letter-spacing:-.02em;margin:0 0 22px;font-weight:750}
+  p{margin:0 0 20px;max-width:66ch}
+  .lead{font-size:23px;color:#3a3531}
+  .big{font-size:clamp(56px,11vw,120px);font-weight:800;letter-spacing:-.04em;line-height:.95}
+  .quiet{color:var(--muted)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 28px;margin:14px 0}
+  .grid{display:grid;gap:16px}
+  @media(min-width:720px){.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1fr 1fr}}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .pill{display:inline-block;padding:5px 13px;border-radius:999px;font:600 14px/1.4 inherit}
+  .p1{background:#e8f3ec;color:var(--green)}
+  .p2{background:#fdf3dc;color:var(--amber)}
+  .p3{background:#fbeae8;color:var(--red)}
+  .arrow{font-size:34px;color:var(--muted);text-align:center;margin:6px 0}
+  .num{font:800 46px/1 inherit;letter-spacing:-.03em}
+  .bar{height:44px;border-radius:8px;display:flex;align-items:center;padding:0 14px;color:#fff;font-weight:700}
+  table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:17px}
+  th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  td.n{font-variant-numeric:tabular-nums;font-weight:700}
+  .win{color:var(--green)}
+  .warn{border-left:4px solid var(--amber);padding-left:20px;background:#fffdf6}
+  .bad{border-left:4px solid var(--red);padding-left:20px;background:#fffaf9}
+  .good{border-left:4px solid var(--green);padding-left:20px;background:#f8fdfa}
+  code{font:500 15px ui-monospace,SFMono-Regular,Menlo,monospace;background:#f1ece4;padding:2px 7px;border-radius:5px}
+  .hero{background:var(--ink);color:#f7f3ec;border-bottom:0}
+  .hero h1{color:#fff}
+  .hero .lead{color:#bdb4a8}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="step" style="color:#8a8078">PR-slop</div>
+  <h1>Somebody has to read all this rubbish.</h1>
+  <p class="lead">A tool that sorts a mountain of code submissions into three piles, so a volunteer can stop reading the pile that does not matter.</p>
+</section>
+
+<!-- 1 PROBLEM -->
+<section>
+  <div class="step">1 &middot; The problem</div>
+  <h2>Free software is maintained by volunteers. They are drowning.</h2>
+
+  <svg viewBox="0 0 800 260" role="img" aria-label="One person facing a huge stack of submissions">
+    <g transform="translate(90,150)">
+      <circle cx="0" cy="-42" r="20" fill="#12100e"/>
+      <rect x="-17" y="-18" width="34" height="52" rx="12" fill="#12100e"/>
+      <text x="0" y="66" text-anchor="middle" font-size="15" fill="#6b6560">one volunteer</text>
+    </g>
+    <g>
+      <g fill="#c0392b" opacity=".85">
+        <rect x="300" y="30" width="420" height="18" rx="4"/>
+        <rect x="300" y="56" width="380" height="18" rx="4"/>
+        <rect x="300" y="82" width="440" height="18" rx="4"/>
+        <rect x="300" y="108" width="360" height="18" rx="4"/>
+        <rect x="300" y="134" width="410" height="18" rx="4"/>
+        <rect x="300" y="160" width="390" height="18" rx="4"/>
+        <rect x="300" y="186" width="430" height="18" rx="4"/>
+      </g>
+      <rect x="300" y="212" width="350" height="18" rx="4" fill="#c0392b" opacity=".35"/>
+      <text x="300" y="252" font-size="15" fill="#6b6560">submissions, most written by machines</text>
+    </g>
+    <path d="M150 150 L285 130" stroke="#6b6560" stroke-width="2" stroke-dasharray="5 5" fill="none"/>
+  </svg>
+
+  <div class="card bad">
+    <p style="margin:0"><strong>Real numbers.</strong> The <em>curl</em> project says it is being flooded to the point of breaking. About <strong>one in five</strong> of its submissions last year were machine-written filler. One project received a single machine-written submission <strong>thirteen thousand lines long</strong>.</p>
+  </div>
+  <p>Every one of those costs the volunteer the same first read as a real one.</p>
+</section>
+
+<!-- 2 WHY -->
+<section>
+  <div class="step">2 &middot; Why it exists</div>
+  <h2>Nobody is being malicious. They are chasing a line on a CV.</h2>
+
+  <svg viewBox="0 0 800 190" role="img" aria-label="Job adverts create pressure which creates volume">
+    <g font-size="15" fill="#12100e">
+      <rect x="10" y="40" width="210" height="96" rx="12" fill="#fff" stroke="#e3ddd3"/>
+      <text x="30" y="72" font-weight="700">Job advert</text>
+      <text x="30" y="98" fill="#6b6560">&ldquo;Contribution to</text>
+      <text x="30" y="118" fill="#6b6560">open-source projects&rdquo;</text>
+
+      <rect x="295" y="40" width="210" height="96" rx="12" fill="#fff" stroke="#e3ddd3"/>
+      <text x="315" y="72" font-weight="700">Applicant</text>
+      <text x="315" y="98" fill="#6b6560">needs that line,</text>
+      <text x="315" y="118" fill="#6b6560">fast</text>
+
+      <rect x="580" y="40" width="210" height="96" rx="12" fill="#fbeae8" stroke="#f0cdc7"/>
+      <text x="600" y="72" font-weight="700" fill="#c0392b">Machine writes it</text>
+      <text x="600" y="98" fill="#a5564b">quantity becomes</text>
+      <text x="600" y="118" fill="#a5564b">nearly free</text>
+    </g>
+    <g stroke="#6b6560" stroke-width="2" fill="none">
+      <path d="M228 88 L286 88"/><path d="M278 82 l8 6 -8 6"/>
+      <path d="M513 88 L571 88"/><path d="M563 82 l8 6 -8 6"/>
+    </g>
+  </svg>
+
+  <div class="card">
+    <p class="quiet" style="margin:0 0 10px">Two real job adverts, collected during my own internship search:</p>
+    <p style="margin:0 0 6px"><strong>&ldquo;Contribution to open-source AI projects&rdquo;</strong></p>
+    <p style="margin:0"><strong>&ldquo;Public portfolio, hackathon wins, open-source contributions&rdquo;</strong></p>
+  </div>
+  <p><strong>I am not a volunteer maintainer.</strong> I am the person standing under that pressure. That is why I picked this problem.</p>
+</section>
+
+<!-- 3 SOLUTION -->
+<section>
+  <div class="step">3 &middot; What I built</div>
+  <h2>It sorts the pile into three. That is the whole idea.</h2>
+
+  <div class="grid g3">
+    <div class="card"><span class="pill p1">Pile 1</span>
+      <p style="margin:14px 0 0"><strong>Act now.</strong><br><span class="quiet">Good work, and it fixes something people already complained about.</span></p></div>
+    <div class="card"><span class="pill p2">Pile 2</span>
+      <p style="margin:14px 0 0"><strong>Worth a look.</strong><br><span class="quiet">Real work. Needs a human to read it.</span></p></div>
+    <div class="card"><span class="pill p3">Pile 3</span>
+      <p style="margin:14px 0 0"><strong>Not merged.</strong><br><span class="quiet">Probably never becoming part of the project.</span></p></div>
+  </div>
+
+  <div class="card good">
+    <p style="margin:0"><strong>It never touches anything.</strong> It writes a note. A human decides. It cannot accept, reject, close or comment on anyone's work.</p>
+  </div>
+</section>
+
+<!-- 4 HOW -->
+<section>
+  <div class="step">4 &middot; How it works</div>
+  <h2>Two steps. Neither is clever.</h2>
+
+  <svg viewBox="0 0 800 200" role="img" aria-label="Two stages, search then check">
+    <g font-size="15">
+      <rect x="10" y="55" width="150" height="84" rx="12" fill="#fff" stroke="#e3ddd3"/>
+      <text x="85" y="90" text-anchor="middle" font-weight="700">A submission</text>
+      <text x="85" y="112" text-anchor="middle" fill="#6b6560">arrives</text>
+
+      <rect x="230" y="55" width="180" height="84" rx="12" fill="#eef3fa" stroke="#cfdcec"/>
+      <text x="320" y="88" text-anchor="middle" font-weight="700">Step 1 &middot; Search</text>
+      <text x="320" y="110" text-anchor="middle" fill="#5a6b80">403 past complaints</text>
+
+      <rect x="475" y="55" width="180" height="84" rx="12" fill="#f2eefa" stroke="#dcd0ec"/>
+      <text x="565" y="88" text-anchor="middle" font-weight="700">Step 2 &middot; Check</text>
+      <text x="565" y="110" text-anchor="middle" fill="#6b5a80">is that real?</text>
+
+      <rect x="700" y="55" width="90" height="84" rx="12" fill="#12100e"/>
+      <text x="745" y="90" text-anchor="middle" font-weight="700" fill="#fff">A note</text>
+      <text x="745" y="112" text-anchor="middle" fill="#bdb4a8">for a human</text>
+    </g>
+    <g stroke="#6b6560" stroke-width="2" fill="none">
+      <path d="M168 97 L222 97"/><path d="M214 91 l8 6 -8 6"/>
+      <path d="M418 97 L467 97"/><path d="M459 91 l8 6 -8 6"/>
+      <path d="M663 97 L692 97"/><path d="M684 91 l8 6 -8 6"/>
+    </g>
+  </svg>
+
+  <div class="grid g2">
+    <div class="card">
+      <p style="margin:0 0 8px"><strong>Step 1, search.</strong></p>
+      <p class="quiet" style="margin:0">The project has <strong>403</strong> past complaints written down. Far too many to hand to a computer all at once. So we go and look, and put the eight closest ones in front of it.</p>
+    </div>
+    <div class="card">
+      <p style="margin:0 0 8px"><strong>Step 2, check.</strong></p>
+      <p class="quiet" style="margin:0">If it claims &ldquo;this fixes complaint #4102&rdquo;, we go and see whether #4102 exists. If it does not, we cross it out.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 TEST -->
+<section>
+  <div class="step">5 &middot; How I tested it fairly</div>
+  <h2>The answers already existed. I did not have to invent them.</h2>
+
+  <p>I took <strong>15</strong> real submissions that were already finished and decided. Then I hid the outcome and asked the tool to guess.</p>
+
+  <div class="card">
+    <table>
+      <tr><th>What the volunteer actually did</th><th>Correct pile</th></tr>
+      <tr><td>Accepted it, and it fixed a known complaint</td><td><span class="pill p1">1</span></td></tr>
+      <tr><td>Accepted it, no known complaint</td><td><span class="pill p2">2</span></td></tr>
+      <tr><td>Did not accept it</td><td><span class="pill p3">3</span></td></tr>
+    </table>
+    <p class="quiet" style="margin:8px 0 0">Nobody grades these by hand. The answer is simply what really happened.</p>
+  </div>
+  <p>Five of each, so guessing gets you <strong>33%</strong> and no better.</p>
+</section>
+
+<!-- 6 CHEAT -->
+<section>
+  <div class="step">6 &middot; The trap I nearly fell into</div>
+  <h2>It could open the answer sheet.</h2>
+
+  <svg viewBox="0 0 800 160" role="img" aria-label="A model reading the answer file">
+    <rect x="60" y="30" width="170" height="100" rx="10" fill="#fff" stroke="#e3ddd3"/>
+    <text x="145" y="72" text-anchor="middle" font-size="15" font-weight="700">the tool</text>
+    <text x="145" y="96" text-anchor="middle" font-size="14" fill="#6b6560">being tested</text>
+    <rect x="560" y="30" width="180" height="100" rx="10" fill="#fbeae8" stroke="#f0cdc7"/>
+    <text x="650" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#c0392b">answers.json</text>
+    <text x="650" y="96" text-anchor="middle" font-size="14" fill="#a5564b">sitting right there</text>
+    <path d="M238 80 L552 80" stroke="#c0392b" stroke-width="3" fill="none"/>
+    <path d="M544 73 l9 7 -9 7" stroke="#c0392b" stroke-width="3" fill="none"/>
+    <text x="395" y="66" text-anchor="middle" font-size="15" fill="#c0392b" font-weight="700">just opened it</text>
+  </svg>
+
+  <div class="card bad">
+    <p style="margin:0">I asked it for the answer to one case. <strong>It opened the file and told me.</strong> Every score after that would have been worthless.</p>
+  </div>
+  <p><strong>Fix:</strong> it now runs in an empty room with the door locked. No file reading, no searching, no internet. A test has to prove it is blind before anything else runs.</p>
+</section>
+
+<!-- 7 RESULTS -->
+<section>
+  <div class="step">7 &middot; The result</div>
+  <h2>Guessing scores 33. We score 73.</h2>
+
+  <div style="margin:26px 0 34px">
+    <p class="quiet" style="margin:0 0 8px">Simple version, one question, no searching</p>
+    <div class="bar" style="width:33.3%;background:#b9b1a7">33.3%</div>
+    <p class="quiet" style="margin:22px 0 8px">Ours, with searching and checking</p>
+    <div class="bar" style="width:73.3%;background:#1e7a4d">73.3%</div>
+    <p class="quiet" style="margin:14px 0 0;font-size:16px">Pure guessing also scores 33.3%. So the simple version added nothing at all.</p>
+  </div>
+
+  <table>
+    <tr><th></th><th>Simple</th><th>Ours</th></tr>
+    <tr><td>Overall</td><td class="n">33.3%</td><td class="n win">73.3%</td></tr>
+    <tr><td>Good work wrongly binned</td><td class="n">1 of 10</td><td class="n win">0 of 10</td></tr>
+    <tr><td>Complaints it named that really exist</td><td class="n">1 of 3</td><td class="n win">9 of 9</td></tr>
+    <tr><td>Cost for all 15</td><td class="n">$1.84</td><td class="n">$1.88</td></tr>
+  </table>
+</section>
+
+<!-- 8 HONEST -->
+<section>
+  <div class="step">8 &middot; What I am not hiding</div>
+  <h2>Three things that make us look worse.</h2>
+
+  <div class="card warn">
+    <p style="margin:0 0 6px"><strong>Step 2 did nothing.</strong></p>
+    <p class="quiet" style="margin:0">The checking step caught <strong>zero</strong> mistakes across all 15. Once step 1 gave it real complaints to point at, it stopped making them up. Step 1 earned the result. I kept step 2 because it is free, not because it proved itself.</p>
+  </div>
+
+  <div class="card warn">
+    <p style="margin:0 0 6px"><strong>I measured the wrong thing at first.</strong></p>
+    <p class="quiet" style="margin:0">My first score said the simple version cited real evidence <strong>86.7%</strong> of the time, which appeared to disprove my own prediction. It did not. Twelve of its thirteen &ldquo;correct&rdquo; citations were <strong>file names copied straight out of the question</strong>. That is free. Counting only things it had to go and find, it scored 1 of 3, and my prediction held.</p>
+  </div>
+
+  <div class="card warn">
+    <p style="margin:0 0 6px"><strong>It is bad at the pile that matters most.</strong></p>
+    <p class="quiet" style="margin:0">It spots accepted work perfectly, <strong>5 of 5</strong> twice over. It spots rejected work <strong>1 of 5</strong>. That is the wrong way round for a tool whose job is finding the pile you can safely ignore.</p>
+  </div>
+</section>
+
+<!-- 9 HOT TAKE -->
+<section>
+  <div class="step">9 &middot; What I learned</div>
+  <h2>&ldquo;Rejected&rdquo; almost never means &ldquo;bad&rdquo;.</h2>
+
+  <svg viewBox="0 0 800 150" role="img" aria-label="Breakdown of 17 rejected submissions">
+    <g font-size="15">
+      <rect x="20" y="40" width="180" height="66" rx="10" fill="#eef1f5" stroke="#dbe1e9"/>
+      <text x="110" y="70" text-anchor="middle" font-weight="700">4</text>
+      <text x="110" y="92" text-anchor="middle" fill="#6b6560">robots tidying up</text>
+
+      <rect x="220" y="40" width="330" height="66" rx="10" fill="#eef1f5" stroke="#dbe1e9"/>
+      <text x="385" y="70" text-anchor="middle" font-weight="700">10</text>
+      <text x="385" y="92" text-anchor="middle" fill="#6b6560">the team's own real work, done a different way</text>
+
+      <rect x="570" y="40" width="210" height="66" rx="10" fill="#fbeae8" stroke="#f0cdc7"/>
+      <text x="675" y="70" text-anchor="middle" font-weight="700" fill="#c0392b">1</text>
+      <text x="675" y="92" text-anchor="middle" fill="#a5564b">actual rubbish</text>
+    </g>
+    <text x="20" y="28" font-size="14" fill="#6b6560">17 rejected submissions, looked at one by one</text>
+  </svg>
+
+  <p class="lead" style="margin-top:26px">Only <strong>one</strong> of seventeen was the thing everyone complains about. The rest were robots doing chores, or the team quietly replacing their own work.</p>
+
+  <div class="card">
+    <p style="margin:0"><strong>So the honest claim is smaller than the exciting one.</strong> A tool built on what a project records for free measures <em>what people did</em>, not <em>whether the work was any good</em>. That is genuinely useful. It is not the same as &ldquo;this detects rubbish&rdquo;, and I would rather say so than let the big number imply it.</p>
+  </div>
+</section>
+
+<!-- 10 CHECK -->
+<section>
+  <div class="step">10 &middot; Check it yourself</div>
+  <h2>Three commands. No account, no payment, no internet.</h2>
+  <div class="card">
+    <p style="margin:0 0 6px"><code>./run.sh eval</code></p>
+    <p style="margin:0 0 6px"><code>./run.sh baseline</code></p>
+    <p style="margin:0"><code>./run.sh advanced</code></p>
+  </div>
+  <p class="quiet">Every answer the tool ever gave is saved in the project. Those commands re-add the scores from the saved answers, so you get exactly the numbers above, every time, on any machine.</p>
+  <p class="quiet" style="font-size:16px">Why not just re-run it live? Because these tools are not repeatable. Ask twice, get different words. Saved answers are the only thing that gives everyone the same result.</p>
+</section>
+
+</body>
+</html>
