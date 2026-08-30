@@ -15,6 +15,7 @@ There is nothing to score here and we do not pretend otherwise. What it gives
 you is checked evidence per submission and a suggested order.
 """
 import argparse
+from itertools import zip_longest
 import base64
 import html
 import json
@@ -30,6 +31,11 @@ import retriever
 import task_spec
 
 OUT_DIR = "reports"
+
+# Off switch for the GitHub-search half of the investigator's retrieval, so the
+# same queue can be run both ways in one sitting. The open queue changes every
+# day, so a before/after taken hours apart compares two different queues.
+GH_SEARCH_ON = os.environ.get("PRSLOP_GH_SEARCH", "1") != "0"
 
 
 def gh(path, jq=None):
@@ -91,6 +97,18 @@ def resolve_issue(repo, n, cache):
         note = f"  [{err.strip()}]" if cache[key] == "unresolved" else ""
         print(f"[live]   ref {repo}#{n} -> {cache[key]}{note}", file=sys.stderr)
     return cache[key]
+
+
+def gh_search(repo, words, k):
+    """GitHub's issue search, scoped to one repository, issues only."""
+    out = subprocess.run(
+        ["gh", "api", "-X", "GET", "search/issues",
+         "--field", f"q=repo:{repo} is:issue {words}",
+         "--field", f"per_page={k}"],
+        capture_output=True, text=True, timeout=60)
+    if out.returncode != 0:
+        raise RuntimeError((out.stderr or "")[:200])
+    return json.loads(out.stdout).get("items") or []
 
 
 class ResolvedIssues:
@@ -220,7 +238,8 @@ def build_input(pr, repo):
             "body": scrub_identity((pr.get("body") or "")[:8000]),
             "changed_files": paths,
             "patch": scrub_identity(patch),
-            "additions": sum(f.get("additions") or 0 for f in files)}
+            "additions": sum(f.get("additions") or 0 for f in files),
+            "file_adds": {f["filename"]: (f.get("additions") or 0) for f in files}}
 
 
 class LiveSearch(retriever.IssueSearch):
@@ -326,10 +345,104 @@ def facts_for(ci, verdict, resolver, declared):
         "declared": declared,
         "declared_ok": any(d["status"] == "open" for d in declared),
         "has_tests": any(TEST_PATH.search(f) for f in ci["changed_files"]),
+        "test_lines": sum(v for k, v in (ci.get("file_adds") or {}).items()
+                          if TEST_PATH.search(k)),
         "files": len(ci["changed_files"]),
         "lines": ci["additions"],
         "claim": verdict.get("_claim_supported"),
     }
+
+
+class UnionSearch(LiveSearch):
+    """Local index first, then ask GitHub, and give GitHub reserved slots.
+
+    The local index only ever held the 300 most recently filed problems. For a
+    repository like this one that is about 300 numbers out of roughly 333,000,
+    so anything reported more than a few days ago was unreachable at ANY model
+    quality. Two of the three declarations in the recorded run, #231076 and
+    #330410, sat outside that window.
+
+    GitHub's own search covers the whole history. We union the two rather than
+    replacing, because the local index still wins on recent problems whose
+    wording is close, and because a search outage must not leave the
+    investigator with nothing.
+
+    Reserved slots matter: taking the top 8 of the merged list would let 8 good
+    local hits crowd GitHub out entirely, which is the exact case this exists
+    to fix. So the merge alternates, local, remote, local, remote.
+
+    The result shape is identical to the local one, so no prompt changes.
+    """
+
+    def __init__(self, rows, repo):
+        super().__init__(rows)
+        self.repo = repo
+        self.searched = 0
+        self.failed = 0
+        self.narrowed = 0
+
+    def _narrow(self, query, n=3):
+        """The 3 rarest words in the query, by the local index's own idf.
+
+        GitHub search ANDs its terms; the local matcher soft-ORs them. So the
+        one query the investigator wrote for a soft-OR matcher returns nothing
+        from GitHub as soon as it is more than a few words long. Measured:
+        "memory leak extension host pseudoterminal" returns 0, while
+        "terminal memory leak" returns the plausible issue.
+
+        Dropping to the rarest terms is a retry, not a rewrite, and it uses the
+        idf table we already built. No model call, no prompt change.
+        """
+        toks = [w for w in dict.fromkeys(re.findall(r"[A-Za-z0-9_]{3,}", query))]
+        toks.sort(key=lambda w: -self.idf.get(w.lower(), 0.0))
+        return " ".join(toks[:n])
+
+    def _remote(self, query, k):
+        if not GH_SEARCH_ON:
+            return []
+        # ponytail: one page, one narrowing retry. Upgrade path: page it if a
+        # real query ever needs more than k hits from GitHub.
+        words = " ".join(re.findall(r"[A-Za-z0-9_]{3,}", query)[:12])
+        if not words:
+            return []
+        raw = []
+        for attempt, q in enumerate((words, self._narrow(query))):
+            if not q:
+                continue
+            try:
+                self.searched += 1
+                raw = gh_search(self.repo, q, k)
+            except Exception as e:
+                self.failed += 1
+                print(f"    [search] GitHub search unavailable, local index only "
+                      f"({type(e).__name__})", file=sys.stderr)
+                return []
+            if raw:
+                if attempt:
+                    self.narrowed += 1
+                break
+        # a pull request is not a reported problem
+        return [{"number": it["number"], "title": it.get("title") or "",
+                 "score": None, "source": "remote",
+                 "excerpt": ((it.get("body") or "").strip()[:300])}
+                for it in raw if "pull_request" not in it]
+
+    def _local(self, query, k):
+        hits = super().search(query, k)
+        for h in hits:
+            h["source"] = "local"
+        return hits
+
+    def search(self, query, k=8):
+        local = self._local(query, k)
+        remote = self._remote(query, k)
+        out, seen = [], set()
+        for a, b in zip_longest(local, remote):
+            for h in (a, b):
+                if h and h["number"] not in seen:
+                    seen.add(h["number"])
+                    out.append(h)
+        return out[:k]
 
 
 def run(repo, limit, include_drafts, only=None):
@@ -345,7 +458,7 @@ def run(repo, limit, include_drafts, only=None):
     print(f"[live] {len(prs)} open. fetching recorded problems to search")
     corpus = fetch_issue_corpus(repo)
     print(f"[live] {len(corpus)} recorded problems")
-    search = LiveSearch(corpus)
+    search = UnionSearch(corpus, repo)
     known = ResolvedIssues(repo, corpus, {})
     sha = json.loads(gh(f"repos/{repo}/commits?per_page=1"))[0]["sha"]
     os.makedirs(A.SCRATCH, exist_ok=True)
@@ -357,7 +470,7 @@ def run(repo, limit, include_drafts, only=None):
         print(f"  #{ci['number']} {ci['title'][:52]}", flush=True)
         trace = []
         found = A.investigate(ci, search, trace)
-        claims = A.check_claims(ci, sha, cache, trace)
+        claims = A.check_claims(ci, sha, cache, trace, repo)
         v = A.adjudicate(ci, found, claims, "", trace, 1)
         failure = A.verify(v, ci, known, trace)
         if failure:

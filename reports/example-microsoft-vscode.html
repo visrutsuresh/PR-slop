@@ -47,77 +47,77 @@ footer{border-top:1px solid var(--line);padding:26px;color:var(--muted);font-siz
 </style></head><body>
 <header><div class="wrap">
   <h1>microsoft/vscode, 9 open pull requests</h1>
-  <div class="sub">A suggested reading order. Generated 2026-08-30 21:00 UTC.</div>
+  <div class="sub">A suggested reading order. Generated 2026-08-30 22:50 UTC.</div>
   <div class="warn"><b>Nothing here has been acted on.</b> This tool cannot
   merge, close, comment or label. It read 300 of your recorded
-  problems and the code at commit <code>e3ce07e8</code>, and
+  problems and the code at commit <code>23f50094</code>, and
   every reference below was checked before you saw it. The order is a
   suggestion; you decide.</div>
 </div></header>
 <main><div class="wrap"><section class="group b1"><div class="bar"></div><h2>Predicted merge, and the model tied it to an already-reported problem <span class="num">3</span></h2><p>A prediction about what a maintainer would decide, not a measurement. The link to a reported problem is the model's, checked against GitHub before you saw it. The order inside the group is evidence strength.</p><article class="pr">
-  <div class="top"><span class="num">#333390</span><span class="rank">1 of 3</span>
+  <div class="top"><span class="num">#333431</span><span class="rank">1 of 3</span>
+    <span class="title">Test: add missing pointer-events assertion to sessionsListTwistie spec</span></div>
+  <div class="chips"><span class="chip ok">fact · author’s text: “…and visibility. Fixes #333430”, open issue, confirmed</span><span class="chip ok">checked · cites #333430, real open issue</span><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 4 test lines added</span><span class="chip">fact · 4 lines added, 1 file</span></div>
+  <div class="why"><b>Why:</b> Small, correct test addition that closes a coverage gap by asserting pointer-events in the unhover state, matching a previously filed issue.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333431">open on GitHub</a></div>
+  
+</article><article class="pr">
+  <div class="top"><span class="num">#333390</span><span class="rank">2 of 3</span>
     <span class="title">Fix #231076: Restore NODE_OPTIONS environment variable on Windows</span></div>
-  <div class="chips"><span class="chip ok">fact · author’s text: “Fix #231076”, open issue, confirmed</span><span class="chip ok">checked · cites #333316, real open issue</span><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 54 lines added, 4 files</span></div>
-  <div class="why"><b>Why:</b> Code matches description and fixes a real, reproducible Windows terminal NODE_OPTIONS inheritance bug that mirrors an existing macOS workaround and multiple reported issues.</div>
+  <div class="chips"><span class="chip ok">fact · author’s text: “Fix #231076”, open issue, confirmed</span><span class="chip ok">checked · cites #231076, real open issue</span><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 37 test lines added</span><span class="chip">fact · 54 lines added, 4 files</span></div>
+  <div class="why"><b>Why:</b> The PR explicitly fixes a reported issue (#231076) about NODE_OPTIONS not being inherited by the integrated terminal on Windows, mirroring an existing macOS workaround, with tests added; this is a real, scoped bug fix addressing a known problem.</div>
   <div class="links"><a href="https://github.com/microsoft/vscode/pull/333390">open on GitHub</a></div>
   
 </article><article class="pr">
-  <div class="top"><span class="num">#333399</span><span class="rank">2 of 3</span>
+  <div class="top"><span class="num">#333399</span><span class="rank">3 of 3</span>
     <span class="title">Fix Copilot memory tool infinite loop with empty old_str in str_replace</span></div>
-  <div class="chips"><span class="chip ok">fact · author’s text: “This PR fixes #333395”, open issue, confirmed</span><span class="chip ok">checked · cites #333395, real open issue</span><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 26 lines added, 2 files</span></div>
-  <div class="why"><b>Why:</b> Small, targeted fix for a real infinite-loop bug in str_replace with empty old_str, includes a regression test, and matches an already-reported issue about the tool hanging.</div>
+  <div class="chips"><span class="chip ok">fact · author’s text: “This PR fixes #333395”, open issue, confirmed</span><span class="chip ok">checked · cites #333395, real open issue</span><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · 20 test lines added</span><span class="chip">fact · 26 lines added, 2 files</span></div>
+  <div class="why"><b>Why:</b> Small, targeted fix for a real reported hang (empty old_str causing infinite loop in str_replace) with a regression test added; matches an already-reported issue.</div>
   <div class="links"><a href="https://github.com/microsoft/vscode/pull/333399">open on GitHub</a></div>
-  
-</article><article class="pr">
-  <div class="top"><span class="num">#333423</span><span class="rank">3 of 3</span>
-    <span class="title">nes: let settings and experiments override baked strategy values</span></div>
-  <div class="chips"><span class="chip ok">checked · cites #333154, real open issue</span><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 608 lines added, 24 files</span></div>
-  <div class="why"><b>Why:</b> Substantive precedence-order fix across many files that plausibly addresses a reported settings/experiment override bug, but I cannot verify #333154 or the merge outcome from source alone.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333423">open on GitHub</a></div>
   
 </article></section>
 <section class="group b2"><div class="bar"></div><h2>Predicted merge, with no reported problem cited by the model <span class="num">5</span></h2><p>Same prediction, without the model finding and citing an already-reported problem for it. That describes the model's search, not the world: a card below can still carry the author's own declared reference, which is machine-derived and does not move the group. The order inside the group is evidence strength.</p><article class="pr">
-  <div class="top"><span class="num">#333404</span><span class="rank">1 of 5</span>
-    <span class="title">editor: show session homes in breadcrumbs</span></div>
-  <div class="chips"><span class="chip ok">fact · author’s text: “Fixes #330410”, open issue, confirmed</span><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 566 lines added, 21 files</span></div>
-  <div class="why"><b>Why:</b> Genuine substantive contribution touching label service and session providers with tests, but no confirmed link to an already-reported issue found in search.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333404">open on GitHub</a></div>
+  <div class="top"><span class="num">#333432</span><span class="rank">1 of 5</span>
+    <span class="title">Fix multi-diff virtualization review follow-ups</span></div>
+  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 120 test lines added</span><span class="chip">fact · 140 lines added, 7 files</span></div>
+  <div class="why"><b>Why:</b> Genuine substantive follow-up fix with matching tests, but the referenced issue #333394 is not a verifiable real problem report, so it lacks confirmed evidence of addressing an already-reported issue.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333432">open on GitHub</a></div>
   
 </article><article class="pr">
   <div class="top"><span class="num">#333428</span><span class="rank">2 of 5</span>
     <span class="title">Agents: refine pull request input banners</span></div>
-  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 369 lines added, 23 files</span></div>
-  <div class="why"><b>Why:</b> Substantial, coherent refactor touching PR banners and feedback attribution with tests, but the cited issue #333189 and the investigator&#x27;s #333217 cannot be verified as real reported problems tied to this change, so it&#x27;s treated as a genuine contribution without confirmed prior-r</div>
+  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 250 test lines added</span><span class="chip">fact · 370 lines added, 24 files</span></div>
+  <div class="why"><b>Why:</b> A substantive multi-file refinement to PR review banner/feedback logic with tests, but no confirmed link to a specific already-reported issue, so it needs human review rather than being flagged as addressing a known bug.</div>
   <div class="links"><a href="https://github.com/microsoft/vscode/pull/333428">open on GitHub</a></div>
   
 </article><article class="pr">
   <div class="top"><span class="num">#333397</span><span class="rank">3 of 5</span>
     <span class="title">fix: memory leak in extension host pseudoterminals</span></div>
-  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 90 lines added, 2 files</span></div>
-  <div class="why"><b>Why:</b> Genuine memory-leak fix with a matching regression test and no evidence it corresponds to any already-filed issue in the search results provided.</div>
+  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 59 test lines added</span><span class="chip">fact · 90 lines added, 2 files</span></div>
+  <div class="why"><b>Why:</b> Genuine substantive fix with tests matching a real leak, but there&#x27;s no verifiable evidence #211462 or the other cited issues actually describe this exact pseudoterminal cleanup bug, so I can&#x27;t confirm it addresses an already-reported problem.</div>
   <div class="links"><a href="https://github.com/microsoft/vscode/pull/333397">open on GitHub</a></div>
   
 </article><article class="pr">
-  <div class="top"><span class="num">#333391</span><span class="rank">4 of 5</span>
-    <span class="title">Fix workspace symbol search with double-colon qualifiers</span></div>
-  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 70 lines added, 2 files</span></div>
-  <div class="why"><b>Why:</b> Genuine, well-tested contribution addressing a real fuzzy-matching gap for qualified symbol queries, but no evidence it maps to an already-reported issue (the cited #308102 wasn&#x27;t confirmed and the search found no clear match).</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333391">open on GitHub</a></div>
+  <div class="top"><span class="num">#333418</span><span class="rank">4 of 5</span>
+    <span class="title">refactor: migrate AsyncIterableObject to AsyncIterableProducer to fix memory leaks</span></div>
+  <div class="chips"><span class="chip no">judgement · code does not match its description</span><span class="chip ok">fact · 3 test lines added</span><span class="chip">fact · 15 lines added, 7 files</span></div>
+  <div class="why"><b>Why:</b> Genuine mechanical rename refactor of AsyncIterableObject to AsyncIterableProducer across core and API files, but the memory-leak claim doesn&#x27;t match the diff and no already-reported issue confirms this fixes a known bug.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333418">open on GitHub</a></div>
   
 </article><article class="pr">
-  <div class="top"><span class="num">#333426</span><span class="rank">5 of 5</span>
-    <span class="title">Show action icons on title bar buttons again</span></div>
-  <div class="chips"><span class="chip no">judgement · code does not match its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 544 lines added, 8 files</span></div>
-  <div class="why"><b>Why:</b> The claim checker&#x27;s verdict is about description-vs-diff mismatch, not evidence about maintainer acceptance; the change itself is a plausible genuine UI fix, but the investigator&#x27;s claim that #333002 is the matching reported issue is not verifiable here.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333426">open on GitHub</a></div>
+  <div class="top"><span class="num">#333391</span><span class="rank">5 of 5</span>
+    <span class="title">Fix workspace symbol search with double-colon qualifiers</span></div>
+  <div class="chips"><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · 60 test lines added</span><span class="chip">fact · 70 lines added, 2 files</span></div>
+  <div class="why"><b>Why:</b> Genuine, tested contribution addressing double-colon symbol search, but I cannot verify #332901 or confirm maintainer acceptance, so I default to worth-reviewing rather than act-now.</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333391">open on GitHub</a></div>
   
 </article></section>
 <section class="group b3"><div class="bar"></div><h2>Predicted not merged <span class="num">1</span></h2><p>A prediction about a human decision, NOT a judgement that the work is bad. Housekeeping, superseded work and duplicates all land here.</p><article class="pr">
-  <div class="top"><span class="num">#333418</span>
-    <span class="title">refactor: migrate AsyncIterableObject to AsyncIterableProducer to fix memory leaks</span></div>
-  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · has tests</span><span class="chip">fact · 15 lines added, 7 files</span></div>
-  <div class="why"><b>Why:</b> The change is a pure mechanical rename (AsyncIterableObject -&gt; AsyncIterableProducer) with no actual memory-leak fix logic, plus unrelated noise: deleting a build artifact and touching a file explicitly marked &#x27;DO NOT MODIFY THIS FILE MANUALLY&#x27; with only a whitespace change — hal</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333418">open on GitHub</a></div>
+  <div class="top"><span class="num">#333426</span>
+    <span class="title">Show action icons on title bar buttons, replace auto-merge with Agent Merge</span></div>
+  <div class="chips"><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · 550 test lines added</span><span class="chip">fact · 684 lines added, 11 files</span></div>
+  <div class="why"><b>Why:</b> The investigator&#x27;s search terms don&#x27;t clearly match this PR&#x27;s actual content (icon/spinner rendering fix plus a UI replacement of auto-merge with Agent Merge); without verifiable evidence linking #332934 to this specific change, and given VS Code-style repos routinely have UI-pol</div>
+  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333426">open on GitHub</a></div>
   
 </article></section></div></main>
 <footer><div class="wrap">
@@ -150,6 +150,6 @@ footer{border-top:1px solid var(--line);padding:26px;color:var(--muted);font-siz
   your release schedule, or that you already decided against an approach. Those
   are the reasons good work gets closed, and it cannot see any of them.</div>
   <div><span class="k">This run</span> microsoft/vscode, 9 submissions,
-  generated 2026-08-30 21:00 UTC, source read at commit
-  <code>e3ce07e8</code>, 3.39 USD.</div>
+  generated 2026-08-30 22:50 UTC, source read at commit
+  <code>23f50094</code>, 4.10 USD.</div>
 </div></footer></body></html>

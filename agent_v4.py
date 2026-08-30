@@ -176,14 +176,21 @@ Reply as JSON:
  "touches_real_code": true or false}"""
 
 
-def fetch_source(path, sha, cache):
-    """WE fetch the file, not the model. It stays blind."""
-    key = (path, sha)
+def fetch_source(path, sha, cache, repo="microsoft/vscode"):
+    """WE fetch the file, not the model. It stays blind.
+
+    `repo` defaults to microsoft/vscode so the 15-case evaluation, which is
+    entirely that repository, calls this exactly as it always did. The live
+    tool passes the repository it was pointed at. Before this argument existed
+    the path was hardcoded, so pointing the tool anywhere else read VS Code's
+    source and still returned a verdict on it.
+    """
+    key = (repo, path, sha)
     if key in cache:
         return cache[key]
     try:
         r = subprocess.run(
-            ["gh", "api", "repos/microsoft/vscode/contents/%s?ref=%s" % (path, sha),
+            ["gh", "api", "repos/%s/contents/%s?ref=%s" % (repo, path, sha),
              "--jq", ".content"], capture_output=True, text=True, timeout=60)
         if r.returncode != 0:
             cache[key] = None
@@ -195,10 +202,30 @@ def fetch_source(path, sha, cache):
         return None
 
 
-def check_claims(ci, sha, cache, trace):
+def pick_claim_file(files, file_adds):
+    """The file the claim is most likely to live in.
+
+    Source files only. Where GitHub's own per-file added-line counts are
+    available, take the file that gained the most lines; otherwise keep the
+    original first-match rule. The evaluation cases carry no per-file counts,
+    so they take the first-match branch and behave exactly as before.
+
+    First-match was arbitrary: on a 24-file submission it is whatever GitHub
+    happened to list first, which is often a config or barrel file that says
+    nothing about the claim.
+    """
+    src = [f for f in files if f.endswith((".ts", ".js", ".py", ".json"))]
+    if not src:
+        return None
+    if file_adds:
+        return max(src, key=lambda f: (file_adds.get(f, 0), -src.index(f)))
+    return src[0]
+
+
+def check_claims(ci, sha, cache, trace, repo="microsoft/vscode"):
     files = ci.get("changed_files") or []
-    target = next((f for f in files if f.endswith((".ts", ".js", ".py", ".json"))), None)
-    source = fetch_source(target, sha, cache) if target else None
+    target = pick_claim_file(files, ci.get("file_adds"))
+    source = fetch_source(target, sha, cache, repo) if target else None
     if not source:
         trace.append({"role": "claim_checker", "action": "no source available",
                       "file": target, "result": "skipped"})

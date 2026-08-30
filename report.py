@@ -125,8 +125,18 @@ def chips(f):
     else:
         out.append(f'<span class="chip hm">judgement {DOT} could not confirm '
                    f'the description</span>')
-    out.append(f'<span class="chip {"ok" if f["has_tests"] else ""}">'
-               f'fact {DOT} {"has tests" if f["has_tests"] else "no tests"}</span>')
+    # "touches a test path" was true on every card of every run so far, because
+    # this repository has test directories everywhere. A chip that never varies
+    # is decoration. Added test LINES varies from 3 to 550 across the same queue,
+    # and it is the tell that separates a real test from a file merely brushed.
+    tl = f.get("test_lines")
+    if tl is None:
+        out.append(f'<span class="chip {"ok" if f["has_tests"] else ""}">'
+                   f'fact {DOT} {"has tests" if f["has_tests"] else "no tests"}</span>')
+    elif tl:
+        out.append(f'<span class="chip ok">fact {DOT} {tl} test lines added</span>')
+    else:
+        out.append(f'<span class="chip">fact {DOT} no test lines added</span>')
     out.append(f'<span class="chip">fact {DOT} {f["lines"]} lines added, '
                f'{f["files"]} file{"s" if f["files"] != 1 else ""}</span>')
     return "".join(out)
