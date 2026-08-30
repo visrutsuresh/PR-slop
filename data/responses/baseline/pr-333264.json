@@ -1,15 +1,15 @@
 {
-  "duration_api_ms": 4184,
+  "duration_api_ms": 3930,
   "stop_reason": "end_turn",
-  "session_id": "1e1b6c98-599a-43c8-a5b2-dade3e6afb5f",
-  "total_cost_usd": 0.13073839999999998,
+  "session_id": "3047ff5e-7aa7-4fb9-995b-9ed2509f5b0f",
+  "total_cost_usd": 0.1512766,
   "usage": {
     "input_tokens": 2,
-    "cache_creation_input_tokens": 31323,
-    "cache_read_input_tokens": 15062,
-    "output_tokens": 243,
+    "cache_creation_input_tokens": 36634,
+    "cache_read_input_tokens": 9733,
+    "output_tokens": 279,
     "output_tokens_details": {
-      "thinking_tokens": 90
+      "thinking_tokens": 140
     },
     "server_tool_use": {
       "web_search_requests": 0,
@@ -17,19 +17,19 @@
     },
     "service_tier": "standard",
     "cache_creation": {
-      "ephemeral_1h_input_tokens": 31323,
+      "ephemeral_1h_input_tokens": 36634,
       "ephemeral_5m_input_tokens": 0
     },
     "inference_geo": "not_available",
     "iterations": [
       {
         "input_tokens": 2,
-        "output_tokens": 243,
-        "cache_read_input_tokens": 15062,
-        "cache_creation_input_tokens": 31323,
+        "output_tokens": 279,
+        "cache_read_input_tokens": 9733,
+        "cache_creation_input_tokens": 36634,
         "cache_creation": {
           "ephemeral_5m_input_tokens": 0,
-          "ephemeral_1h_input_tokens": 31323
+          "ephemeral_1h_input_tokens": 36634
         },
         "type": "message"
       }
@@ -39,11 +39,11 @@
   "modelUsage": {
     "claude-sonnet-5": {
       "inputTokens": 2,
-      "outputTokens": 243,
-      "cacheReadInputTokens": 15062,
-      "cacheCreationInputTokens": 31323,
+      "outputTokens": 279,
+      "cacheReadInputTokens": 9733,
+      "cacheCreationInputTokens": 36634,
       "webSearchRequests": 0,
-      "costUSD": 0.13073839999999998,
+      "costUSD": 0.1512766,
       "contextWindow": 1000000,
       "maxOutputTokens": 64000,
       "canonicalModel": "claude-sonnet-5",
@@ -83,14 +83,14 @@
   "num_turns": 1,
   "subtype": "success",
   "api_error_status": null,
-  "result": "{\"bucket\": 2, \"confidence\": \"medium\", \"reason\": \"Well-tested, scoped contribution extending an existing legacy-settings compatibility bridge with clear rationale and test coverage, but the description gives no indication it responds to a previously reported issue.\", \"citations\": [\"src/vs/platform/agentHost/common/agentHostManagedSettings.ts\", \"src/vs/platform/agentHost/common/agentHostSchema.ts\"]}",
-  "ttft_ms": 2934,
+  "result": "{\"bucket\": 2, \"confidence\": \"medium\", \"reason\": \"Substantive, well-tested compatibility shim with clear rationale and multi-model review, but the description gives no indication it resolves an already-reported issue.\", \"citations\": [\"src/vs/platform/agentHost/common/agentHostManagedSettings.ts\", \"src/vs/platform/agentHost/common/agentHostSchema.ts\"]}",
+  "ttft_ms": 2804,
   "type": "result",
-  "duration_ms": 4291,
-  "uuid": "4fa75796-a54f-4d9a-9a91-f4ab36e87320",
-  "ttft_stream_ms": 1833,
-  "time_to_request_ms": 44,
+  "duration_ms": 4113,
+  "uuid": "80539fd9-9c6a-42ea-910b-ec590e509bbf",
+  "ttft_stream_ms": 1058,
+  "time_to_request_ms": 90,
   "queued_turn_count": 0,
-  "_prompt_chars": 24865,
-  "_wall_seconds": 5.8
+  "_prompt_chars": 24816,
+  "_wall_seconds": 10.4
 }

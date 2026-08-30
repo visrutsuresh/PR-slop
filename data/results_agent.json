@@ -11,15 +11,15 @@
     10
   ],
   "citations": {
-    "self_cited": 17,
+    "self_cited": 15,
     "external_offered": 5,
     "external_resolved": 5,
     "external_rate": 1.0,
     "unknown": 0,
-    "total_offered": 22
+    "total_offered": 20
   },
   "abstained": 0,
-  "cost_usd": 3.8793,
+  "cost_usd": 4.1362,
   "search_rounds": 21,
   "claims_checked": 10,
   "sent_back": 1

@@ -1,38 +1,35 @@
 {
   "bucket": 2,
   "confidence": "low",
-  "reason": "Genuine, well-documented compatibility work matching its description, but no verifiable link to a specific already-reported issue; the investigator's cited #333280 is unconfirmed as the actual driver.",
-  "citations": [
-    "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
-    "src/vs/platform/agentHost/common/agentHostSchema.ts"
-  ],
+  "reason": "This is a substantive, well-reasoned contribution to a policy-mapping module, but the investigator's claimed link to #333280 is unverified since I cannot access that issue, and the diff shows no direct issue reference tying this to a reported bug.",
+  "citations": [],
   "_trace": [
     {
       "role": "investigator",
       "action": "chose a search",
       "round": 1,
-      "query": "chat.tools.eligibleForAutoApproval setting not respected agent auto approve tools",
-      "looking_for": "an issue where a user reports that the eligibleForAutoApproval (or ChatToolsEligibleForAutoApproval policy) setting for restricting which tools can be auto-approved doesn't work with the new agent/copilot SDK managed settings, or a request to support this legacy setting in the new agent host",
-      "cost": 0.0087224
+      "query": "chat.tools.eligibleForAutoApproval per tool auto approve setting not working policy",
+      "looking_for": "a report from a user or admin saying the eligibleForAutoApproval / ChatToolsEligibleForAutoApproval policy setting doesn't take effect, is ignored, or isn't respected by the agent/chat tools auto-approval behavior",
+      "cost": 0.1096566
     },
     {
       "role": "investigator",
       "action": "judged the results",
       "round": 1,
       "returned": [
-        305308,
         305317,
+        305329,
+        305308,
+        305331,
+        330027,
+        309589,
         333280,
-        305312,
-        333134,
-        333023,
-        333039,
-        305320
+        333023
       ],
       "decision": "stop",
       "matched": 333280,
-      "why": "Both concern Terminal/Chat auto-approve settings for tools not being honored, forcing manual confirmation despite configured rules.",
-      "cost": 0.08653179999999999
+      "why": "auto-approval/wildcard rule failing for tool calls matches eligibleForAutoApproval policy not working behaviour",
+      "cost": 0.0864458
     },
     {
       "role": "claim_checker",
@@ -40,34 +37,28 @@
       "file": "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
       "source_chars": 14070,
       "supported": true,
-      "why": "The current file shows contributeEligibleForAutoApprovalRestriction registered via managedPermissionsSetting with 'policyOnly', mapping any non-all-true value to {disableBypassPermissionsMode: 'disable'} and undefined otherwise, plus ELIGIBLE_FOR_AUTO_APPROVAL_SETTING_ID imported from agentHostSchema.js and the module header documenting the exact exception described in the PR.",
-      "cost": 0.01084
+      "why": "The current file shows contributeEligibleForAutoApprovalRestriction and ELIGIBLE_FOR_AUTO_APPROVAL_SETTING_ID registered via managedPermissionsSetting(..., 'policyOnly', ...), matching the diff and description: it maps the per-tool legacy setting to the family-agnostic disableBypassPermissionsMode bypass lock only when policy marks a tool ineligible, matching the stated rationale about ManagedRuleFamily lacking a tool-name family.",
+      "cost": 0.1469086
     },
     {
       "role": "adjudicator",
       "action": "decided the pile",
       "attempt": 1,
       "bucket": 2,
-      "citations": [
-        "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
-        "src/vs/platform/agentHost/common/agentHostSchema.ts"
-      ],
-      "reason": "Genuine, well-documented compatibility work matching its description, but no verifiable link to a specific already-reported issue; the investigator's cited #333280 is unconfirmed as the actual driver.",
-      "cost": 0.11015159999999999
+      "citations": [],
+      "reason": "This is a substantive, well-reasoned contribution to a policy-mapping module, but the investigator's claimed link to #333280 is unverified since I cannot access that issue, and the diff shows no direct issue reference tying this to a reported bug.",
+      "cost": 0.1300966
     },
     {
       "role": "verifier",
       "action": "checked every claim",
-      "claims": [
-        "src/vs/platform/agentHost/common/agentHostManagedSettings.ts",
-        "src/vs/platform/agentHost/common/agentHostSchema.ts"
-      ],
+      "claims": [],
       "failures": [],
       "sending_back": false
     }
   ],
   "_investigator_rounds": 1,
   "_claim_supported": true,
-  "_cost": 0.2162,
-  "_wall_seconds": 38.8
+  "_cost": 0.4731,
+  "_wall_seconds": 19.6
 }

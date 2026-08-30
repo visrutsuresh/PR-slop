@@ -1,13 +1,13 @@
 {
-  "duration_api_ms": 4256,
+  "duration_api_ms": 3030,
   "stop_reason": "end_turn",
-  "session_id": "5b3cd3d1-5a38-4ee9-b5d3-5beee03b63c9",
-  "total_cost_usd": 0.1342084,
+  "session_id": "4d0bfa34-2f58-4856-8d7a-3cc71c39d709",
+  "total_cost_usd": 0.1342864,
   "usage": {
     "input_tokens": 2,
-    "cache_creation_input_tokens": 32393,
+    "cache_creation_input_tokens": 32375,
     "cache_read_input_tokens": 15062,
-    "output_tokens": 162,
+    "output_tokens": 177,
     "output_tokens_details": {
       "thinking_tokens": 0
     },
@@ -17,19 +17,19 @@
     },
     "service_tier": "standard",
     "cache_creation": {
-      "ephemeral_1h_input_tokens": 32393,
+      "ephemeral_1h_input_tokens": 32375,
       "ephemeral_5m_input_tokens": 0
     },
     "inference_geo": "not_available",
     "iterations": [
       {
         "input_tokens": 2,
-        "output_tokens": 162,
+        "output_tokens": 177,
         "cache_read_input_tokens": 15062,
-        "cache_creation_input_tokens": 32393,
+        "cache_creation_input_tokens": 32375,
         "cache_creation": {
           "ephemeral_5m_input_tokens": 0,
-          "ephemeral_1h_input_tokens": 32393
+          "ephemeral_1h_input_tokens": 32375
         },
         "type": "message"
       }
@@ -39,11 +39,11 @@
   "modelUsage": {
     "claude-sonnet-5": {
       "inputTokens": 2,
-      "outputTokens": 162,
+      "outputTokens": 177,
       "cacheReadInputTokens": 15062,
-      "cacheCreationInputTokens": 32393,
+      "cacheCreationInputTokens": 32375,
       "webSearchRequests": 0,
-      "costUSD": 0.1342084,
+      "costUSD": 0.1342864,
       "contextWindow": 1000000,
       "maxOutputTokens": 64000,
       "canonicalModel": "claude-sonnet-5",
@@ -83,13 +83,13 @@
   "num_turns": 1,
   "subtype": "success",
   "api_error_status": null,
-  "result": "{\"bucket\": 2, \"confidence\": \"medium\", \"reason\": \"Well-tested, deliberate compatibility shim with clear rationale and full test coverage, but none of the listed open issues describe this specific legacy-setting mapping problem, so it doesn't appear to answer a reported issue.\", \"citations\": [\"src/vs/platform/agentHost/common/agentHostManagedSettings.ts\", \"src/vs/platform/agentHost/common/agentHostSchema.ts\"]}",
-  "ttft_ms": 4261,
+  "result": "{\"bucket\": 2, \"confidence\": \"medium\", \"reason\": \"Well-tested, well-reasoned compatibility shim from what reads as a serious contributor, but none of the surfaced open issues actually describe this eligibleForAutoApproval/managed-settings mapping gap, so there's no evidence it answers an already-reported problem.\", \"citations\": [\"src/vs/platform/agentHost/common/agentHostManagedSettings.ts\", \"src/vs/platform/agentHost/common/agentHostSchema.ts\"]}",
+  "ttft_ms": 3058,
   "type": "result",
-  "duration_ms": 4356,
-  "uuid": "1b194c08-7aa6-4a30-93d5-c8cc3da2defa",
-  "ttft_stream_ms": 2795,
-  "time_to_request_ms": 43,
+  "duration_ms": 3116,
+  "uuid": "8626e574-ef81-46f5-b77e-29b761df19b3",
+  "ttft_stream_ms": 1087,
+  "time_to_request_ms": 50,
   "queued_turn_count": 0,
   "_retrieved": [
     325494,
@@ -101,7 +101,7 @@
     333153,
     306497
   ],
-  "_prompt_chars": 27580,
-  "_wall_seconds": 6.1,
+  "_prompt_chars": 27531,
+  "_wall_seconds": 4.7,
   "_stage": 2
 }

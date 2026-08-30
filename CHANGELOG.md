@@ -170,3 +170,17 @@ Done means four things: one command, every factual claim resolves, it never acts
 **Verified after.** Every reported problem named on the page resolves against the repository. Five named, zero fake.
 
 **The honest count of made-up numbers in this project: three.** The 86.7% citation figure, the 61.5% evidence figure, and the invented minutes. Each was caught, each is recorded. The pattern is worth more than any single fix: every one came from producing a number that felt reasonable rather than one that was measured, and every one was caught by a human or a machine noticing it sat oddly beside another number. Writing a rule against it did not prevent the second and third.
+
+## A leak that survived the first scrub, found by auditing every tracked file
+
+**What happened.** An audit of all 224 tracked files for personal addresses found one still present: a `Co-authored-by:` line with a real address, inside the **body** of one case.
+
+**Why the first fix missed it.** The scrub ran on patches only. Titles and bodies were never scrubbed, because the leak we found first happened to be in a patch and we fixed exactly what we saw.
+
+**Two reasons it mattered**, even though the address belongs to a bot. The README claims no contributor identity survives anywhere, and that claim was simply false. And "Co-authored-by: Copilot" tells the model the work was machine-assisted, which is the kind of hint that can quietly correlate with the outcome we are trying to predict.
+
+**What we did.** Extended the scrub to titles and bodies, re-applied it, then **regenerated that case for all three systems**, so the committed input still matches the answers that produced our published numbers. Every score is unchanged: baseline 33.3%, script 73.3%, agent 73.3% with the same per-pile shape.
+
+**The test now checks the whole input**, not just the patch, and it is proven to fail on a planted address in a body.
+
+**The pattern, which is the useful part.** This is the third leak of the same family: the declaration in a body, then identity in a patch, now identity in a body. Each time we fixed precisely the surface where the leak was found and did not ask where else that class could live. The thing that caught this one was not a test we wrote. It was walking every tracked file and asking what a hostile reader would grep for.

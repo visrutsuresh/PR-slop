@@ -180,10 +180,17 @@ def test_no_identity_or_closing_ref_survives_in_patch():
     assert cases, "no cases on disk"
     scrubbed_something = False
     for path in cases:
-        patch = _json.load(open(path))["input"]["patch"]
-        assert not IDENTITY_LINE_RE.search(patch), f"identity line survives in {path}"
-        assert not EMAIL_RE.search(patch), f"mail address survives in {path}"
-        assert not CLOSING_RE.search(patch), f"closing reference survives in {path}"
+        inp = _json.load(open(path))["input"]
+        # Checks the WHOLE input, not just the patch. An earlier version checked
+        # patches alone, and a `Co-authored-by:` line with a real address
+        # survived in a body, falsifying the README's claim that no contributor
+        # identity survives anywhere.
+        for field in ("title", "body", "patch"):
+            text = inp.get(field) or ""
+            assert not IDENTITY_LINE_RE.search(text), f"identity line in {field} of {path}"
+            assert not EMAIL_RE.search(text), f"address in {field} of {path}"
+            assert not CLOSING_RE.search(text), f"closing reference in {field} of {path}"
+        patch = inp["patch"]
         if "[REDACTED-IDENTITY]" in patch:
             scrubbed_something = True
     # positive control: the scrub must have actually fired somewhere, otherwise

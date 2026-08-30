@@ -137,6 +137,12 @@ def build_input(raw_pr: dict) -> dict:
     out = {k: raw_pr[k] for k in ALLOWED}
     out["title"] = CLOSING_RE.sub(REDACT_TOKEN, out["title"] or "")
     out["body"] = CLOSING_RE.sub(REDACT_TOKEN, out["body"] or "")
+    # The scrub runs on title and body too, not only the patch. A
+    # `Co-authored-by:` line with a real address survived in one body because
+    # an earlier version scrubbed patches alone, which falsified the README's
+    # claim that no contributor identity survives anywhere.
+    out["title"] = scrub_patch(out["title"] or "")
+    out["body"] = scrub_patch(out["body"] or "")
     out["patch"] = scrub_patch(out["patch"] or "")
     return out
 
