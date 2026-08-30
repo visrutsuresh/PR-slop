@@ -3,7 +3,7 @@ Run: python3 test_harvest.py
 
 Item 1 uses crafted fixtures (no network). Items 2-7 read the already
 harvested, committed cache under data/cases/ (also no network): the
-reproducibility promise in PRD.md 7 is that the cache IS the fixture.
+reproducibility promise of this project is that the committed cache IS the fixture.
 """
 import json
 from pathlib import Path

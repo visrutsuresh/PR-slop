@@ -2,7 +2,7 @@
 field had NOT been stripped from `input`.
 
 This is not a competing triage system and it is not meant to be beaten by
-a small margin. It exists to measure the LEAK that PRD.md 7.1/7.1.1 (and
+a small margin. It exists to measure the LEAK that the harvest step (and
 loop-3 conditions B/C) required stripping out. Conditional on `merged`,
 the bucket label is a DETERMINISTIC FUNCTION of whether an in-repo closing
 reference was declared: bucket 1 = merged + declared, bucket 2 = merged +
@@ -57,11 +57,13 @@ def main() -> int:
         print(f"  bucket {b} recall: {recalls[b]:.3f} ({'never predicted' if b == 3 else 'declared-link rule'})")
     print(f"balanced accuracy: {acc:.3f}")
     print()
-    print("This measures the closing-reference LEAK removed from `input` by")
-    print("PRD.md 7.1.1 / loop-3 conditions B-C. It is a documented reference")
-    print("point, not a competing system, and is never shown to a judge as")
-    print("the baseline the agent must beat (that is micro1's own named")
-    print("baseline in section 8).")
+    print("This measures a leak we found and removed. Pull requests declare")
+    print("which problem they fix, and that declaration IS the answer for two")
+    print("of the three piles, so a five-line rule with no model scores 67%.")
+    print("The harvest step strips that declaration out of what any system")
+    print("sees. This number is a reference point, published so the gap is")
+    print("visible. It is NOT the baseline our system is compared against;")
+    print("that is a single direct prompt, see ./run.sh baseline.")
     return 0
 
 

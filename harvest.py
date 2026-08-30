@@ -2,8 +2,8 @@
 """Harvest the PR-slop evaluation set from microsoft/vscode.
 
 Gated by contrarian plan-review PASS loop 3 (change_id prslop-harvest-2026-08-29,
-Meta/receipts/contrarian-2026-08-29-2230-prslop-harvest-planreview-loop3.md),
-conditions A-G. Cites: PRD.md sections 6, 7.0-7.2, 8, 9, 13.
+an independent review, three rounds, summarised in CHANGELOG.md),
+conditions found in review. The reasoning behind each is in CHANGELOG.md.
 
 ponytail: fetch-and-write script, not a framework. No classes beyond what
 the stdlib already gives us. Idempotent: a second run with no flags is a
