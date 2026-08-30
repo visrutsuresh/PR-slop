@@ -438,3 +438,39 @@ the eight-submission run, four of the eight cards have their position decided by
 pull request number alone. Said plainly because this entry is about writing
 claims from the record instead of from memory, and an "evidence ordering" that
 sometimes sorts by nothing but recency is the kind of sentence that got us here.
+
+## The investigator was searching a keyhole
+
+Everything above tunes how the roles reason. This entry is about what they were allowed to see, which turned out to matter more.
+
+`live.fetch_issue_corpus` pulled the 300 most recently filed problems and the investigator searched only those. On this repository that is about 300 numbers out of roughly 333,000. Anything reported more than a few days ago was unreachable, and no improvement to the model could have reached it. Two of the three declarations in the recorded run, #231076 and #330410, sat outside the window.
+
+It now unions that local index with GitHub's own issue search.
+
+**Reserved slots are the whole trick, and the obvious version does nothing.** The first design was "local first, then remote, cap the merged list at 8". Running the real matcher over the real corpus, local returns a full 8 hits on 9 of 9 submissions, because it keeps every document with any term overlap and truncates at 8. So the obvious merge would have let local crowd remote out completely and the change would have been a measured no-op. The merge alternates instead.
+
+**The two search engines disagree about what a query means.** GitHub ANDs its terms; the local matcher soft-ORs them. The investigator writes one query, tuned for the soft-OR matcher, and we do not change its prompt. So a query like `memory leak extension host pseudoterminal` returns nothing from GitHub while `terminal memory leak` returns the plausible issue. On zero hits the search retries once with the three rarest words of the same query, scored by the idf table already built for the local index. No model call, no prompt change.
+
+**What it actually bought, measured offline and free.** Over the 9 open submissions, 21 issues that the old corpus could not contain were surfaced, across 7 of the 9 cards. Five narrowing retries fired, no failures.
+
+One is exactly the case this was built for. Submission #333418 is titled "migrate AsyncIterableObject to AsyncIterableProducer to fix memory leak", and an earlier run called it "a superficial class rename with no actual leak-fixing logic" and put it in the skip pile. Search surfaces #256854, "Review AsyncIterableObject usage: potential memory leaks and migration to AsyncIterableProducer", an open issue asking for precisely that migration. It is 76,000 numbers outside the old window.
+
+**And some of it is noise, which is the honest half.** The same 21 include #519, "Allow to change the font size and font of the workbench". Raising candidate recall raises both signal and noise, and a wider net is not the same thing as a better answer.
+
+**What we deliberately did not claim.** A before-and-after on the live queue would be worthless: the queue changes every day, four of the nine submissions turned over between two runs hours apart, and one card is eleven points of any rate computed over nine. So the retrieval measurement above is offline, deterministic, model-free, and repeatable; it is the only part attributable to this change. The end-to-end numbers from those two runs are not comparable and are not published as a trend.
+
+**It is also invisible on the 15 closed cases, by construction.** `harvest.py` seeds the evaluation corpus with every declared target plus a band of distractors, so retrieval there is solvable by design. A retrieval improvement therefore cannot show up in the headline accuracy, and we are not going to pretend otherwise by quoting one.
+
+## Three smaller things the same pass fixed
+
+**The claim checker was reading an arbitrary file.** It took the first source file GitHub happened to list, which on a 24-file submission is usually a config or barrel file that says nothing about the claim. It now reads the file that gained the most lines. This sits behind a default argument: the 15 evaluation cases carry no per-file counts, so they take the original branch and the scored path is unchanged by construction rather than by hope.
+
+**It was also reading the wrong repository.** `fetch_source` requested `repos/microsoft/vscode/contents/` no matter which repository the tool was pointed at, so `./run.sh live some/other-repo` read VS Code's source and still returned a verdict on it. It takes the repository now, defaulting to VS Code so the evaluation is untouched.
+
+**"Has tests" was true on every card of every run.** The path pattern matches any test directory and this repository has them everywhere, so the chip never varied and carried no information. It now reports added test lines, which ranges from 3 to 550 across the same nine submissions. #333418 touches three test files and adds three lines, which the old chip flattered as "has tests".
+
+## A regression check that could not regress
+
+`./run.sh agent` returning 73.3% was cited as proof that the two changes above were safe. It was not proof of anything. The published numbers replay from committed JSON and never enter `check_claims` or `fetch_source`, so those two functions had no test coverage at all and the headline number was structurally incapable of moving.
+
+Twelve offline checks now call them directly: the file chooser's fallback, its tie-breaking, the repository defaulting, the cache key, the merge's reserved slots, deduplication across the two sources, the counted search failure, and the filter that stops a pull request being offered as a reported problem. Each was verified by breaking the code and confirming the check fails. One of them was written vacuous on the first attempt, asserting something that could not fail, and was replaced.

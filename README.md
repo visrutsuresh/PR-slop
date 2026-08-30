@@ -41,7 +41,7 @@ It triages the pull requests **actually open** right now and writes a page you o
 
 **Say plainly what changes here.** Everything scored in this README runs on 15 **closed** submissions, because closed ones are the only place answers exist. A maintainer's queue is **open** submissions, where no answer exists at all, which is exactly why they want help. The system is identical; it simply cannot be scored there, and we are not going to invent a number for it. What it gives you is checked evidence and a suggested order.
 
-**How the order is decided, since "which pile" is not enough on a real queue.** The decider judges each submission on its own, so on a busy repository "read these first" could hold sixty items, which is the original problem with extra steps. Two things fix that, and neither is a model change.
+**How the order is decided, since "which pile" is not enough on a real queue.** The decider judges each submission on its own, so on a busy repository the first pile could hold sixty items, which is the original problem with extra steps. Two things fix that, and neither is a model change.
 
 Within each group, submissions are ordered by how much **checked** evidence supports them: first a reference the author declared themselves that we then confirmed is a real open issue, then a confirmed link to an already-reported problem, then a confirmed description. When two submissions tie on all three, the newer one goes first, and that last step is **recency, not evidence**. Tests and size no longer affect the order at all: **size never earns a place, because a large diff is work, not value**, and tests are true of nearly everything, so ranking by either would sort on noise. Both still show on the card.
 
