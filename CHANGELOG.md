@@ -492,3 +492,19 @@ A maintainer does not triage once. They open the queue on Monday, again on Wedne
 Two failure modes are handled explicitly because a memory that can break the tool is worse than no memory. A corrupt or unreadable store degrades to no-memory rather than raising, and an unwritable store prints a warning and lets the run finish. Both are tested. So is the rule that `unresolved`, meaning we could not reach GitHub, is never cached: one rate-limited run must not poison every later run with a fact we never actually learned.
 
 Six offline checks cover it, including the corruption and unwritable paths.
+
+## A script is a thing you remember to run
+
+Every command in this project assumes the maintainer opens a terminal, remembers the incantation and reads a page. That is a fine way to demonstrate a system and a poor way to fit into someone's Tuesday. The assistant they already have open is where the question actually gets asked.
+
+`mcp_server.py` exposes the same triage over the Model Context Protocol, so "what should I look at in vscode today" is answered where the maintainer is standing.
+
+**The browser page stays, and the reason is a real constraint rather than a preference.** Chat is bad at tables. Nine submissions with five evidence chips, a rank and a reason each is a grid, and a grid pasted into a conversation is unreadable. So every tool returns a short summary inline and writes the full page beside it, handing back the path. Summary where you are, detail where detail belongs.
+
+**The free tool is the important one.** `whats_new` reads only the memory store: no model call, no network, no cost. It answers "is there anything worth paying for today", and on a quiet day that is the entire interaction. Putting the cheap question first is the design; a tool that can only answer expensively will get run less often than it should.
+
+**We did not add the SDK, and that was the interesting decision.** The reproduction promise is a clean clone plus the standard library plus `gh`, with no install step. An MCP SDK would have been this project's first dependency, spent on one feature, and every judge running from a fresh clone would have hit an install wall. The stdio transport is newline-delimited JSON-RPC 2.0, which is a loop over stdin, so we wrote the loop. About 150 lines against the cost of the project's "no install" claim.
+
+**Nothing it exposes can act.** The tools read, and they write one HTML file. No merge, no close, no comment, no label, and every summary says so in its final line.
+
+Seven checks drive the server over its real transport with no network and no model, including the two failures that would be invisible in a demo and fatal in use: replying to a notification, which corrupts the stream, and a raising tool killing the transport instead of returning readable error content. Registration could not be exercised on the build machine, where local policy blocks adding MCP servers, so the protocol is tested directly, which is the stronger evidence anyway.

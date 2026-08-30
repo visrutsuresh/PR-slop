@@ -90,6 +90,34 @@ The author is not a maintainer and does not claim to be. He is the person standi
 
 All of these replay from committed responses. No account, no network, no cost. See `docs/reproduction.md` for the full step-by-step guide, written for someone starting from a clean checkout with nothing set up yet.
 
+## Use it from your own assistant
+
+A script is a thing you remember to run. An assistant is already open.
+
+```
+claude mcp add pr-slop -- python3 /absolute/path/to/mcp_server.py
+```
+
+Then ask it in plain language: *"what should I look at in vscode today"*, or *"triage pull request 333390 on microsoft/vscode"*, or *"anything new in my queue since last time"*.
+
+Three tools:
+
+| Tool | What it does | Cost |
+| --- | --- | --- |
+| `whats_new` | What changed since the last triage of this repository. Reads the memory store only. | **free, instant, no network** |
+| `triage_queue` | Triage the open queue. Returns a chat-readable summary and writes the full page. | about 0.45 USD per submission |
+| `triage_pull_request` | The same checks on one specific submission. | about 0.45 USD |
+
+**The browser page stays, on purpose.** Chat is bad at tables. Nine submissions with five evidence chips each is a grid, and a grid pasted into a conversation is unreadable. So every tool returns a short summary inline, the part a person actually reads in a chat window, and writes the full page beside it and hands back the path. Summary where you are, detail where detail belongs.
+
+**Ask `whats_new` first.** It is free and it tells you whether there is anything worth paying for. On a day when nothing has changed, that is the whole interaction.
+
+**No SDK.** This project's reproduction promise is that a judge clones it and runs it with the standard library and `gh`, with no install step. An MCP SDK would have been the first dependency and would have broken that for one feature, so the stdio transport is written directly: it is newline-delimited JSON-RPC 2.0, which is a loop over stdin. About 150 lines against a dependency that would have cost the project its "no install" claim.
+
+**Blast radius.** The tools read, and they write one HTML file. Nothing here can merge, close, comment or label, and every summary says so in its last line. Ground rule 4 asks for consequential actions to sit behind a human; the safest way to satisfy that is to have no consequential action to gate in the first place.
+
+**Verified how.** Seven checks in `test_live_refs.py` drive the server over its real stdio transport with no network and no model: the handshake, that notifications get no reply (replying to one corrupts the stream), that every advertised tool has a handler and every handler is advertised, that an unknown tool is a JSON-RPC error rather than a crash, that a raising tool returns readable error content instead of killing the transport, that malformed input does not kill the loop, and that the summary always states nothing was acted on. Registration itself could not be exercised on the build machine, where local policy blocks adding MCP servers; the protocol is tested directly instead, which is the stronger evidence.
+
 ## How it works
 
 Four roles, and a loop. Each was added only after a measurement showed it was needed; the six versions and their numbers are in `CHANGELOG.md`.

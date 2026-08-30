@@ -74,6 +74,7 @@ def main():
     union_checks()
     eval_path_checks()
     memory_checks()
+    mcp_checks()
 
 
 
@@ -266,6 +267,81 @@ def memory_checks():
         shutil.rmtree(tmp, ignore_errors=True)
 
     print(f"memory: {checks}/{checks} checks passed")
+
+
+
+
+def mcp_checks():
+    """The protocol surface, exercised without a network call or a model call."""
+    import io, json as J, mcp_server
+    checks = 0
+
+    def rpc(*msgs):
+        out = io.StringIO()
+        mcp_server.serve(io.StringIO("\n".join(J.dumps(m) for m in msgs)), out)
+        return [J.loads(l) for l in out.getvalue().splitlines() if l.strip()]
+
+    # handshake returns the protocol version and declares the tools capability
+    r = rpc({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})[0]
+    assert r["result"]["protocolVersion"] == mcp_server.PROTOCOL
+    assert "tools" in r["result"]["capabilities"]
+    checks += 1
+
+    # a notification gets NO response; replying to one corrupts the stream
+    assert rpc({"jsonrpc": "2.0", "method": "notifications/initialized"}) == []
+    checks += 1
+
+    # every advertised tool has a handler, and every handler is advertised
+    r = rpc({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})[0]
+    names = {t["name"] for t in r["result"]["tools"]}
+    assert names == set(mcp_server.HANDLERS), (names, set(mcp_server.HANDLERS))
+    for t in r["result"]["tools"]:
+        assert t["inputSchema"]["type"] == "object"
+        for req in t["inputSchema"].get("required", []):
+            assert req in t["inputSchema"]["properties"], (t["name"], req)
+    checks += 1
+
+    # an unknown tool is a JSON-RPC error, not a crash
+    r = rpc({"jsonrpc": "2.0", "id": 3, "method": "tools/call",
+             "params": {"name": "does_not_exist", "arguments": {}}})[0]
+    assert r["error"]["code"] == -32601
+    checks += 1
+
+    # a tool that raises returns isError content, so the assistant can read the
+    # failure and tell the maintainer, rather than the transport dying
+    boom = lambda a: (_ for _ in ()).throw(RuntimeError("kaboom"))
+    mcp_server.HANDLERS["_boom"] = boom
+    try:
+        r = rpc({"jsonrpc": "2.0", "id": 4, "method": "tools/call",
+                 "params": {"name": "_boom", "arguments": {}}})[0]
+        assert r["result"]["isError"] is True
+        assert "kaboom" in r["result"]["content"][0]["text"]
+    finally:
+        del mcp_server.HANDLERS["_boom"]
+    checks += 1
+
+    # malformed input must not kill the loop: the good message still answers
+    out = io.StringIO()
+    mcp_server.serve(io.StringIO('not json\n\n{"jsonrpc":"2.0","id":9,'
+                                 '"method":"tools/list"}\n'), out)
+    got = [J.loads(l) for l in out.getvalue().splitlines() if l.strip()]
+    assert len(got) == 1 and got[0]["id"] == 9, got
+    checks += 1
+
+    # the inline summary must never imply an action was taken
+    import memory, tempfile
+    old = memory.MEM_DIR
+    memory.MEM_DIR = tempfile.mkdtemp()
+    try:
+        data = J.load(open("reports/microsoft-vscode.json"))
+        text = mcp_server.summarise(data)
+        assert "Nothing was merged, closed, commented or labelled." in text
+        assert "USD" in text
+    finally:
+        memory.MEM_DIR = old
+    checks += 1
+
+    print(f"mcp server: {checks}/{checks} checks passed")
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@
 # committed responses are the record.
 set -euo pipefail
 
-usage() { echo "usage: $0 {live <owner/repo> [pr-number]|triage [pr-number]|evidence|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
+usage() { echo "usage: $0 {live <owner/repo> [pr-number]|mcp|triage [pr-number]|evidence|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
 
 [ $# -ge 1 ] && [ $# -le 3 ] || usage
 
@@ -78,6 +78,14 @@ case "$1" in
       echo "[agent] shipped system, replaying committed responses, no credential"
       PRSLOP_AGENT_DIR=data/responses/agent-v4 python3 agent_v4.py --replay
     fi
+    ;;
+  mcp)
+    # The same triage, exposed to the maintainer's own assistant over the Model
+    # Context Protocol. Speaks JSON-RPC on stdin/stdout, so running it by hand
+    # just waits for input; that is correct, not a hang.
+    echo "[mcp] stdio server. register it with:" >&2
+    echo "[mcp]   claude mcp add pr-slop -- python3 $(cd "$(dirname "$0")" && pwd)/mcp_server.py" >&2
+    python3 mcp_server.py
     ;;
   evidence)
     # judges the WORK rather than the maintainer's decision, and lists
