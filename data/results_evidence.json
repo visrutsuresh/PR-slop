@@ -140,7 +140,7 @@
   {
     "cites_real_problem": null,
     "problems_cited": [],
-    "cites_real_files": true,
+    "cites_real_files": null,
     "has_tests": true,
     "lines_added": 179,
     "files_touched": 4,

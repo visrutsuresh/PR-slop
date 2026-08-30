@@ -12,7 +12,7 @@
 # committed responses are the record.
 set -euo pipefail
 
-usage() { echo "usage: $0 {triage [pr-number]|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
+usage() { echo "usage: $0 {triage [pr-number]|evidence|baseline|script|agent|versions|eval|probe|harvest}" >&2; exit 1; }
 
 [ $# -ge 1 ] && [ $# -le 2 ] || usage
 
@@ -66,6 +66,12 @@ case "$1" in
       echo "[agent] shipped system, replaying committed responses, no credential"
       PRSLOP_AGENT_DIR=data/responses/agent-v4 python3 agent_v4.py --replay
     fi
+    ;;
+  evidence)
+    # judges the WORK rather than the maintainer's decision, and lists
+    # well-supported submissions that were closed anyway
+    echo "[evidence] facts only, checkable against the repository. offline."
+    python3 evidence.py
     ;;
   versions)
     # rebuilds the six-version table in CHANGELOG.md from committed answers,

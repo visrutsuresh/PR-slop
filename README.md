@@ -57,6 +57,7 @@ The author is not a maintainer and does not claim to be. He is the person standi
 ./run.sh baseline    # the simple comparison version
 ./run.sh script      # the intermediate two-stage version
 ./run.sh agent       # the shipped system, four roles with a loop
+./run.sh evidence    # judges the work, not the decision, plus the second-opinion list
 ./run.sh versions    # rebuilds the six-version table from committed answers
 ./run.sh eval        # the checks
 ```
@@ -243,7 +244,7 @@ So alongside the prediction we produce an **evidence card**, made only of claims
 
 Of 16 factual claims the agent made across the 15 cases, **16 hold up**.
 
-**The disagreement report is the point.** Well-supported work that was closed anyway is not the tool failing. It is the tool finding something a human may have missed. Run `python3 evidence.py` and it surfaces two, including pr-308696.
+**The disagreement report is the point.** Well-supported work that was closed anyway is not the tool failing. It is the tool finding something a human may have missed. Run **`./run.sh evidence`** and it surfaces two, including pr-308696, the one case no version of the agent ever got right.
 
 ## Results
 

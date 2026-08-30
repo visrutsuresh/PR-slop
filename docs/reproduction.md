@@ -12,6 +12,9 @@ cd PR-slop
 ./run.sh baseline    # the simple version's numbers
 ./run.sh script      # the intermediate two-stage version
 ./run.sh agent       # the shipped system's numbers
+./run.sh evidence    # judges the work rather than the decision, plus the
+                     #   second-opinion list of well-supported work that was
+                     #   closed anyway
 ./run.sh triage 308696   # one submission, for a reviewer working one at a time
 ```
 
