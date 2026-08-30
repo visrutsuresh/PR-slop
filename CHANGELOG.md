@@ -1,6 +1,12 @@
 # Improvement Changelog
 
-Each entry: what changed, and the evidence that drove the decision (a trace, a failing test, a metric, a judge-visible constraint). Filled in from kickoff onward.
+Each entry: what changed, and the evidence that drove it. Every number below is recomputable from the committed answers; `./run.sh versions` rebuilds the central table.
+
+**How to read this.** The arc, in one paragraph, so the detail has somewhere to sit.
+
+A simple prompt scored **33.3%**, exactly the same as guessing. Adding search over the project's recorded problems took a script to **73.3%**. The fully agentic version was then built and was **worse, 46.7%**, for a reason we could point at. Six rebuilds followed, two of which we broke ourselves, ending at **73.3%** with four times the script's ability to find the pile that matters. Along the way the evaluation itself turned out to be flawed, because it scores the tool against what a human decided, so we added a second output that judges the work instead.
+
+**Four entries record us being wrong**, and they are the ones worth reading: a removed experiment that cost 27 points, three published figures that turned out to be invented, a data leak that survived its own fix twice, and an overclaim in the first sentence of the README. None were found by a test we had written in advance.
 
 ## 2026-08-27: pre-kickoff harness
 
@@ -50,7 +56,7 @@ Added a plain word-overlap search, weighting rare words higher so a query does n
 
 **What we tried and why.** The thing a maintainer actually fears is not a wrong label, it is a confident claim that turns out to be invented. The simple version demonstrated exactly that: of three reported problems it named, two did not exist. So every reference our system produces is resolved against the real project, and anything that does not exist is struck out rather than shown. If a first-pile verdict rested entirely on a reference that turned out to be made up, the verdict is downgraded to "cannot determine", because the evidence for it is gone.
 
-**Evidence.** Here is the honest part. **The check struck nothing. Zero references removed across all fifteen cases.**
+**Evidence.** Here is the honest part. **The check struck 0 of 15. Not one reference removed across the whole set.**
 
 **Decision. Kept, but we are not claiming it earned its place on this evidence.** It fired zero times, so on these fifteen cases it contributed nothing measurable. The reason it had nothing to catch is that stage 1 handed the model real reported problems to work from, so it no longer needed to invent any. That is a genuine effect, but it is stage 1 getting the credit, not stage 2.
 
@@ -217,7 +223,9 @@ Three separate times the documents drifted from the code. The README described t
 
 `check_docs.py` now runs inside `./run.sh eval`. It reads what the code actually prints for all three systems, accuracy, per-pile recall and cost, and fails if any of it is missing from the README.
 
-It is deliberately dumb: no parsing of our prose, just "does this number appear". That is enough, because every drift so far has been a number that silently stopped being true, not an argument that stopped being valid.
+It is deliberately dumb: no parsing of our prose, just "does this number appear". That is enough, because all 3 drifts so far were a number that silently stopped being true, not an argument that stopped being valid.
+
+It caught 2 more the moment it was switched on: the per-pile figures and the costs, both stale in the README after one case was regenerated.
 
 ## An overclaim in the first sentence, caught by testing our own headline
 
