@@ -4,7 +4,20 @@
 
 Submission for the **micro1 Agentic Workflows Hackathon 2026**. Kickoff 2026-08-28 15:00 UTC, submissions close 2026-08-31 18:00 UTC.
 
-Status: problem locked, evaluation design fixed, build in progress. See `PRE-EXISTING.md` for exactly what existed before kickoff.
+## The result, up front
+
+| | Simple version | **This system** |
+| --- | --- | --- |
+| Balanced accuracy | 33.3% | **73.3%** |
+| Finds the not-merged pile | 0.40 | **0.80** |
+| Merge-worthy work wrongly rejected | 1 of 10 | **0 of 10** |
+| Reported problems it named that exist | 1 of 3 | **5 of 5** |
+
+The floor for three equal piles is 33.3%, so **the simple version scored exactly as well as guessing.** Full table with the intermediate version, and what fifteen cases can and cannot tell you, further down.
+
+**Three things this write-up does that you may not expect.** It reports an experiment that made things worse and was removed, with numbers. It records three occasions where we published a figure that turned out to be made up, and how each was caught. And it explains why the evaluation itself is flawed: it scores the tool against what a human decided, so a tool that correctly spots value a maintainer overlooked gets marked wrong. There is a section on what we did about that.
+
+Everything below runs from a fresh clone with no account, no network and no cost. `PRE-EXISTING.md` lists what existed before kickoff.
 
 ## Intended user
 
