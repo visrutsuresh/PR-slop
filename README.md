@@ -284,6 +284,29 @@ The trace files live in `traces/`, 45 records, one per run of each system, liste
 
 The shipped agent's records are marked **captured**: it writes each step as the run happens, so what you read is the live record. The other two are marked **reconstructed**, because their calls were saved whole and replayed into the same format afterwards. Nothing in a reconstructed record is invented, every field comes from a committed file, but the distinction is stated rather than glossed.
 
+## What every file is
+
+There are six agent versions at the root because this project improved by measurement, and each one's code and answers are kept so the table in `CHANGELOG.md` can be recomputed. **`agent_v4.py` is the one that ships.**
+
+| File | What it is |
+| --- | --- |
+| **`agent_v4.py`** | **The shipped system.** Four roles and a loop. This is what `./run.sh agent` runs. |
+| `agent.py`, `agent_v2/v3/v5/v6.py` | The other five versions, kept so `./run.sh versions` can recompute the whole table. Not shipped. |
+| `triage.py` | **The product.** The page a maintainer reads. `./run.sh triage` |
+| `retriever.py` | The search over the project's 403 recorded problems |
+| `evidence.py` | The evidence card and the second-opinion list, facts only |
+| `run_baseline.py` | The simple comparison version, one direct prompt |
+| `run_advanced.py` | The intermediate two-stage version |
+| `harvest.py` | Collected the 15 cases once. Its output is committed; you never need to run it |
+| `scoring.py` | Shared scoring, so no system gets a different yardstick |
+| `task_spec.py` | The task description, given word for word to every system |
+| `isolation_probe.py` | Proves the model cannot read the answers before anything is generated |
+| `versions.py` | Recomputes the six-version table from committed answers |
+| `check_docs.py` | Fails if a number in this README no longer matches what the code prints |
+| `test_harness.py`, `test_harvest.py` | The checks. 25 in total |
+| `build_traces.py`, `build_agent_traces.py` | Render the step-by-step records into `traces/` |
+| `data/` | The 15 cases, 403 recorded problems, and every answer every system gave |
+
 ## Harness (pre-existing, see PRE-EXISTING.md)
 
 The harness is the support code built before kickoff, the plumbing that records what each agent does and checks nothing is broken. It contains no logic specific to the actual problem, since the problem was not known yet when it was built.
