@@ -192,3 +192,11 @@ Three separate times the documents drifted from the code. The README described t
 `check_docs.py` now runs inside `./run.sh eval`. It reads what the code actually prints for all three systems, accuracy, per-pile recall and cost, and fails if any of it is missing from the README.
 
 It is deliberately dumb: no parsing of our prose, just "does this number appear". That is enough, because every drift so far has been a number that silently stopped being true, not an argument that stopped being valid.
+
+## An overclaim in the first sentence, caught by testing our own headline
+
+The README opened with "every claim carries a citation checked against the real repository". Checked against the runs: the agent cited nothing at all on 4 of 15 submissions.
+
+The accurate version is narrower and, we think, better: **every citation it does give you resolves**, and where it has no evidence it says nothing rather than inventing a reference. Five reported problems named, five real, four silences.
+
+Worth noting how this was found. We took the strongest sentence in the document and asked whether the data supported it, rather than waiting for a reader to do that. That is now the last check before anything ships: read your own headline as a hostile reviewer would.

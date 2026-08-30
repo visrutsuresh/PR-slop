@@ -1,6 +1,8 @@
 # PR-slop
 
-**Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three buckets, act now, worth reviewing, not merged, where every claim carries a citation checked against the real repository.
+**Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three piles: act now, worth reviewing, not merged.
+
+Every reference it gives you is checked against the real repository before you see it, and anything that does not resolve is struck out. On these fifteen cases it named five reported problems and **all five exist**. It stayed silent on four rather than inventing something, which is the behaviour we wanted: an earlier version of this sentence claimed every submission carries a citation, and that was an overclaim.
 
 Submission for the **micro1 Agentic Workflows Hackathon 2026**. Kickoff 2026-08-28 15:00 UTC, submissions close 2026-08-31 18:00 UTC.
 
