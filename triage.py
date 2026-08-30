@@ -75,6 +75,36 @@ def facts(ev):
     return " | ".join(out)
 
 
+def render_one(item):
+    """One submission, for a reviewer working through the queue by hand.
+
+    Real reviewers open things one at a time, so the tool has to support that.
+    It is deliberately NOT part of the evaluation: judging a single item in
+    isolation is close to what one prompt already does, and scoring it would
+    misrepresent where the value is. It is a convenience built on the same
+    pipeline, and it says so.
+    """
+    ev = item["evidence"]
+    L = [BAR, f"  #{item['number']}  {clip(item['title'], 56)}", BAR, ""]
+    L.append(f"  https://github.com/microsoft/vscode/pull/{item['number']}")
+    L.append("")
+    L.append("  EVIDENCE, each of these is checkable against the repository")
+    L.append(f"    reported problem : {', '.join(ev['problems_cited']) if ev['cites_real_problem'] is True else 'none named'}")
+    supported = {True: "yes", False: "NO", None: "could not tell"}.get(ev["claim_supported"], "could not tell")
+    L.append(f"    code matches its description : {supported}")
+    L.append(f"    tests            : {'yes' if ev['has_tests'] else 'no'}")
+    L.append(f"    size             : {ev['lines_added']} lines, {ev['files_touched']} file(s)")
+    L.append("")
+    L.append(f"  SUGGESTED PILE   : {item['bucket']}  (confidence: {item['confidence']})")
+    if item["reason"]:
+        L.append(f"  why              : {clip(item['reason'], 200)}")
+    if item["closed_unmerged"] and item["strength"] >= 3:
+        L += ["", "  NOTE: this was closed without merging, but the evidence above is",
+              "  strong. Worth a second look before you move on."]
+    L += ["", BAR, "  Nothing was posted, closed, merged or commented on. You decide.", BAR]
+    return "\n".join(L)
+
+
 def render(items):
     lines = []
     add = lines.append
@@ -152,8 +182,20 @@ def render(items):
 
 
 if __name__ == "__main__":
-    d = sys.argv[1] if len(sys.argv) > 1 else AGENT_DIR
+    args = [a for a in sys.argv[1:]]
+    one = None
+    if args and args[0].lstrip("#").isdigit():
+        one = int(args.pop(0).lstrip("#"))
+    d = args[0] if args else AGENT_DIR
     items = load(d)
+    if one is not None:
+        hit = next((i for i in items if i["number"] == one), None)
+        if not hit:
+            print(f"no saved result for #{one}. available: "
+                  f"{', '.join(str(i['number']) for i in items)}", file=sys.stderr)
+            raise SystemExit(1)
+        print(render_one(hit))
+        raise SystemExit(0)
     if not items:
         print("no saved responses found", file=sys.stderr)
         raise SystemExit(1)

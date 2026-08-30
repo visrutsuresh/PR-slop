@@ -60,7 +60,13 @@ Four roles, and a loop. Each was added only after a measurement showed it was ne
 
 **Multi-agent, but NOT autonomous.** It performs no consequential action of any kind. It never posts, comments, closes, merges or labels anything on any real repository. It writes a page and a human decides. Closing a real contributor's pull request affects a real person, so a qualified human reviewer stays in the loop by design.
 
-There is also a single-pull-request mode, because real reviewers work sequentially. It is deliberately NOT part of the evaluation: single-item triage is close to what one prompt already does, and scoring it would misrepresent where the value is.
+**Single-submission mode**, because real reviewers work through a queue one at a time:
+
+```
+./run.sh triage 308696
+```
+
+It prints that submission's evidence card, the suggested pile, and a second-look note if the evidence is strong but it was closed. It is deliberately NOT part of the evaluation: judging one item in isolation is close to what a single prompt already does, and scoring it would misrepresent where the value is.
 
 ## Evaluation
 

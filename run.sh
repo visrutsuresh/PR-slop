@@ -12,14 +12,16 @@
 # committed responses are the record.
 set -euo pipefail
 
-usage() { echo "usage: $0 {triage|baseline|script|agent|eval|probe|harvest}" >&2; exit 1; }
+usage() { echo "usage: $0 {triage [pr-number]|baseline|script|agent|eval|probe|harvest}" >&2; exit 1; }
 
-[ $# -eq 1 ] || usage
+[ $# -ge 1 ] && [ $# -le 2 ] || usage
 
 case "$1" in
   triage)
+    # optional second argument: a pull request number, for a reviewer working
+    # through the queue one at a time. e.g. ./run.sh triage 308696
     echo "[triage] the product: one page a maintainer reads. offline, from the cache."
-    python3 triage.py
+    python3 triage.py ${2:-}
     ;;
   harvest)
     if [ "${REGENERATE:-0}" != "1" ]; then

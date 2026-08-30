@@ -12,6 +12,7 @@ cd PR-slop
 ./run.sh baseline    # the simple version's numbers
 ./run.sh script      # the intermediate two-stage version
 ./run.sh agent       # the shipped system's numbers
+./run.sh triage 308696   # one submission, for a reviewer working one at a time
 ```
 
 That is everything. **No account, no key, no payment, no internet.** Those three commands reproduce every number in the README exactly.
@@ -88,7 +89,7 @@ Fifteen checks. Among them: the input half contains exactly five permitted field
 
 ```bash
 REGENERATE=1 ./run.sh baseline
-REGENERATE=1 ./run.sh advanced
+REGENERATE=1 ./run.sh agent
 ```
 
 This needs Claude Code installed and signed in. **Expect different numbers.** That is the models being unrepeatable, not a fault. The isolation check runs first and refuses to continue if it fails.
