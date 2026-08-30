@@ -306,6 +306,7 @@ There are six agent versions at the root because this project improved by measur
 | `test_harness.py`, `test_harvest.py` | The checks. 25 in total |
 | `build_traces.py`, `build_agent_traces.py` | Render the step-by-step records into `traces/` |
 | `data/` | The 15 cases, 403 recorded problems, and every answer every system gave |
+| `Dockerfile` | Pre-kickoff scaffolding. Present but **not verified**, see the reproduction guide. Nothing here needs it |
 
 ## Harness (pre-existing, see PRE-EXISTING.md)
 

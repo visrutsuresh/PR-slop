@@ -21,6 +21,8 @@ That is everything. **No account, no key, no payment, no internet.** Those three
 
 Python 3.10 or newer. Nothing else. No packages are installed, nothing is downloaded, and the standard library is all that is used.
 
+**On the Dockerfile.** There is one in the repository, from the pre-kickoff scaffolding. It copies the project into `python:3.12-slim` and runs the checks. We are not claiming it works, because Docker was not running on the machine this was finished on and we did not verify it. It is a convenience, not a requirement: the project needs nothing but Python, so running the commands directly is the supported path and the one we tested.
+
 ## Why nothing needs an account
 
 Every model answer this project ever received is saved whole, under `data/responses/`, and committed. The commands above read those saved answers and recompute the results from them.
