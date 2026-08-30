@@ -254,7 +254,7 @@ def tool_triage_queue(args):
     if not args.get("confirm_cost"):
         open_count = None
         if scan_all:
-            open_count = len(live.fetch_open_prs(repo, 10 ** 9, False))
+            open_count = live.count_open_prs(repo)
             n = open_count
         else:
             n = limit

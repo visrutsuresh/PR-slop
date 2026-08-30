@@ -165,6 +165,32 @@ class ResolvedIssues:
         return self.classify(n) in ("open", "closed")
 
 
+def count_open_prs(repo, include_drafts=False):
+    """How many are open, in ONE call.
+
+    Counting by pagination meant about 36 API calls and the better part of a
+    minute spent purely to say "this is too expensive to run". A pause that
+    long before a refusal reads as a hang, and it is the same bill of API
+    calls we then pay again for real. Search returns the total directly.
+
+    Falls back to pagination if search is unavailable, because a missing count
+    must not stop the tool: the count exists to inform a choice, not to gate
+    correctness.
+    """
+    draft = "" if include_drafts else " -is:draft"
+    try:
+        out = subprocess.run(
+            ["gh", "api", "-X", "GET", "search/issues",
+             "--field", f"q=repo:{repo} is:pr is:open{draft}",
+             "--field", "per_page=1", "--jq", ".total_count"],
+            capture_output=True, text=True, timeout=60)
+        if out.returncode == 0 and out.stdout.strip().isdigit():
+            return int(out.stdout.strip())
+    except Exception:
+        pass
+    return len(fetch_open_prs(repo, 10 ** 9, include_drafts))
+
+
 def depth_options(repo, open_count=None, each=0.45):
     """The choices worth offering, with the bill attached to each.
 
@@ -746,7 +772,7 @@ if __name__ == "__main__":
         n = a.limit
         open_count = None
         if a.all:
-            open_count = len(fetch_open_prs(a.repo, 10 ** 9, a.drafts))
+            open_count = count_open_prs(a.repo, a.drafts)
             n = open_count
         if n > CONFIRM_ABOVE:
             opts = depth_options(a.repo, open_count, each)

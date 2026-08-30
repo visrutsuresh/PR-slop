@@ -496,15 +496,32 @@ def mcp_checks():
     checks += 1
 
     # a full scan must refuse and quote the bill before spending it
-    real_fetch = _live.fetch_open_prs
-    _live.fetch_open_prs = lambda repo, limit, drafts: [None] * 1782
+    real_fetch = _live.count_open_prs
+    _live.count_open_prs = lambda repo, drafts=False: 1782
     try:
         t = mcp_server.tool_triage_queue({"repo": "o/r", "scan_all": True})
         assert "1782" in t, t                      # the real size, not a guess
         assert "801.90" in t or "801.9" in t, t    # 1782 * 0.45, priced honestly
         assert "Nothing has been spent" in t and "confirm_cost" in t, t
     finally:
-        _live.fetch_open_prs = real_fetch
+        _live.count_open_prs = real_fetch
+    checks += 1
+
+    # the size is fetched in ONE call, not by paginating the whole queue. That
+    # cost ~36 API calls and 48 seconds purely to say "too expensive to run",
+    # which reads as a hang and pays the same bill twice.
+    calls = []
+    real_run = _live.subprocess.run
+    class _R:
+        returncode, stdout, stderr = 0, "1782", ""
+    _live.subprocess.run = lambda cmd, **kw: (calls.append(cmd), _R())[1]
+    try:
+        assert _live.count_open_prs("o/r") == 1782
+    finally:
+        _live.subprocess.run = real_run
+    assert len(calls) == 1, f"expected one call, made {len(calls)}"
+    assert "search/issues" in calls[0], calls[0]
+    assert any("-is:draft" in str(c) for c in calls[0]), calls[0]
     checks += 1
 
     print(f"mcp server: {checks}/{checks} checks passed")

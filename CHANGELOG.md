@@ -592,3 +592,16 @@ Three more things the same review found, all of the same family, a claim that wa
 **Three output modes were two.** `inline` appended the report path exactly like `both`, so they were byte-identical, and the check covering it asserted on a string every branch produced. Fourth unfalsifiable test in this project. The modes are now distinct and the check compares all three against each other. The redundant whitelist behind it was deleted rather than kept: `_shape` already fell through correctly, so the guard was unreachable and the test could not tell the difference.
 
 Two numbers were also wrong in the safe direction and are now right. The 1,782 figure is non-draft submissions; GitHub's own counter says 2,442 because it includes 660 drafts, which this tool skips. And the time estimate used 25 seconds per submission against our own recorded 29, running about 16% optimistic.
+
+
+## Forty-eight seconds to say no
+
+The size check counted the queue by paginating it: about thirty-six API calls and the better part of a minute, spent entirely to reach the answer "this is too expensive to run". A pause that long before a refusal reads as a hang, and it is the same bill of calls the real run then pays again.
+
+One search query returns the total directly. 0.45 seconds instead of 48, one call instead of thirty-six, same 1,782. It falls back to pagination if search is unavailable, because the count exists to inform a choice and must never be able to stop the tool working.
+
+## A quotation is not ours to tidy
+
+Two pull-quotes in the README had been altered inside their quote marks: an em dash swapped for a comma to satisfy our own house style, and a parenthetical dropped with no ellipsis. Both changes were cosmetic and neither changed the meaning, which is exactly the argument someone makes before doing it again with something that does.
+
+The dropped clause is restored, the substituted character is marked, and the edit is disclosed under the quotations. A project that keeps a running list of its own invented numbers does not get to silently improve a quotation.

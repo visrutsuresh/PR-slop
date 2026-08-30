@@ -112,9 +112,11 @@ Three tools:
 
 On `microsoft/vscode#333418`, a rename titled as a memory-leak fix, it returned `workable` and found a blocking problem nobody asked it to look for:
 
-> The diff contains a hand-edit to a file explicitly marked DO-NOT-MODIFY-MANUALLY (1ES pipeline auto-baselining config), this should never be included in a PR.
+> The diff contains a hand-edit to a file explicitly marked DO-NOT-MODIFY-MANUALLY (1ES pipeline auto-baselining config) [...] this should never be included in a PR.
 
-and named the real tension: *"a maintainer taking this on merges it believing it fixes memory leaks, but nothing in the visible diff changed at all"*.
+and named the real tension: *"a maintainer taking this on merges it believing it fixes memory leaks, but nothing in the visible diff (constructor bodies, emitter logic, disposal handling) changed at all"*.
+
+(Both quotations are the reviewer's own words from the run recorded above. Where a character is replaced for house style, the substitution is marked `[...]` rather than made silently: a project that keeps a list of its own invented numbers does not get to tidy a quotation.)
 
 **The reviewer does not see our own conclusion.** It gets the diff, the source and the counts, and never the bucket, the evidence chips or the investigator search. Handing it our answer would invite it to agree with us, and a reviewer that agrees with the thing it is checking is worth nothing.
 
