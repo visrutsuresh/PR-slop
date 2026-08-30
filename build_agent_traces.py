@@ -23,7 +23,18 @@ from harness.trace import Trace, render_index, render_markdown
 AGENT_DIR = os.environ.get("PRSLOP_AGENT_DIR", "data/responses/agent-v4")
 
 
+def _clear_old(prefixes):
+    """Records are keyed by a timestamp, so re-running appends a second copy of
+    every run instead of replacing it. One rebuild left 91 records where there
+    should have been 45. Clear this builder's own output first."""
+    import glob as _g
+    for pre in prefixes:
+        for p in _g.glob(f"traces/{pre}-*.md") + _g.glob(f"traces/{pre}-*.jsonl"):
+            os.remove(p)
+
+
 def main():
+    _clear_old(("agent",))
     made = 0
     for case in scoring.load_cases():
         n = case["input"]["number"]

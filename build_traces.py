@@ -85,7 +85,18 @@ def trace_advanced(case, env, search, known):
     return t.run_id
 
 
+def _clear_old(prefixes):
+    """Records are keyed by a timestamp, so re-running appends a second copy of
+    every run instead of replacing it. One rebuild left 91 records where there
+    should have been 45. Clear this builder's own output first."""
+    import glob as _g
+    for pre in prefixes:
+        for p in _g.glob(f"traces/{pre}-*.md") + _g.glob(f"traces/{pre}-*.jsonl"):
+            os.remove(p)
+
+
 def main():
+    _clear_old(("baseline", "our-system"))
     cases = scoring.load_cases()
     search = IssueSearch()
     known = scoring.known_issue_numbers()
