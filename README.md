@@ -247,7 +247,9 @@ Required per the rule book: "You must disclose the tools you used and submit the
 
 **Why the isolation matters.** Our first attempt asked the model, running normally inside this project, to report the recorded answer for one case. **It opened the answer file and returned the correct value.** Left alone, the simple comparison version could have read the answers instead of reasoning, making the whole comparison worthless. `isolation_probe.py` now has to pass before anything is generated, and it must reply that it has no way to read a file.
 
-The trace files themselves live in `traces/`. Each run gets its own readable write-up at `traces/<run_id>.md`. `traces/INDEX.md` lists every run, grouped by agent.
+The trace files live in `traces/`, 45 records, one per run of each system, listed in `traces/INDEX.md`.
+
+The shipped agent's records are marked **captured**: it writes each step as the run happens, so what you read is the live record. The other two are marked **reconstructed**, because their calls were saved whole and replayed into the same format afterwards. Nothing in a reconstructed record is invented, every field comes from a committed file, but the distinction is stated rather than glossed.
 
 ## Harness (pre-existing, see PRE-EXISTING.md)
 
