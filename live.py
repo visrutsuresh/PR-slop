@@ -84,6 +84,10 @@ def resolve_issue(repo, n, cache):
             cache[key] = "missing"
         else:
             cache[key] = "unresolved"
+        # ponytail: one stderr line per lookup, not a structured log. Enough
+        # to tell a rate limit apart from a bug during a run. Upgrade path: if
+        # this ever needs machine reading, write the same dict into the report
+        # JSON alongside the facts.
         note = f"  [{err.strip()}]" if cache[key] == "unresolved" else ""
         print(f"[live]   ref {repo}#{n} -> {cache[key]}{note}", file=sys.stderr)
     return cache[key]
@@ -185,6 +189,9 @@ def fetch_pr_files(repo, number):
     """Paginated, mirroring harvest.fetch_files. One unpaginated page silently
     caps both the file list and the added-line count above 100 changed files."""
     files = []
+    # ponytail: three pages, 300 files, mirroring harvest.fetch_files rather
+    # than generalising. Upgrade path: loop until a short batch if a real
+    # submission ever exceeds it.
     for page in (1, 2, 3):
         batch = json.loads(gh(f"repos/{repo}/pulls/{number}/files"
                               f"?per_page=100&page={page}"))
