@@ -6,7 +6,7 @@ Each entry: what changed, and the evidence that drove it. Every number below is 
 
 A simple prompt scored **33.3%**, exactly the same as guessing. Adding search over the project's recorded problems took a script to **73.3%**. The fully agentic version was then built and was **worse, 46.7%**, for a reason we could point at. Six rebuilds followed, two of which we broke ourselves, ending at **73.3%** with four times the script's ability to find the pile that matters. Along the way the evaluation itself turned out to be flawed, because it scores the tool against what a human decided, so we added a second output that judges the work instead.
 
-**Four entries record us being wrong**, and they are the ones worth reading: a removed experiment that cost 27 points, three published figures that turned out to be invented, a data leak that survived its own fix twice, and an overclaim in the first sentence of the README. None were found by a test we had written in advance.
+**Six entries record us being wrong**, and they are the ones worth reading: a removed experiment that cost 27 points, three published figures that turned out to be invented, a data leak that survived its own fix twice, an overclaim in the first sentence of the README, a claim about our own live run that the run's own record contradicts, and an ordering rule the code had been applying backwards. None were found by a test we had written in advance.
 
 ## 2026-08-27: pre-kickoff harness
 
@@ -278,3 +278,143 @@ Fixed without touching the model. Within each group, submissions are ordered by 
 Then a cap: only the strongest few per group are marked as today's reading, 5 and 8. The rest sit behind one click, still ordered. **Nothing is hidden.** A hidden submission is one nobody ever looks at again, which is the harm we are trying to prevent, so collapsing is as far as we go.
 
 **"It should be able to be pointed at a specific open one."** `./run.sh live owner/repo 333418`. Verified against a live open submission: 54 seconds, 0.30 USD, its own page. A reviewer working a queue by hand wants this far more often than the whole list.
+
+## The live tool was destroying the author's own evidence before the model saw it
+
+`./run.sh live` reused the evaluation's scrub wholesale. That scrub removes the
+author's declared closing reference, and it removes it for a good reason: on a
+CLOSED submission the declaration IS the answer key, so leaving it in would let
+the agent read its own label off its own input.
+
+An open queue has no answer to protect. There, the same field is the strongest
+evidence on the page, because it is a statement by the person who wrote the
+code rather than something a model inferred. We were deleting it and then
+binning the submission for having no evidence of a link.
+
+Measured on the eight-submission run at commit `e3ce07e8`, recorded in
+`reports/microsoft-vscode.json`: **three of eight submissions declared a
+reference and all three were destroyed** (#333390 declared #231076, #333399
+declared #333395, #333404 declared #330410; all three are real open issues).
+One of them, #333390, had it removed from its **title**, so the page rendered
+`[REDACTED-CLOSING-REF]: Restore NODE_OPTIONS environment variable on Windows`.
+
+Five things changed, none of them the model or any prompt.
+
+**The live path keeps the declaration; the evaluation still strips it.** A
+live-only identity-only scrub, four lines. `harvest.scrub_patch` and the frozen
+`CLOSING_RE` are untouched, so every published evaluation number is
+byte-identical: 10/10, 15/15, 73.3% at 0.60 / 0.80 / 0.80, and the six-version
+table.
+
+**The declaration is quoted, not paraphrased.** The chip reads *author's text:
+"Fix #231076", open issue, confirmed*. The first draft said *author says it
+fixes #231076*, which is a claim about INTENT that a regular expression cannot
+support: `This does not fix #123` matches the same pattern. Quoting the
+author's own words, from the start of their own line, means a negation, an
+unticked template checkbox and a `>` quote marker all reach the reader as
+written, and the reader decides. `test_live_refs.py` locks all six cases.
+References inside a fenced code block are skipped outright, one line in the
+extractor. What survives is narrow and is stated on the page: a negated
+reference to a genuinely open issue would still show a chip.
+
+**A number outside our search window is no longer called invented.** The
+investigator pulls the 300 most recent recorded problems; #231076 and #330410
+sit below that window. The page said *claimed #231076, does not exist*, about a
+real open issue, and the rework loop told the model the same thing and made it
+retract a correct citation. Any number not in the window is now resolved once
+against GitHub and reported as what it is: open, closed, actually a pull
+request, genuinely absent, or **not checkable right now**. A 403 or a timeout
+is never quietly downgraded to "invented". This reaches the verifier through a
+membership object, with `agent_v4.py` unedited, so the evaluation path (which
+builds its own plain set) cannot move.
+
+**The line count was measured off a truncated string.** The patch is capped at
+40000 characters before the counter runs, so every large submission was
+undercounted. #333423 read **209 lines against GitHub's 608**, #333404 read 242
+against 566. The control is exact: in that same run #333426's patch was 34411
+characters, under the cap, and its count of 473 matched GitHub's additions to
+the line. Both wrong ones sat at exactly 40000. (That pull request has had
+commits pushed to it since, so GitHub now reports a larger number for it. The
+comparison above is between the run record and GitHub as it stood at commit
+`e3ce07e8`, which is the only comparison that means anything.) The count now comes from GitHub's own per-file `additions`,
+and the file fetch is paginated, which it was not: above 100 changed files the
+file list was silently short too.
+
+**A citation shape the model really returns used to crash the run.** `#333395
+(memory tool)` starts with `#`, and `int(c[1:])` raises on it, after the entire
+run has already been paid for. It now parses the same way the verifier always
+did, `re.fullmatch(r"#(\d+)", c)`, and anything else is dropped rather than
+counted as an invention.
+
+**And the labels stopped claiming more than we checked.** Every chip now carries
+one word saying where it came from: `fact` for anything you can re-derive from
+GitHub with no model at all, `checked` for a reference the model proposed and we
+then verified, `judgement` for the model's opinion with nothing behind it. The
+group headings say "predicted merge" and "predicted not merged" rather than
+"read these first" and "leave until last", because a bucket is a prediction
+about a human decision and a reading order is a different claim.
+
+**The gap this leaves, said plainly.** No automated check reads the live report.
+`check_docs.py` parses offline replay metrics only, and teaching it to audit a
+live page would be a new subsystem. The one thing `./run.sh eval` now checks is
+that the committed example page is tracked at all. That gap is why the error in
+the next section survived as long as it did.
+
+## The sixth mislabelled number, and this one was about our own live run
+
+Three sections up, this file said that inventing an accuracy figure for the live
+tool "would be the sixth mislabelled number in this project". The sixth arrived
+anyway, through a different door.
+
+That section claimed **#333399 was correctly linked to reported problem
+#333395**. The shipped run record says the opposite. In
+`reports/microsoft-vscode.json` that submission carries no citations, no
+reported problems, pile 3, and a reason that explicitly REJECTS the link: *"No
+verifiable evidence the linked issue #333395 or others actually correspond to
+this bug."*
+
+Worth being precise about what went wrong, because it is not a typo. The line
+describes a five-submission run at 145 seconds and 2.28 USD whose record is not
+in this repository, and it contradicts the record that is. So it is not merely
+contradicted, it is unreproducible, which is the worse of the two.
+
+The cause is understood and is fixed in the section above: live mode was
+redacting the author's declared reference before the model ever saw it, then
+binning the submission for having no evidence of a link. Three of eight
+submissions in that run declared a reference and all three were destroyed.
+
+The corrected claim, taken from the record instead of from memory, specifically
+the eight-submission run at commit `e3ce07e8` recorded in
+`reports/microsoft-vscode.json` **before** this change: of the eight open
+submissions, **six returned at least one citation (an issue number or a file
+path), and only one of those was an issue number**, two returned nothing, there
+were zero invented references, and exactly one had a confirmed link to an
+already-reported problem. The old bullet is **withdrawn**.
+
+**Sixth time now**, and the first one caught by reading a shipped artifact
+rather than a document. The other five are above. The common thread has never
+been arithmetic; it is a sentence written once from a run that is gone.
+
+## Size never ranked last, it ranked first
+
+The section above titled "Deciding how much is worth reading today, and pointing
+at one submission" says, verbatim: **"Size ranks last deliberately."** `README.md`
+said the same thing. Both explained why: a large diff is work, not value, and
+ranking by it would reward the exact thing this tool exists to filter.
+
+`live.rank()` was sorting by `-lines`, biggest diff first. The code did the
+opposite of both documents, and both documents had been describing an intention
+rather than the behaviour. That sentence is **withdrawn**.
+
+Size is removed from the ordering key rather than reversed. There is no honest
+direction for it: small is not a virtue either. Tests went with it for a duller
+reason, they are true of eight submissions out of eight, so that key was sorting
+on noise. Both are still shown on the card.
+
+The order is now a verified author-declared reference first, then a confirmed
+link to an already-reported problem, then a confirmed description. When those
+all tie, the newer submission goes first, and that is recency, not evidence: on
+the eight-submission run, four of the eight cards have their position decided by
+pull request number alone. Said plainly because this entry is about writing
+claims from the record instead of from memory, and an "evidence ordering" that
+sometimes sorts by nothing but recency is the kind of sentence that got us here.

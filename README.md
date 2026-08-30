@@ -35,13 +35,15 @@ No account, no network, no cost, from a fresh clone.
 ./run.sh live microsoft/vscode 333418    # one specific open pull request
 ```
 
+No login? An example page from a real run is committed at `reports/example-microsoft-vscode.html`, so you can see the output without spending anything.
+
 It triages the pull requests **actually open** right now and writes a page you open in a browser. This one does need a GitHub login and the model, because there is nothing to replay: the queue is different every day.
 
 **Say plainly what changes here.** Everything scored in this README runs on 15 **closed** submissions, because closed ones are the only place answers exist. A maintainer's queue is **open** submissions, where no answer exists at all, which is exactly why they want help. The system is identical; it simply cannot be scored there, and we are not going to invent a number for it. What it gives you is checked evidence and a suggested order.
 
 **How the order is decided, since "which pile" is not enough on a real queue.** The decider judges each submission on its own, so on a busy repository "read these first" could hold sixty items, which is the original problem with extra steps. Two things fix that, and neither is a model change.
 
-Within each group, submissions are ordered by how much **checked** evidence supports them: a confirmed link to a reported problem first, then a confirmed description, then tests, then size. **Size ranks last on purpose, because a large diff is work, not value.**
+Within each group, submissions are ordered by how much **checked** evidence supports them: first a reference the author declared themselves that we then confirmed is a real open issue, then a confirmed link to an already-reported problem, then a confirmed description. When two submissions tie on all three, the newer one goes first, and that last step is **recency, not evidence**. Tests and size no longer affect the order at all: **size never earns a place, because a large diff is work, not value**, and tests are true of nearly everything, so ranking by either would sort on noise. Both still show on the card.
 
 Then only the strongest few in each group are marked as today's reading, currently 5 in the first group and 8 in the second. The rest stay visible behind one click, still ordered. **Nothing is hidden**, because a hidden submission is one nobody looks at again, and that is exactly the harm this tool exists to prevent. Full command list under Quickstart. `PRE-EXISTING.md` lists what existed before kickoff.
 
@@ -124,6 +126,8 @@ It prints that submission's evidence card, the suggested pile, and a second-look
 | Closed it without merging | 3, not merged |
 
 The agent sees each pull request as an allow-list of five fields (number, title, body, changed-file list, patch), with the closing reference redacted, and predicts a bucket. Source reads are pinned to a commit predating the case window, because reading live `HEAD` would itself reveal whether a pull request was merged.
+
+That redaction is a property of the **evaluation**, not of the tool at the top of this file. On a closed case the declared reference IS the answer key, so leaving it in would let the agent read the label off its own input. On an open queue there is no answer to protect and the same field is the author's own evidence, so `./run.sh live` passes it through. The identity scrub applies in both.
 
 **Known bias we did not fix, stated here rather than left for a reader to find.** Every bucket-1 target issue is guaranteed present in our corpus by seeding. Bucket-2 cases have no declared target to seed, so their real counterparts are present only by chance. "Found a strong topical match" therefore correlates with bucket 1 by construction, which flatters the act-now versus worth-reviewing split inside our bucket-accuracy figure. Fixing it properly would need hand-labelling, which would make the evaluation circular. So we disclose it instead. The baseline gets the identical cases and the identical output format.
 
