@@ -57,6 +57,9 @@ main{padding:30px 26px 90px}
 .why b{font-weight:650}
 .links{margin:11px 0 0;font-size:14px}
 a{color:#2f5d8f}
+.new{display:inline-block;margin-top:7px;font-size:13px;font-weight:650;
+  color:#1c7a4b;background:#e6f4ec;padding:2px 9px;border-radius:6px}
+.seen{display:inline-block;margin-top:7px;font-size:13px;color:var(--muted)}
 .flag{margin-top:11px;padding:10px 13px;background:#fbf6e8;border-left:3px solid var(--amber);
   border-radius:0 7px 7px 0;font-size:14.5px;color:#6b5410}
 footer{border-top:1px solid var(--line);padding:26px;color:var(--muted);font-size:14px}
@@ -142,7 +145,7 @@ def chips(f):
     return "".join(out)
 
 
-def card(r, repo):
+def card(r, repo, data_has_memory=False):
     ci, v, f = r["input"], r["verdict"], r["facts"]
     n = ci["number"]
     strong = (bool(f["problems"]) and f["claim"] is True) or bool(f.get("declared_ok"))
@@ -150,11 +153,21 @@ def card(r, repo):
     if strong and v.get("bucket") == 3:
         flag = ('<div class="flag">The evidence here is stronger than the '
                 'suggested order implies. Worth a look before you skip it.</div>')
+    mem = ""
+    if r.get("is_new") and data_has_memory:
+        mem = '<span class="new">new since your last visit</span>'
+    elif (r.get("times_seen") or 0) > 1:
+        n = r["times_seen"]
+        extra = (", and it was in your reading list before"
+                 if r.get("was_today_before") else "")
+        mem = (f'<span class="seen">{n}th visit, first seen '
+               f'{esc(r.get("first_seen"))}{extra}</span>')
     rankbadge = (f'<span class="rank">{r["rank"]} of {r["group_size"]}</span>'
                  if r.get("group_size", 0) > 1 else "")
     return f"""<article class="pr">
   <div class="top"><span class="num">#{n}</span>{rankbadge}
     <span class="title">{esc(ci['title'])}</span></div>
+  {mem}
   <div class="chips">{chips(f)}</div>
   <div class="why"><b>Why:</b> {esc((v.get('reason') or '')[:280])}</div>
   <div class="links"><a href="https://github.com/{repo}/pull/{n}">open on GitHub</a></div>
@@ -190,6 +203,8 @@ GROUPS = [
 def write(data, path):
     repo = data["repo"]
     rs = data["results"]
+    # "new" only means something once there is a previous visit to be new since.
+    has_mem = bool(data.get("prior_runs"))
     total = sum(r["cost"] for r in rs)
     parts = []
     for b, cls, name, note in GROUPS:
@@ -202,14 +217,14 @@ def write(data, path):
         head = (f'<section class="group {cls}"><div class="bar"></div>'
                 f'<h2>{name} <span class="num">{len(grp)}</span></h2>'
                 f'<p>{note}</p>')
-        body_html = "".join(card(r, repo) for r in today)
+        body_html = "".join(card(r, repo, has_mem) for r in today)
         if later:
             body_html += (
                 f'<details class="rest"><summary>{len(later)} more in this '
                 f'group, ordered by checked evidence, then by how recent they '
                 f'are. Nothing is hidden, this is just not today\'s '
                 f'reading.</summary>'
-                + "".join(card(r, repo) for r in later) + "</details>")
+                + "".join(card(r, repo, has_mem) for r in later) + "</details>")
         parts.append(head + body_html + "</section>")
 
     body = "\n".join(parts)

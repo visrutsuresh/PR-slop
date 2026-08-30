@@ -474,3 +474,21 @@ One is exactly the case this was built for. Submission #333418 is titled "migrat
 `./run.sh agent` returning 73.3% was cited as proof that the two changes above were safe. It was not proof of anything. The published numbers replay from committed JSON and never enter `check_claims` or `fetch_source`, so those two functions had no test coverage at all and the headline number was structurally incapable of moving.
 
 Twelve offline checks now call them directly: the file chooser's fallback, its tie-breaking, the repository defaulting, the cache key, the merge's reserved slots, deduplication across the two sources, the counted search failure, and the filter that stops a pull request being offered as a reported problem. Each was verified by breaking the code and confirming the check fails. One of them was written vacuous on the first attempt, asserting something that could not fail, and was replaced.
+
+## The tool had no idea it had ever seen your queue before
+
+A maintainer does not triage once. They open the queue on Monday, again on Wednesday, again on Friday, and most of what they see is what they already saw. Every run until now started from nothing, so the third visit re-presented the same twenty submissions with the same conclusions and no indication which of them were actually new. That is the original problem wearing a different hat.
+
+`memory.py` is a plain JSON file per repository. It carries three things forward and refuses to carry anything else.
+
+**What is new since your last visit.** On a repeat run the page marks genuinely new submissions and tells you which visit this is for the rest. Simulated over the nine live submissions plus one new arrival: visit one flags 9 of 9 as new, visit two flags exactly 1. That is the difference between reading ten cards and reading one.
+
+**How long something has been waiting, and whether we already put it in front of you.** A submission the tool ranked into your reading list three visits ago that is still open is a different object from one filed this morning, and the page now says so.
+
+**Resolved issue lookups.** Whether #231076 exists and is open is a fact about the repository, not about this run. Re-asking GitHub for it every time is a wasted call, and calls are what cost money and hit rate limits. Recalled lookups are reported to stderr so the saving is visible rather than assumed.
+
+**What it deliberately does not remember, which is the more interesting half.** No model output. Buckets, reasons and claim verdicts are re-derived every single run. Caching a judgement would let a stale conclusion silently outlive the evidence that produced it, and this file already contains six entries about claims that outlived their evidence. A cached fact is a saving. A cached judgement is a lie waiting to happen.
+
+Two failure modes are handled explicitly because a memory that can break the tool is worse than no memory. A corrupt or unreadable store degrades to no-memory rather than raising, and an unwritable store prints a warning and lets the run finish. Both are tested. So is the rule that `unresolved`, meaning we could not reach GitHub, is never cached: one rate-limited run must not poison every later run with a fact we never actually learned.
+
+Six offline checks cover it, including the corruption and unwritable paths.

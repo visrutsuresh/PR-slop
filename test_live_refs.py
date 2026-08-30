@@ -73,6 +73,7 @@ def main():
     print(f"declared references: {checks}/{checks} checks passed")
     union_checks()
     eval_path_checks()
+    memory_checks()
 
 
 
@@ -202,6 +203,69 @@ def eval_path_checks():
     checks += 1
 
     print(f"eval path unchanged: {checks}/{checks} checks passed")
+
+
+
+
+def memory_checks():
+    """Memory is only allowed to carry FACTS forward. These pin that."""
+    import tempfile, shutil, memory
+    checks = 0
+    tmp = tempfile.mkdtemp()
+    old_dir = memory.MEM_DIR
+    memory.MEM_DIR = tmp
+    try:
+        # first visit: everything is new, nothing was seen before
+        mem = memory.load("o/r")
+        assert mem["runs"] == 0 and mem["seen"] == {}
+        rs = [{"input": {"number": 1}, "today": True},
+              {"input": {"number": 2}, "today": False}]
+        memory.annotate(mem, rs)
+        assert all(r["is_new"] for r in rs), rs
+        assert all(r["times_seen"] == 1 for r in rs)
+        assert memory.save(mem)
+        checks += 1
+
+        # second visit: #1 is not new, #3 is, and the count advances
+        mem2 = memory.load("o/r")
+        assert mem2["runs"] == 1, mem2["runs"]
+        rs2 = [{"input": {"number": 1}, "today": False},
+               {"input": {"number": 3}, "today": True}]
+        memory.annotate(mem2, rs2)
+        by = {r["input"]["number"]: r for r in rs2}
+        assert by[1]["is_new"] is False and by[1]["times_seen"] == 2, rs2
+        assert by[3]["is_new"] is True
+        # #1 was in the reading list on visit one, and that must survive
+        assert by[1]["was_today_before"] is True, by[1]
+        checks += 1
+
+        # a resolved issue state is a fact and is reusable
+        memory.remember_issue(mem2, "o/r", 42, "open")
+        assert memory.cached_issue(mem2, "o/r", 42) == "open"
+        checks += 1
+
+        # but "we could not reach GitHub" is NOT a fact, and caching it would
+        # let one rate-limited run poison every later run
+        memory.remember_issue(mem2, "o/r", 43, "unresolved")
+        assert memory.cached_issue(mem2, "o/r", 43) is None
+        checks += 1
+
+        # a corrupt store must degrade to no-memory, never crash the run
+        with open(memory._path("o/r"), "w") as fh:
+            fh.write("{ this is not json")
+        broken = memory.load("o/r")
+        assert broken["runs"] == 0 and broken["seen"] == {}, broken
+        checks += 1
+
+        # an unwritable store must not fail the run
+        memory.MEM_DIR = "/proc/nonexistent-cannot-create"
+        assert memory.save(memory._empty("o/r")) is False
+        checks += 1
+    finally:
+        memory.MEM_DIR = old_dir
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    print(f"memory: {checks}/{checks} checks passed")
 
 
 if __name__ == "__main__":

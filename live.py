@@ -27,6 +27,7 @@ import time
 from datetime import datetime, timezone
 
 import agent_v4 as A
+import memory
 import retriever
 import task_spec
 
@@ -126,17 +127,30 @@ class ResolvedIssues:
     all out: a rework prompt is cheaper than a chip calling a real issue fake.
     """
 
-    def __init__(self, repo, rows, cache):
+    def __init__(self, repo, rows, cache, mem=None):
         self.repo = repo
         self.corpus = {r["number"]: ("open" if r.get("state") == "open"
                                      else "closed") for r in rows}
         self.cache = cache
+        self.mem = mem
+        self.recalled = 0
 
     def classify(self, n, repo=None):
         repo = repo or self.repo
         if repo.lower() == self.repo.lower() and n in self.corpus:
             return self.corpus[n]
-        return resolve_issue(repo, n, self.cache)
+        # Whether an issue exists and is open is a fact about the repository,
+        # not about this run, so a previous run's answer is still good. This is
+        # the only thing memory is allowed to skip a network call for.
+        if self.mem is not None:
+            hit = memory.cached_issue(self.mem, repo, n)
+            if hit:
+                self.recalled += 1
+                return hit
+        got = resolve_issue(repo, n, self.cache)
+        if self.mem is not None:
+            memory.remember_issue(self.mem, repo, n, got)
+        return got
 
     def __contains__(self, n):
         return self.classify(n) in ("open", "closed")
@@ -459,7 +473,8 @@ def run(repo, limit, include_drafts, only=None):
     corpus = fetch_issue_corpus(repo)
     print(f"[live] {len(corpus)} recorded problems")
     search = UnionSearch(corpus, repo)
-    known = ResolvedIssues(repo, corpus, {})
+    mem = memory.load(repo)
+    known = ResolvedIssues(repo, corpus, {}, mem)
     sha = json.loads(gh(f"repos/{repo}/commits?per_page=1"))[0]["sha"]
     os.makedirs(A.SCRATCH, exist_ok=True)
 
@@ -486,8 +501,21 @@ def run(repo, limit, include_drafts, only=None):
                         "cost": v["_cost"],
                         "searches": found["rounds"]})
     rank(results)
+    # rank() first, so `today` is settled before memory records whether we ever
+    # put this submission in front of the maintainer.
+    prior_runs = mem.get("runs") or 0
+    memory.annotate(mem, results)
+    saved = memory.save(mem)
+    if known.recalled:
+        print(f"[live] {known.recalled} issue lookups answered from memory, "
+              f"not re-fetched", file=sys.stderr)
+    if not saved:
+        print("[live] could not write the memory store, this run is not "
+              "remembered", file=sys.stderr)
     return {"repo": repo, "sha": sha, "corpus": len(corpus),
             "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+            "prior_runs": prior_runs,
+            "recalled_lookups": known.recalled,
             "results": results}
 
 

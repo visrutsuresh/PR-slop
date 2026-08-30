@@ -149,6 +149,25 @@ Second, 40.0% against a 33.3% floor is a difference of about one case at this sa
 
 **Known limits of that answer key, stated up front.** Merge decisions carry social and political factors unrelated to technical quality, so this is a proxy for value, not truth. It is also survivorship-flavoured: a good pull request that sat ignored and was auto-closed as stale is filed under "not merged", so the system is marked wrong for correctly calling it good.
 
+### The comparison in one table
+
+Same fifteen cases, same task description, same output contract, both sides.
+
+| Metric | Simple baseline | Agent solution | Change |
+| --- | --- | --- | --- |
+| **Primary outcome** (balanced accuracy across three piles) | 33.3% | **73.3%** | **+40.0 points** |
+| Recall on the pile you want to skip | 0.40 | **0.80** | +0.40 |
+| Good work wrongly binned | 1 of 10 | **0 of 10** | -1 |
+| Problems named that actually exist | 1 of 3 | **5 of 5** | 33% to 100% |
+| Cost per case | 0.124 USD | 0.276 USD | +0.152 USD |
+| Human actions replaced per submission | 0 | **5.1** | see below |
+
+Guessing scores 33.3%, because there are three equal piles. So the baseline is exactly a coin toss with extra steps, which is the honest headline: **a direct prompt with no repository access cannot do this task at all.**
+
+**On cost.** The agent costs about 2.2 times the baseline per case, and that is the trade being offered: roughly fifteen cents to convert a coin toss into a 73.3% answer with checkable evidence attached. On the live tool the figure is higher, 0.455 USD per submission, because live mode also reads the real source and resolves every reference.
+
+**On human time, and why there is no number in that row.** We did not measure a human. Timing ourselves would be an n=1 measurement by the people who built the thing, which is worth nothing, and quoting an industry figure would be inventing a number in a project whose whole point is not inventing numbers. What IS mechanically countable from the shipped run record is the number of discrete actions the page performs that a maintainer would otherwise perform by hand: open the submission, read the diff, run each issue-tracker search the investigator ran, open each declared reference to check it exists and is open, open each candidate issue, and open the source file to check the code matches the description. Over the nine live submissions that is **46 actions, 5.1 per submission**. Multiply by whatever your own reading speed is. We are not going to do that multiplication for you and call it a measurement.
+
 **Baseline.** A single direct prompt with basic instructions, given the pull request text, with NO repository access. This is micro1's own first suggested baseline. Declared resource difference: the agent has repository access and the baseline does not, because repository access is precisely the intervention being measured. A stronger keyword-search baseline was considered and was out of scope for the time available.
 
 **Pre-registered targets, frozen before any evaluation was run.** False-prune rate under 10%, where a false prune means the system predicted "not merged" for something the maintainer actually merged. Citation validity at 90% or higher. Both were fixed in advance and are not revised in light of results.
