@@ -350,13 +350,14 @@ paginated, which it was not: above 100 changed files the file list was silently
 short too.
 
 One number needs saying out loud, because two committed files disagree about it
-and neither is wrong. 473 and 544 are the same pull request read an hour apart,
+and neither is wrong. 473 and 684 are the same pull request read an hour apart,
 with commits pushed to #333426 in between. `data/live-record-prefix.json` is the
 pre-fix run of eight submissions, generated 2026-08-30 20:01 UTC, and records
 473 lines for it. `reports/example-microsoft-vscode.html` is the later run of
-nine, generated 22:50 UTC. Both name commit `23f50094`, which is
-microsoft/vscode's own default branch head. It pins the source the roles read,
-not the state of any one submission, so it cannot separate the two figures. The
+nine, generated 22:50 UTC, and records 684. They name different commits,
+`e3ce07e8` and `23f50094`, microsoft/vscode's default branch head at each run
+time. That pins the corpus the roles read, not the state of any one
+submission, so it cannot separate the two figures. The
 run is the unit of comparison here. The sha is not.
 
 **A citation shape the model really returns used to crash the run.** `#333395
