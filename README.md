@@ -35,6 +35,8 @@ No account, no network, no cost, from a fresh clone.
 ./run.sh live microsoft/vscode 333418    # one specific open pull request
 ```
 
+The output is a board. Three columns for the three piles, every pull request a card you click through to a full page for it, and back to the board from the top left. Evidence on each page is split into three labelled blocks so an opinion can never be mistaken for a checked fact.
+
 No login? An example page from a real run is committed at `reports/example-microsoft-vscode.html`, so you can see the output without spending anything.
 
 It triages the pull requests **actually open** right now and writes a page you open in a browser. This one does need a GitHub login and the model, because there is nothing to replay: the queue is different every day.
@@ -157,7 +159,7 @@ Four roles, and a loop. Each was added only after a measurement showed it was ne
 3. **Adjudicator.** Decides the pile from what the other two found.
 4. **Verifier.** Checks every claim and, when one does not hold up, **sends the work back** rather than deleting it quietly. Honest frequency: it fired **once in fifteen**. In the earlier two-stage version the equivalent check fired **zero** times. We keep it because it costs nothing, and the failure it guards against is documented in our own baseline output, where 2 of 3 named problems did not exist. But nobody should read this line and picture it firing often.
 
-**Why this is not one prompt.** The project has 403 recorded problems, far too many to hand a model at once, so answering "does this fix something already reported" requires going and searching. The investigator writes those searches itself, which produced queries like `snippet tab stop limit 10 nested placeholders` from a title containing none of those words. A person reporting a problem uses different words from a developer fixing it.
+**Why this is not one prompt.** The project has 403 recorded problems, far too many to hand a model at once, so answering "does this fix something already reported" requires going and searching. The investigator writes those searches itself, which produced queries like `snippet tabstop limit 10 nested placeholder matrix latex` from a title containing none of those words. A person reporting a problem uses different words from a developer fixing it.
 
 **Multi-agent, but NOT autonomous.** It performs no consequential action of any kind. It never posts, comments, closes, merges or labels anything on any real repository. It writes a page and a human decides. Closing a real contributor's pull request affects a real person, so a qualified human reviewer stays in the loop by design.
 
@@ -173,7 +175,7 @@ It prints that submission's evidence card, the suggested pile, and a second-look
 
 **Repository:** `microsoft/vscode`. Repo selection was verified before use against a 15/74/11 split under an earlier, narrower label rule. `home-assistant/core` was the alternative, rejecting fewer pull requests, 4 per 100 against vscode's double-digit rate. **Re-derived at harvest time under the FROZEN pattern actually shipped (`src/harvest.py`), because a published number must be one the project's own rule reproduces:** of the true 100 most-recently-closed pull requests as of the harvest run, **23 fall in bucket 1, 54 in bucket 2, 23 in bucket 3** (see `data/manifest.json` -> `census_re_derived`). All three buckets still clear the 5-case floor comfortably, and no decision changes.
 
-**Cases:** 15, sampled DELIBERATELY to 5 per bucket. Random sampling would have skewed to bucket 2, which is 74% of recent closed pull requests.
+**Cases:** 15, sampled DELIBERATELY to 5 per bucket. Random sampling would have skewed to bucket 2, which is 54% of recent closed pull requests.
 
 **Where the answer key comes from.** No maintainer ever records "this pull request was high value", so the answer key is built from what the maintainer actually DID:
 
@@ -347,7 +349,7 @@ The one case no version ever got right, pr-308696, is very likely exactly that. 
 
 So alongside the prediction we produce an **evidence card**, made only of claims that are true or false against the repository, with no human verdict involved. It asks five things: does it name a genuinely reported problem, does it name real files, does it carry tests, is it substantive, and does the code match its description.
 
-Of 16 factual claims the agent made across the 15 cases, **16 hold up**.
+Of 15 factual claims the agent made across the 15 cases, **15 hold up**.
 
 **The disagreement report is the point.** Well-supported work that was closed anyway is not the tool failing. It is the tool finding something a human may have missed. Run **`./run.sh evidence`** and it surfaces two, including pr-308696, the one case no version of the agent ever got right.
 

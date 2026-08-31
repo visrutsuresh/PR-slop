@@ -8,6 +8,22 @@ A simple prompt scored **33.3%**, exactly the same as guessing. Adding search ov
 
 **Six entries record us being wrong**, and they are the ones worth reading. Two: a removed experiment that cost 27 points, and three published figures that turned out to be invented. Two more: a data leak that survived its own fix twice, and an overclaim in the first sentence of the README. And two last: a claim about our own live run that the run's own record contradicts, and an ordering rule the code had been applying backwards. None were found by a test we had written in advance.
 
+## The first command a judge runs failed on a fresh clone, and the guard that should have caught it could not fail
+
+`./run.sh eval` passed here and exited 1 on a clean clone. A line in this changelog named `reports/microsoft-vscode.json`, which `.gitignore` excludes, so the path existed only on a machine that had already paid for a live run. The reference is narrated history, describing the fixture a bug used to read, so the fix is an allow-list entry carrying its reason, not an edit to the sentence.
+
+The larger finding sits underneath it. `tests/check_docs.py` called `subprocess.run(...).stdout` and threw the return code away. Half-rewriting `run.sh` on purpose made `baseline`, `script` and `agent` each exit 2 while `eval` exited **0** and printed "docs match the code". The guard could not fail, so it was decoration. It now asserts the return code, and a new `tests/check_paths.py` checks that every path named in the docs exists, with an anti-vacuity floor so a broken extractor fails loudly instead of passing silently. Evidence: the sabotage run, and the fact that this defect was found by a fresh clone rather than by 25 passing checks.
+
+The 45 machine-readable `.jsonl` trace logs now ship too. Deliverable 4 asks what the agent did and how its tools responded, and the tool responses live in the JSONL; the rendered pages are a view of it. 91 files are tracked.
+
+## The report is a board now, and the mark on the card disagreed with the page
+
+`src/report.py` produces a kanban board: three columns for the three piles, every card clickable through to a full page for that pull request, back to the board from the top left. The design was rejected once by the CEO and failed its own review twice before it shipped.
+
+The defect worth recording is the second failure. The board drew its judgement mark from a string literal, so all nine cards showed "the code matches its own description" while the detail pages carried one contradiction and three unknowns. The count was read from the data; the mark never was. A maintainer triages from the board, so the tool's most important negative signal was invisible exactly where decisions get made, and contradicted by a mark asserting the opposite. It is the same failure this project exists to detect, committed by the project. Every mark is now derived from the record, and a check compares each card against its own page.
+
+Two smaller ones from the same port: `verdict.confidence` and `verdict.reason` were read as top-level fields, which was true only of the mockup's flattened test data, so every real card would have shown "none given" while the model had supplied both.
+
 ## 2026-08-27: pre-kickoff harness
 
 Built `src/harness/trace.py`, `tests/test_harness.py`, `run.sh`, and the submission templates before the problem PDF (the document describing what to actually build) was published. This was done first because a trajectory, the full step-by-step record of what an agent run actually did, cannot be put together after the fact. It has to be captured live, while the run is happening. Evidence: competition deliverable 4 requires trajectories "from the agent instructions through to the final result." Without a logger already running before the first real agent run, that run's trajectory would be lost for good. See `PRE-EXISTING.md`.
@@ -16,7 +32,7 @@ Built `src/harness/trace.py`, `tests/test_harness.py`, `run.sh`, and the submiss
 
 Built `src/harvest.py`, `src/baselines/regex_rule.py`, `tests/test_harvest.py`, and wired a `harvest` subcommand into `run.sh`. Gated by contrarian plan-review PASS at loop 3 of 3 (change_id `prslop-harvest-2026-08-29`), which found and fixed 7 binding conditions before any code was written. Most importantly: `created_at` was still in the allow-list and turned out to be an 8x to 30x open-duration leak in disguise (86.2% AUC, removed). The frozen closing-reference pattern did not actually capture owner/repo, so the cross-repo carve-out could not have worked. A third declaration form (`owner/repo#N`) was missing from the pattern. And `changed_files` and `patch` are not obtainable from the raw pull object as originally written (`changed_files` there is an integer count, not a file list).
 
-Evidence from the real harvest run: the frozen pattern re-derives the bucket census as 23/54/23 on the true 100-most-recently-closed pull requests. This is against the earlier, narrower rule's 15/74/11 (condition E; both numbers are in `data/manifest.json`). The no-model reference rule that reads the (now-stripped) declared-link field directly scores 66.7% balanced accuracy by construction (`src/baselines/regex_rule.py`), which is the size of the leak the strip closes. All 15 harvested cases pass the allow-list, forbidden-field, and zero-surviving-match tests (`tests/test_harvest.py`, 14/14). That includes the positive control that at least one case's redacted reference used the URL or shorthand form and not just bare `#N`.
+Evidence from the real harvest run: the frozen pattern re-derives the bucket census as 23/54/23 on the true 100-most-recently-closed pull requests. This is against the earlier, narrower rule's 15/74/11 (condition E; both numbers are in `data/manifest.json`). The no-model reference rule that reads the (now-stripped) declared-link field directly scores 66.7% balanced accuracy by construction (`src/baselines/regex_rule.py`), which is the size of the leak the strip closes. All 15 harvested cases pass the allow-list, forbidden-field, and zero-surviving-match tests (`tests/test_harvest.py`, 15/15). That includes the positive control that at least one case's redacted reference used the URL or shorthand form and not just bare `#N`.
 
 ## Baseline, the starting point
 
@@ -114,7 +130,7 @@ Giving an agent a sharper sense of code quality made it WORSE at this task, beca
 
 **Decision: REMOVED.** The two-stage version ships. The agent is kept in the repository at `src/agent.py`, runnable, with its 15 saved responses, so anyone can reproduce this negative result.
 
-**What we would keep from it.** The investigator's habit of writing its own search wording is good, and it works. It produced queries like "snippet tab stop limit 10 nested placeholders" from a title that said none of those things. It used the words a person REPORTING a problem would use, rather than the words a developer FIXING it would use. That idea is worth carrying into a future version. The quality judgement is not.
+**What we would keep from it.** The investigator's habit of writing its own search wording is good, and it works. It produced queries like "snippet tabstop limit 10 nested placeholder matrix latex" from a title that said none of those things. It used the words a person REPORTING a problem would use, rather than the words a developer FIXING it would use. That idea is worth carrying into a future version. The quality judgement is not.
 
 **Honest note on the verifier.** It sent nothing back across all 15, so the loop we built never actually ran. Twice now, across two architectures, our verification stage has fired zero times. That is worth saying plainly rather than describing a mechanism that has never once been exercised.
 
@@ -164,7 +180,7 @@ It is not hypothetical. The single case that no version out of six ever got righ
 
 Nobody labels anything. Each is a fact.
 
-**Result on the 15 cases.** Of 16 factual claims the agent made, **16 hold up, 100%**. Eleven of fifteen submissions carry tests. Fourteen are substantive.
+**Result on the 15 cases.** Of 15 factual claims the agent made, **15 hold up, 100%**. Eleven of fifteen submissions carry tests. Fourteen are substantive.
 
 **The disagreement report, which is the actual point.** When the evidence says a submission is well supported and the record says it was closed, that is not the tool being wrong. That is the tool finding work a human may have overlooked. Two surfaced:
 

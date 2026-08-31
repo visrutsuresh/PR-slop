@@ -42,7 +42,7 @@ Everything else. This paragraph was written before kickoff in the future tense; 
 
 ## Everything else in this repository was written after kickoff
 
-Listed in full, so "what existed before" and "what we added" are both explicit rather than one being left to inference.
+The main ones are listed below, so "what existed before" and "what we added" are both explicit rather than one being left to inference.
 
 | File | What it does |
 | --- | --- |

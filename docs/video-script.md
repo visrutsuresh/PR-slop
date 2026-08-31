@@ -4,7 +4,7 @@ Everything on screen is real and in this repository. Timings are a guide.
 
 ---
 
-## 0:00 to 0:40 — the problem, and why I am the one telling you
+## 0:00 to 0:40, the problem, and why I am the one telling you
 
 Volunteers maintain free software. They are buried in machine-written submissions. The curl project says it is "effectively being DDoSed" by them. Roughly one in five of its submissions last year were slop. OCaml maintainers rejected a single AI-written pull request of thirteen thousand lines.
 
@@ -21,7 +21,7 @@ I am not a maintainer. I am the person standing under that pressure. That is why
 
 ---
 
-## 0:40 to 1:10 — the baseline, and its score
+## 0:40 to 1:10, the baseline, and its score
 
 **On screen: `./run.sh baseline`**
 
@@ -31,13 +31,13 @@ One prompt per submission, no tools. This is the comparison micro1's own brief s
 
 ---
 
-## 1:10 to 2:20 — one real run, end to end
+## 1:10 to 2:20, one real run, end to end
 
 **On screen: `./run.sh agent`, then open one trace in `traces/`.**
 
 Four roles, and a loop.
 
-The **investigator** decides what to search for. Watch this: from a title that says none of these words, it wrote `snippet tab stop limit 10 nested placeholders`. It is using the words a person *reporting* a problem would use, not the words a developer *fixing* it uses. It found the right one. It can also search again if the first attempt was poor, and it chose to do that six times across fifteen cases.
+The **investigator** decides what to search for. Watch this: from a title that says none of these words, it wrote `snippet tabstop limit 10 nested placeholder matrix latex`. It is using the words a person *reporting* a problem would use, not the words a developer *fixing* it uses. It can also search again if the first attempt was poor, and it chose to do that six times across fifteen cases.
 
 The **claim checker** then reads the real source at a pinned commit and tests whether the code does what the description says.
 
@@ -47,7 +47,7 @@ Then the product itself: **`./run.sh triage`**. One page. What to read first and
 
 ---
 
-## 2:20 to 3:10 — six versions, including two I broke myself
+## 2:20 to 3:10, six versions, including two I broke myself
 
 **On screen: the version table.**
 
@@ -63,7 +63,7 @@ I stopped at six, because one case is worth 6.7 points on fifteen cases, and pas
 
 ---
 
-## 3:10 to 4:00 — the flaw in the whole idea, and what I did about it
+## 3:10 to 4:00, the flaw in the whole idea, and what I did about it
 
 Here is the uncomfortable part.
 
@@ -71,7 +71,7 @@ Every version predicts what a maintainer *did*. So if a maintainer overlooks som
 
 **On screen: pr-308696.** The one case no version out of six ever got right. Real code. Fixes a genuinely reported problem. Confirmed against the actual source. Closed anyway. Six versions all said "this is good work" and I scored all six as mistakes.
 
-So I added a second output that judges the work rather than the decision: does it name a genuinely reported problem, does it carry tests, does the code match its description. All facts, no human verdict. Sixteen factual claims, sixteen hold up.
+So I added a second output that judges the work rather than the decision: does it name a genuinely reported problem, does it carry tests, does the code match its description. All facts, no human verdict. Fifteen factual claims, fifteen hold up.
 
 **On screen: the SECOND OPINION section of the triage page.**
 
@@ -79,7 +79,7 @@ And now the failure becomes the feature. That section lists well-supported work 
 
 ---
 
-## 4:00 to 4:35 — what I removed, and three numbers I made up
+## 4:00 to 4:35, what I removed, and three numbers I made up
 
 **Removed:** the fully agentic version scored 46.7 against 73.3 and cost three and a half times as much. It is still in the repo, runnable, with its saved answers, so the negative result reproduces.
 
@@ -89,7 +89,7 @@ All three are in the changelog. Writing a rule against it after the first one di
 
 ---
 
-## 4:35 to 5:00 — the hot take
+## 4:35 to 5:00, the hot take
 
 "Closed without merging" looks like it should mean "rejected as bad". On vscode it mostly does not. Of seventeen I inspected: four were bots, about ten were maintainers closing their own real work in favour of another approach, and **exactly one** looked like slop.
 
@@ -110,10 +110,22 @@ Open a terminal in the repo. Nothing below needs an account or a network.
 | 1:50 | `./run.sh triage` | the three piles, then scroll to SECOND OPINION at the bottom |
 | 2:20 | `./run.sh versions` | the whole six-version table, recomputed live |
 | 3:10 | `./run.sh triage 308696` | `NOTE: closed without merging, but the evidence above is strong` |
-| 3:40 | `./run.sh evidence` | `16 factual claims, 16 hold up`, then the two flagged submissions |
+| 3:40 | `./run.sh evidence` | `15 factual claims, 15 hold up`, then the two flagged submissions |
 | 4:00 | `IMPROVEMENT-CHANGELOG.md`, search for "made-up" | the three invented figures and how each was caught |
 | 4:35 | (slide) 17 closed submissions: 4 bots, 10 insiders, 1 slop | the single slop case |
 
 **One rehearsal note.** `./run.sh versions` and `./run.sh triage` both print more than a screen. Scroll slowly or pre-size the window, because the numbers are the point and an unreadable frame wastes the shot.
 
 **If you have time for one more thing**, run `./run.sh probe` on camera. It proves the model cannot read the answer file, and it is the single most convincing thing in the repository for anyone suspicious that the evaluation is rigged.
+
+## The question to be ready for, and the answer
+
+A judge who knows the literature may ask about Liang et al. 2023, which found seven AI-text detectors flagged over half of 91 TOEFL essays by non-native English writers as machine-written, one of them at nearly 98%. Asking a tool to spot machine-written pull requests invites exactly that objection. Have this ready:
+
+> This is not a text detector. It never scores writing style. It scores three checkable things: does the pull request name a problem that is actually in the issue tracker, does the source at a pinned commit match what the description says it does, and how much code and test code is there. Author identity is stripped before the model sees anything. The Liang failure mode is stylometry punishing people who write English differently, and there is no stylometry here. The honest residual risk: the adjudicator is a language model reading the pull request body, so prose style can leak in indirectly, and I have no test for that.
+
+The last sentence is the one that makes it credible. Do not drop it.
+
+## If you show the report
+
+The board is the best-looking artifact in the repository and the shot list never opens it. `reports/example-microsoft-vscode.html` is committed and needs no login. Worth ten seconds: the three piles as columns, one card clicked through to its own page, and the three labelled evidence blocks that keep an opinion from being mistaken for a checked fact.

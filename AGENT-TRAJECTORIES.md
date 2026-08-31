@@ -1,6 +1,6 @@
 # Agent trajectories
 
-This file indexes the step-by-step record of what the shipped agent (`src/agent_v4.py`) did on all 45 cases: instructions, tool responses, feedback, retries, and the one human checkpoint. It does not duplicate `traces/INDEX.md`, which `src/harness/trace.py` regenerates and which lists every trace file. Read this file first if you want to follow one run end to end.
+This file indexes the step-by-step record of what all three systems did across 45 records: the shipped agent (`src/agent_v4.py`) on 15 cases, captured as each run happened, plus 30 reconstructed records for the baseline and the intermediate script: instructions, tool responses, feedback, retries, and the one human checkpoint. It does not duplicate `traces/INDEX.md`, which `src/harness/trace.py` regenerates and which lists every trace file. Read this file first if you want to follow one run end to end.
 
 ## The four roles in the loop
 

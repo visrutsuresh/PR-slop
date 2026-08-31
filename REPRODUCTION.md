@@ -18,7 +18,7 @@ cd PR-slop
 ./run.sh triage 308696   # one submission, for a reviewer working one at a time
 ```
 
-That is everything. **No account, no key, no payment, no internet.** Those three commands reproduce every number in the README exactly.
+That is everything. **No account, no key, no payment, no internet.** Those commands reproduce every number in the README exactly.
 
 ## What you need
 
@@ -66,7 +66,7 @@ Fifteen closed pull requests from `microsoft/vscode`, all public, collected once
 - `data/issues.jsonl` : 403 reported problems from the same project, the thing our system searches.
 - `data/manifest.json` : when it was collected, the exact queries used, the pile counts, and the pinned commit.
 - `data/responses/` : every model answer, saved whole.
-- `traces/` : a readable step-by-step record for each of the thirty runs.
+- `traces/` : a readable step-by-step record for each of the 45 runs.
 
 ## Checking that we are not cheating
 
@@ -125,7 +125,7 @@ Then ask in plain language. Three tools are exposed:
 | Tool | Needs | Cost |
 | --- | --- | --- |
 | `whats_new` | nothing, reads the local memory store | **free, offline, instant** |
-| `triage_pull_request` | `gh` authenticated, the model | about 0.45 USD |
+| `triage_pull_request` | `gh` authenticated, the model | about 0.55 USD |
 | `triage_queue` | `gh` authenticated, the model | about 0.45 USD per submission |
 
 **Start with `whats_new`.** It costs nothing and tells you whether anything changed since the last triage, which on a quiet day is the whole answer.
