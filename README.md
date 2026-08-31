@@ -1,6 +1,6 @@
 # PR-slop
 
-**Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three piles: act now, worth reviewing, not merged.
+**Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three piles: read first, read next, likely to be closed.
 
 Every reference it gives you is checked against the real repository before you see it, and anything that does not resolve is struck out. On these fifteen cases it named five reported problems and **all five exist**. It stayed silent on four rather than inventing something, which is the behaviour we wanted. An earlier version of this sentence claimed every submission carries a citation, and that was an overclaim.
 
