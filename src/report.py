@@ -581,7 +581,7 @@ button{font:inherit}
   border-radius:999px;padding:1px 9px}
 /* FIX 3: subtitle now needs to hold a full sentence, not a fragment.
    No max-width/line clamp here on purpose - it must wrap freely. */
-.col-note{margin:8px 0 18px;color:var(--muted);font-size:12.5px;line-height:1.55}
+.col-note{margin:8px 0 18px;color:var(--muted);font-size:12.5px;line-height:1.55;min-height:3.1em}  /* ponytail: min-height, not a grid. The longest subtitle wraps to 3 lines between 1120px and 1280px and drops its column's first card 19px below the others. Reserving the tallest case keeps the card tops level at every width. Upgrade path if subtitles ever get longer: subgrid the header row. */
 .col-cards{display:grid;gap:11px}
 .card{all:unset;display:block;background:var(--card-surface);box-shadow:var(--card-shadow);border-radius:10px;
   padding:14px 15px;cursor:pointer;transition:transform var(--dur-snappy) var(--ease-snappy),
