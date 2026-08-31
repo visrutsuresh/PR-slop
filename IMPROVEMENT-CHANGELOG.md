@@ -307,7 +307,7 @@ reference removed from its **title**. So the page rendered
 `[REDACTED-CLOSING-REF]: Restore NODE_OPTIONS environment variable on Windows`.
 The three declarations themselves are readable on the later page,
 `reports/example-microsoft-vscode.html`, generated after this fix: *author's
-text: "Fix #231076"*, *"This PR fixes #333395"*, *"Fixes #330410"*.
+text: "Fix #231076"*, *"This PR fixes #333395"*, *"Fixes #333430"*.
 
 Five things changed, none of them the model or any prompt.
 
@@ -354,7 +354,7 @@ and neither is wrong. 473 and 544 are the same pull request read an hour apart,
 with commits pushed to #333426 in between. `data/live-record-prefix.json` is the
 pre-fix run of eight submissions, generated 2026-08-30 20:01 UTC, and records
 473 lines for it. `reports/example-microsoft-vscode.html` is the later run of
-nine, generated 21:00 UTC, and shows 544. Both name commit `e3ce07e8`, which is
+nine, generated 22:50 UTC. Both name commit `23f50094`, which is
 microsoft/vscode's own default branch head. It pins the source the roles read,
 not the state of any one submission, so it cannot separate the two figures. The
 run is the unit of comparison here. The sha is not.
