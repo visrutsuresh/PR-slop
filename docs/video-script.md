@@ -37,7 +37,7 @@ One prompt per submission, no tools. This is the comparison micro1's own brief s
 
 Four roles, and a loop.
 
-The **investigator** decides what to search for. Watch this: from a title that says none of these words, it wrote `snippet tabstop limit 10 nested placeholder matrix latex`. It is using the words a person *reporting* a problem would use, not the words a developer *fixing* it uses. It can also search again if the first attempt was poor, and it chose to do that six times across fifteen cases.
+The **investigator** decides what to search for. Watch this: from a title that says none of these words, it wrote `snippet tabstop limit nesting level exceeded 4x4 matrix latex 16 tabstops`. It is using the words a person *reporting* a problem would use, not the words a developer *fixing* it uses. It can also search again if the first attempt was poor, and it chose to do that six times across fifteen cases.
 
 The **claim checker** then reads the real source at a pinned commit and tests whether the code does what the description says.
 

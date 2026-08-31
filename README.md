@@ -35,7 +35,7 @@ No account, no network, no cost, from a fresh clone.
 ./run.sh live microsoft/vscode 333418    # one specific open pull request
 ```
 
-The output is a board. Three columns for the three piles, every pull request a card you click through to a full page for it, and back to the board from the top left. Evidence on each page is split into three labelled blocks so an opinion can never be mistaken for a checked fact.
+The output is a board. Three columns for the three piles, every pull request a card you click through to a full page for it, and back to the board from the top left. Evidence on each page is split into up to three labelled blocks, one per kind, so an opinion can never be mistaken for a checked fact. A block is omitted when that kind is empty, so most pages show two.
 
 No login? An example page from a real run is committed at `reports/example-microsoft-vscode.html`, so you can see the output without spending anything.
 
@@ -159,7 +159,7 @@ Four roles, and a loop. Each was added only after a measurement showed it was ne
 3. **Adjudicator.** Decides the pile from what the other two found.
 4. **Verifier.** Checks every claim and, when one does not hold up, **sends the work back** rather than deleting it quietly. Honest frequency: it fired **once in fifteen**. In the earlier two-stage version the equivalent check fired **zero** times. We keep it because it costs nothing, and the failure it guards against is documented in our own baseline output, where 2 of 3 named problems did not exist. But nobody should read this line and picture it firing often.
 
-**Why this is not one prompt.** The project has 403 recorded problems, far too many to hand a model at once, so answering "does this fix something already reported" requires going and searching. The investigator writes those searches itself, which produced queries like `snippet tabstop limit 10 nested placeholder matrix latex` from a title containing none of those words. A person reporting a problem uses different words from a developer fixing it.
+**Why this is not one prompt.** The project has 403 recorded problems, far too many to hand a model at once, so answering "does this fix something already reported" requires going and searching. The investigator writes those searches itself, which produced queries like `snippet tabstop limit nesting level exceeded 4x4 matrix latex 16 tabstops` from a title containing none of those words. A person reporting a problem uses different words from a developer fixing it.
 
 **Multi-agent, but NOT autonomous.** It performs no consequential action of any kind. It never posts, comments, closes, merges or labels anything on any real repository. It writes a page and a human decides. Closing a real contributor's pull request affects a real person, so a qualified human reviewer stays in the loop by design.
 
