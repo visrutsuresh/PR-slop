@@ -109,7 +109,7 @@ Record it working. Speed this up in the edit.
 
 ```
 Now the real question. What should I look at today. And here is the part I am most pleased with. It did not answer. It came back with a menu, a price against every option, and it has spent nothing.
-The whole open queue here is one thousand seven hundred and eighty two pull requests. Reading all of them is about eight hundred dollars and fourteen hours. A maintainer should see that number before it happens, not after.
+The whole open queue here is one thousand seven hundred and eighty two pull requests. Reading all of them is about eight hundred dollars of model usage and fourteen hours. A maintainer should see that number before it happens, not after.
 So I pick a depth deliberately. Five, for about two dollars. It never spends money without showing me the bill first, and it never offers an option larger than the repository.
 ```
 

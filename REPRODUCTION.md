@@ -128,6 +128,8 @@ Then ask in plain language. Three tools are exposed:
 | `triage_pull_request` | `gh` authenticated, the model | about 0.55 USD |
 | `triage_queue` | `gh` authenticated, the model | about 0.45 USD per submission |
 
+**These are model-usage estimates, not amounts billed.** The tool shells out to `claude -p`, so the model runs on whatever account the machine is signed in to. Under an API key the estimate tracks a real charge. Under a Claude subscription it draws on your plan's usage and no charge appears anywhere. Expect no line on a bill when you reproduce this.
+
 **Start with `whats_new`.** It costs nothing and tells you whether anything changed since the last triage, which on a quiet day is the whole answer.
 
 **Driving it without an assistant.** It speaks newline-delimited JSON-RPC 2.0 on stdin and stdout, so you can exercise it from a shell and see exactly what a client would see:
