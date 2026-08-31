@@ -128,4 +128,4 @@ The last sentence is the one that makes it credible. Do not drop it.
 
 ## If you show the report
 
-The board is the best-looking artifact in the repository and the shot list never opens it. `reports/example-microsoft-vscode.html` is committed and needs no login. Worth ten seconds: the three piles as columns, one card clicked through to its own page, and the three labelled evidence blocks that keep an opinion from being mistaken for a checked fact.
+The board is the best-looking artifact in the repository and the shot list never opens it. `reports/example-microsoft-vscode.html` is committed and needs no login. Worth ten seconds: the three piles as columns, one card clicked through to its own page, and the labelled evidence blocks that keep an opinion from being mistaken for a checked fact.
