@@ -22,7 +22,7 @@ Eight sections. Four animate a real session, four are rendered graphics.
 
 **The session in sections 2 and 3** ran on 2026-08-31 at 14:52 UTC, in Claude Code, against `microsoft/vscode` through the MCP server. The assistant was asked what was new (free, no model call), then what to look at today. It refused to scan without showing the bill, offered a priced menu, and ran ten submissions for 3.70 USD at a quoted 0.45 each. It flagged `#333508` for referencing a `todoFeature.ts` module that does not exist, carrying placeholder comments in another language, and shipping no tests, closing with "Don't trust the description."
 
-**Sections 4 and 5** are rendered from `reports/microsoft-vscode.html`, the page that run produced, captured at 4800 pixels wide so the camera moves stay sharp.
+**Sections 4 and 5** are rendered from the HTML report that run produced, captured at 4800 pixels wide so the camera moves stay sharp. That page is not committed, because `reports/` is gitignored apart from the example; regenerate it by pointing the tool at a repository yourself, or open the committed `reports/example-microsoft-vscode.html` to see the same layout.
 
 **Sections 1, 6, 7 and 8** are built with HyperFrames from HTML. Every figure in them is read from `README.md` or `IMPROVEMENT-CHANGELOG.md`.
 
