@@ -2,7 +2,7 @@
 
 **Triage for maintainers buried in AI-generated pull requests.** Give it a queue of open pull requests; it returns a sorted worklist in three piles: act now, worth reviewing, not merged.
 
-Every reference it gives you is checked against the real repository before you see it, and anything that does not resolve is struck out. On these fifteen cases it named five reported problems and **all five exist**. It stayed silent on four rather than inventing something, which is the behaviour we wanted: an earlier version of this sentence claimed every submission carries a citation, and that was an overclaim.
+Every reference it gives you is checked against the real repository before you see it, and anything that does not resolve is struck out. On these fifteen cases it named five reported problems and **all five exist**. It stayed silent on four rather than inventing something, which is the behaviour we wanted. An earlier version of this sentence claimed every submission carries a citation, and that was an overclaim.
 
 Submission for the **micro1 Agentic Workflows Hackathon 2026**. Kickoff 2026-08-28 15:00 UTC, submissions close 2026-08-31 18:00 UTC.
 
@@ -17,7 +17,7 @@ Submission for the **micro1 Agentic Workflows Hackathon 2026**. Kickoff 2026-08-
 
 The floor for three equal piles is 33.3%, so **the simple version scored exactly as well as guessing.** Full table with the intermediate version, and what fifteen cases can and cannot tell you, further down.
 
-**Three things this write-up does that you may not expect.** It reports an experiment that made things worse and was removed, with numbers. It records three occasions where we published a figure that turned out to be made up, and how each was caught. And it explains why the evaluation itself is flawed: it scores the tool against what a human decided, so a tool that correctly spots value a maintainer overlooked gets marked wrong. There is a section on what we did about that.
+**Three things this write-up does that you may not expect.** It reports an experiment that made things worse and was removed, with numbers. It records three occasions where we published a figure that turned out to be made up, and how each was caught. And it explains why the evaluation itself is flawed. It scores the tool against what a human decided, so a tool that correctly spots value a maintainer overlooked gets marked wrong. A section below covers what we did about that.
 
 **Try it in ten seconds.** Clone, then:
 
@@ -43,7 +43,7 @@ It triages the pull requests **actually open** right now and writes a page you o
 
 **How the order is decided, since "which pile" is not enough on a real queue.** The decider judges each submission on its own, so on a busy repository the first pile could hold sixty items, which is the original problem with extra steps. Two things fix that, and neither is a model change.
 
-Within each group, submissions are ordered by how much **checked** evidence supports them: first a reference the author declared themselves that we then confirmed is a real open issue, then a confirmed link to an already-reported problem, then a confirmed description. When two submissions tie on all three, the newer one goes first, and that last step is **recency, not evidence**. Tests and size no longer affect the order at all: **size never earns a place, because a large diff is work, not value**, and tests are true of nearly everything, so ranking by either would sort on noise. Both still show on the card.
+Within each group, submissions are ordered by how much **checked** evidence supports them. First: a reference the author declared themselves that we then confirmed is a real open issue. Then: a confirmed link to an already-reported problem. Then: a confirmed description. When two submissions tie on all three, the newer one goes first, and that last step is **recency, not evidence**. Tests and size no longer affect the order at all. **Size never earns a place, because a large diff is work, not value.** Tests are true of nearly everything, so ranking by either would sort on noise. Both still show on the card.
 
 Then only the strongest few in each group are marked as today's reading, currently 5 in the first group and 8 in the second. The rest stay visible behind one click, still ordered. **Nothing is hidden**, because a hidden submission is one nobody looks at again, and that is exactly the harm this tool exists to prevent. Full command list under Quickstart. `PRE-EXISTING.md` lists what existed before kickoff.
 
@@ -53,9 +53,9 @@ A solo or small-team maintainer of a popular public repository. Unpaid, no triag
 
 ## Their current bottleneck
 
-They personally read every incoming pull request, verify its claims by hand, and search their own issue history to see whether it duplicates something already filed. There is no filter in front of them.
+They personally read every incoming pull request, verify its claims by hand, and search their own issue history to see whether it duplicates something already filed. No filter sits in front of them.
 
-The volume is documented, not assumed. Daniel Stenberg has said the curl project is "effectively being DDoSed" by AI-generated bug reports, roughly 20% of its 2025 submissions were AI slop, and OCaml maintainers rejected a single AI-generated pull request of 13,000 lines.
+The volume is documented, not assumed. Daniel Stenberg has said the curl project is "effectively being DDoSed" by AI-generated bug reports, and roughly 20% of its 2025 submissions were AI slop. OCaml maintainers rejected a single AI-generated pull request of 13,000 lines.
 
 ## Why solving it is valuable
 
@@ -108,7 +108,7 @@ Three tools:
 | `triage_queue` | Sort the open queue into the three piles. Defaults to the 100 most recent. Anything past a dozen offers you the depths with a price on each and spends nothing until you pick. | about 0.45 USD per submission |
 | `triage_pull_request` | Everything about one submission: the pile, the checked evidence, **and a judgement of the code itself**. | about 0.55 USD |
 
-**Pointed at one submission, it answers the question triage never could.** Which pile a change belongs in is useless when there is only one change. So on a single pull request the tool also reviews the work: an overall quality call, what it genuinely does well, what should be improved before merging with a file and a reason attached to each, anything that should block a merge outright, and what breaks if the judgement is wrong.
+**Pointed at one submission, it answers the question triage never could.** Which pile a change belongs in is useless when there is only one change. So on a single pull request the tool also reviews the work. It gives an overall quality call, names what it genuinely does well, and names what should be improved before merging, with a file and a reason attached to each. It also flags anything that should block a merge outright, and states what breaks if the judgement is wrong.
 
 On `microsoft/vscode#333418`, a rename titled as a memory-leak fix, it returned `workable` and found a blocking problem nobody asked it to look for:
 
@@ -116,7 +116,7 @@ On `microsoft/vscode#333418`, a rename titled as a memory-leak fix, it returned 
 
 and named the real tension: *"a maintainer taking this on merges it believing it fixes memory leaks, but nothing in the visible diff (constructor bodies, emitter logic, disposal handling) changed at all"*.
 
-(Both quotations are the reviewer's own words from the run recorded above. Where a character is replaced for house style, the substitution is marked `[...]` rather than made silently: a project that keeps a list of its own invented numbers does not get to tidy a quotation.)
+(Both quotations are the reviewer's own words from the run recorded above. Where a character is replaced for house style, the substitution is marked `[...]` rather than made silently. A project that keeps a list of its own invented numbers does not get to tidy a quotation.)
 
 **The reviewer does not see our own conclusion.** It gets the diff, the source and the counts, and never the bucket, the evidence chips or the investigator search. Handing it our answer would invite it to agree with us, and a reviewer that agrees with the thing it is checking is worth nothing.
 
@@ -142,11 +142,11 @@ A bare number is not a choice. "100" means nothing to someone who has not priced
 
 **Ask `whats_new` first.** It is free and it tells you whether there is anything worth paying for. On a day when nothing has changed, that is the whole interaction.
 
-**No SDK.** This project's reproduction promise is that a judge clones it and runs it with the standard library and `gh`, with no install step. An MCP SDK would have been the first dependency and would have broken that for one feature, so the stdio transport is written directly: it is newline-delimited JSON-RPC 2.0, which is a loop over stdin. About 150 lines against a dependency that would have cost the project its "no install" claim.
+**No SDK.** This project's reproduction promise is that a judge clones it and runs it with the standard library and `gh`, with no install step. An MCP SDK would have been the first dependency and would have broken that for one feature, so the stdio transport is written directly. It is newline-delimited JSON-RPC 2.0, which is a loop over stdin. About 150 lines against a dependency that would have cost the project its "no install" claim.
 
 **Blast radius.** The tools read, and they write one HTML file. Nothing here can merge, close, comment or label, and every summary says so in its last line. Ground rule 4 asks for consequential actions to sit behind a human; the safest way to satisfy that is to have no consequential action to gate in the first place.
 
-**Verified how.** Seven checks in `tests/test_live_refs.py` drive the server over its real stdio transport with no network and no model: the handshake, that notifications get no reply (replying to one corrupts the stream), that every advertised tool has a handler and every handler is advertised, that an unknown tool is a JSON-RPC error rather than a crash, that a raising tool returns readable error content instead of killing the transport, that malformed input does not kill the loop, and that the summary always states nothing was acted on. Registration itself could not be exercised on the build machine, where local policy blocks adding MCP servers; the protocol is tested directly instead, which is the stronger evidence.
+**Verified how.** Seven checks in `tests/test_live_refs.py` drive the server over its real stdio transport, with no network and no model. One is the handshake. One checks that notifications get no reply, since replying to one corrupts the stream. Another confirms every advertised tool has a handler, and every handler is advertised. A fourth checks that an unknown tool returns a JSON-RPC error rather than a crash. A fifth confirms a raising tool returns readable error content instead of killing the transport. A sixth checks that malformed input does not kill the loop. The last confirms the summary always states nothing was acted on. Registration itself could not be exercised on the build machine, where local policy blocks adding MCP servers; the protocol is tested directly instead, which is the stronger evidence.
 
 ## How it works
 
@@ -155,9 +155,9 @@ Four roles, and a loop. Each was added only after a measurement showed it was ne
 1. **Investigator.** Decides for itself what to search for, reads what comes back, and can search again with different wording if the first attempt was poor. It chose 6 follow-up searches on its own across the 15 cases. This is the one choosing the action, not us.
 2. **Claim checker.** Reads the actual source at a pinned commit and tests whether the submission does what it says. It reads the real source on **every** submission. On 10 of 15 it reached a definite yes or no; on the other 5 it returned "cannot tell" rather than guess, which is the behaviour we wanted.
 3. **Adjudicator.** Decides the pile from what the other two found.
-4. **Verifier.** Checks every claim and, when one does not hold up, **sends the work back** rather than deleting it quietly. Honest frequency: it fired **once in fifteen**. In the earlier two-stage version the equivalent check fired **zero** times. We keep it because it costs nothing and the failure it guards against is documented in our own baseline output, where 2 of 3 named problems did not exist, but nobody should read this line and picture it firing often.
+4. **Verifier.** Checks every claim and, when one does not hold up, **sends the work back** rather than deleting it quietly. Honest frequency: it fired **once in fifteen**. In the earlier two-stage version the equivalent check fired **zero** times. We keep it because it costs nothing, and the failure it guards against is documented in our own baseline output, where 2 of 3 named problems did not exist. But nobody should read this line and picture it firing often.
 
-**Why this is not one prompt.** The project has 403 recorded problems, far too many to hand a model at once, so answering "does this fix something already reported" requires going and searching. The investigator writes those searches itself, which produced queries like `snippet tab stop limit 10 nested placeholders` from a title containing none of those words, because a person reporting a problem uses different words from a developer fixing it.
+**Why this is not one prompt.** The project has 403 recorded problems, far too many to hand a model at once, so answering "does this fix something already reported" requires going and searching. The investigator writes those searches itself, which produced queries like `snippet tab stop limit 10 nested placeholders` from a title containing none of those words. A person reporting a problem uses different words from a developer fixing it.
 
 **Multi-agent, but NOT autonomous.** It performs no consequential action of any kind. It never posts, comments, closes, merges or labels anything on any real repository. It writes a page and a human decides. Closing a real contributor's pull request affects a real person, so a qualified human reviewer stays in the loop by design.
 
@@ -167,11 +167,11 @@ Four roles, and a loop. Each was added only after a measurement showed it was ne
 ./run.sh triage 308696
 ```
 
-It prints that submission's evidence card, the suggested pile, and a second-look note if the evidence is strong but it was closed. It is deliberately NOT part of the evaluation: judging one item in isolation is close to what a single prompt already does, and scoring it would misrepresent where the value is.
+It prints that submission's evidence card, the suggested pile, and a second-look note if the evidence is strong but it was closed. It is deliberately NOT part of the evaluation. Judging one item in isolation is close to what a single prompt already does, and scoring it would misrepresent where the value is.
 
 ## Evaluation
 
-**Repository:** `microsoft/vscode`. Repo selection was verified before use against a 15/74/11 split under an earlier, narrower label rule (`home-assistant/core` was the alternative, rejecting fewer pull requests, 4 per 100 against vscode's double-digit rate). **Re-derived at harvest time under the FROZEN pattern actually shipped (`src/harvest.py`), because a published number must be one the project's own rule reproduces:** of the true 100 most-recently-closed pull requests as of the harvest run, **23 fall in bucket 1, 54 in bucket 2, 23 in bucket 3** (see `data/manifest.json` -> `census_re_derived`). All three buckets still clear the 5-case floor comfortably, and no decision changes.
+**Repository:** `microsoft/vscode`. Repo selection was verified before use against a 15/74/11 split under an earlier, narrower label rule. `home-assistant/core` was the alternative, rejecting fewer pull requests, 4 per 100 against vscode's double-digit rate. **Re-derived at harvest time under the FROZEN pattern actually shipped (`src/harvest.py`), because a published number must be one the project's own rule reproduces:** of the true 100 most-recently-closed pull requests as of the harvest run, **23 fall in bucket 1, 54 in bucket 2, 23 in bucket 3** (see `data/manifest.json` -> `census_re_derived`). All three buckets still clear the 5-case floor comfortably, and no decision changes.
 
 **Cases:** 15, sampled DELIBERATELY to 5 per bucket. Random sampling would have skewed to bucket 2, which is 74% of recent closed pull requests.
 
@@ -189,7 +189,7 @@ That redaction is a property of the **evaluation**, not of the tool at the top o
 
 **Known bias we did not fix, stated here rather than left for a reader to find.** Every bucket-1 target issue is guaranteed present in our corpus by seeding. Bucket-2 cases have no declared target to seed, so their real counterparts are present only by chance. "Found a strong topical match" therefore correlates with bucket 1 by construction, which flatters the act-now versus worth-reviewing split inside our bucket-accuracy figure. Fixing it properly would need hand-labelling, which would make the evaluation circular. So we disclose it instead. The baseline gets the identical cases and the identical output format.
 
-**Bucket 3 is NOT a slop detector, stated plainly.** "Not merged" is a workflow fact the API records for free. It is not a quality judgment. Of 17 `microsoft/vscode` bucket-3 pull requests inspected before building the eval set, 4 were bots and roughly 10 were team members closing their own real work, one of them over 7,700 added lines, in favour of another approach. Only ONE resembled AI slop. If the agent correctly calls an insider's real refactor "real work, do not deprioritise it", the oracle still grades that bucket 3. That is a disclosed proxy error, not a system failure.
+**Bucket 3 is NOT a slop detector, stated plainly.** "Not merged" is a workflow fact the API records for free. It is not a quality judgment. Of 17 `microsoft/vscode` bucket-3 pull requests inspected before building the eval set, 4 were bots. Roughly 10 were team members closing their own real work in favour of another approach, one of them over 7,700 added lines. Only ONE resembled AI slop. If the agent correctly calls an insider's real refactor "real work, do not deprioritise it", the oracle still grades that bucket 3. That is a disclosed proxy error, not a system failure.
 
 **Sampling rule.** At least 3 of the 5 bucket-3 cases are non-bot, outside-contributor closes (bot: `user.type == "Bot"` or a verified automation account; outside contributor: `author_association` is `CONTRIBUTOR`, `FIRST_TIME_CONTRIBUTOR` or `NONE`). This deliberately skews the sample away from the true bucket-3 population, where bots and insiders are the majority.
 
@@ -199,13 +199,13 @@ The unfiltered breakdown, measured on all 23 bucket-3 pull requests in the same 
 
 Two things must be said plainly about those figures. First, an earlier draft of this file published 78% and 50%. Those came from a different, larger sample taken before the evaluation set existed, and they are **withdrawn**. The numbers above are computed on the exact fifteen cases in `data/cases/`, and anyone can recompute them.
 
-Second, 40.0% against a 33.3% floor is a difference of about one case at this sample size, so it argues very little on its own. We are not going to pretend it is strong evidence. The stronger reason for removing author identity is not the score, it is that publishing real contributors' names and mail addresses alongside a label saying their work was not merged is not something we are willing to do.
+Second, 40.0% against a 33.3% floor is a difference of about one case at this sample size, so it argues very little on its own. We are not going to pretend it is strong evidence. The stronger reason for removing author identity is not the score. It is that publishing real contributors' names and mail addresses alongside a label saying their work was not merged is not something we are willing to do.
 
-**A defect we found in our own data and fixed, recorded rather than quietly patched.** The first version of this evaluation set left every contributor's real name and mail address inside the code changes, in all fifteen cases, while this file claimed the system never sees who submitted a pull request. That claim was false. One case also still contained the giveaway phrase the strip exists to remove. Both are fixed, the scrub is deterministic and re-runnable, and the tests now check for both.
+**A defect we found in our own data and fixed, recorded rather than quietly patched.** The first version of this evaluation set left every contributor's real name and mail address inside the code changes, in all fifteen cases. At the same time, this file claimed the system never sees who submitted a pull request. That claim was false. One case also still contained the giveaway phrase the strip exists to remove. Both are fixed, the scrub is deterministic and re-runnable, and the tests now check for both.
 
 **Stripping includes the declared closing reference, not just the merge outcome.** The bucket label is a deterministic function of that field, so leaving it visible would let the agent read the label off the input instead of earning it. For the pull requests that declare a link, and every bucket-1 case does by definition, this makes the input less realistic than what a maintainer actually sees. That is a disclosed trade, not a free one.
 
-**Known limits of that answer key, stated up front.** Merge decisions carry social and political factors unrelated to technical quality, so this is a proxy for value, not truth. It is also survivorship-flavoured: a good pull request that sat ignored and was auto-closed as stale is filed under "not merged", so the system is marked wrong for correctly calling it good.
+**Known limits of that answer key, stated up front.** Merge decisions carry social and political factors unrelated to technical quality, so this is a proxy for value, not truth. It is also survivorship-flavoured. A good pull request that sat ignored and was auto-closed as stale is filed under "not merged", so the system is marked wrong for correctly calling it good.
 
 ### The comparison in one table
 
@@ -222,9 +222,9 @@ Same fifteen cases, same task description, same output contract, both sides.
 
 Guessing scores 33.3%, because there are three equal piles. So the baseline is exactly a coin toss with extra steps, which is the honest headline: **a direct prompt with no repository access cannot do this task at all.**
 
-**On cost.** The agent costs about 2.2 times the baseline per case, and that is the trade being offered: roughly fifteen cents to convert a coin toss into a 73.3% answer with checkable evidence attached. On the live tool the figure is higher, 0.455 USD per submission, because live mode also reads the real source and resolves every reference.
+**On cost.** The agent costs about 2.2 times the baseline per case, and that is the trade being offered. Roughly fifteen cents converts a coin toss into a 73.3% answer with checkable evidence attached. On the live tool the figure is higher, 0.455 USD per submission, because live mode also reads the real source and resolves every reference.
 
-**On human time, and why there is no number in that row.** We did not measure a human. Timing ourselves would be an n=1 measurement by the people who built the thing, which is worth nothing, and quoting an industry figure would be inventing a number in a project whose whole point is not inventing numbers. What IS mechanically countable from the shipped run record is the number of discrete actions the page performs that a maintainer would otherwise perform by hand: open the submission, read the diff, run each issue-tracker search the investigator ran, open each declared reference to check it exists and is open, open each candidate issue, and open the source file to check the code matches the description. Over the nine live submissions that is **46 actions, 5.1 per submission**. Multiply by whatever your own reading speed is. We are not going to do that multiplication for you and call it a measurement.
+**On human time, and why there is no number in that row.** We did not measure a human. Timing ourselves would be an n=1 measurement by the people who built the thing, which is worth nothing. Quoting an industry figure would be inventing a number in a project whose whole point is not inventing numbers. What IS mechanically countable from the shipped run record is the number of discrete actions the page performs that a maintainer would otherwise perform by hand. That list runs six deep: open the submission, read the diff, and run each issue-tracker search the investigator ran. Then open each declared reference to check it exists and is open, open each candidate issue, and open the source file to check the code matches the description. Over the nine live submissions that is **46 actions, 5.1 per submission**. Multiply by whatever your own reading speed is. We are not going to do that multiplication for you and call it a measurement.
 
 **Baseline.** A single direct prompt with basic instructions, given the pull request text, with NO repository access. This is micro1's own first suggested baseline. Declared resource difference: the agent has repository access and the baseline does not, because repository access is precisely the intervention being measured. A stronger keyword-search baseline was considered and was out of scope for the time available.
 
@@ -263,15 +263,15 @@ On `microsoft/vscode` we inspected 17 such pull requests one at a time. Four wer
 
 **This was confirmed, not assumed.** Three results in this project point the same way. The one case no version out of six ever got right, pr-308696, is real code that fixes a genuinely reported problem, confirmed against the actual source, and was closed anyway. Our evidence card, which judges the work rather than the decision, flags two closed submissions as well supported. And version 1 of the agent failed precisely by confusing "I do not rate this code" with "this was not accepted", losing 27 points to that single confusion.
 
-**The practical lesson.** Any triage system built from the metadata a project records for free is measuring maintainer **behaviour**, not maintainer **judgment of quality**. That is enough to build something genuinely useful, and this one is. It is not the same claim as "this detects slop", and the difference is not pedantic: a system optimised against merge outcomes will learn to predict organisational decisions, not code quality, and will confidently mistake the two.
+**The practical lesson.** Any triage system built from the metadata a project records for free is measuring maintainer **behaviour**, not maintainer **judgment of quality**. That is enough to build something genuinely useful, and this one is. It is not the same claim as "this detects slop", and the difference is not pedantic. A system optimised against merge outcomes will learn to predict organisational decisions, not code quality, and will confidently mistake the two.
 
 **The consequence we did something about.** If the label is "what a human decided", then a tool that correctly spots value a maintainer overlooked is marked **wrong**. The scoring fights the product. That is why this repository also produces an evidence card of facts checkable against the code, and a second-opinion list of well-supported work that was closed anyway. Our worst failure case is the top entry on that list.
 
-Anyone building this on another repository should expect the same gap and state it, rather than assuming their own project's bots and insiders average out into the label they hoped to measure.
+Anyone building this on another repository should expect the same gap and state it. They should not assume their own project's bots and insiders average out into the label they hoped to measure.
 
 ## Agent instructions
 
-The exact instructions given to each AI agent used in this submission, in the words actually used to prompt it. This satisfies deliverable 1's own wording, "the instructions that shape each agent." This section is the one place those instructions live in full. Each individual run also carries its own copy of the instruction it was given, inside that run's trace file (a trace is the full step-by-step record of what one agent run actually did, saved under `traces/`). That per-run copy is supporting evidence that a real run used these instructions. It does not replace stating them here.
+The exact instructions given to each AI agent used in this submission, in the words actually used to prompt it. This satisfies deliverable 1's own wording, "the instructions that shape each agent." This section is the one place those instructions live in full. Each individual run also carries its own copy of the instruction it was given, inside that run's trace file. A trace is the full step-by-step record of what one agent run actually did, saved under `traces/`. That per-run copy is supporting evidence that a real run used these instructions. It does not replace stating them here.
 
 ### The task description, given word for word to BOTH sides
 
@@ -329,7 +329,7 @@ The simple version receives no such section, because having no way to search the
 
 ## The experiment we removed
 
-We also built the fully agentic version: an investigator that writes its own search wording and can search again, a claim checker that reads the real source and tests the submission's claims, an adjudicator, and a verifier that sends failed work back to be redone.
+We also built the fully agentic version: an investigator that writes its own search wording and can search again. It also had a claim checker that reads the real source and tests the submission's claims, an adjudicator, and a verifier that sends failed work back to be redone.
 
 **It scored 46.7%, against 73.3% for the simpler two-stage version, and it wrongly rejected merge-worthy work 4 times out of 10 instead of zero.** It cost three and a half times as much.
 
@@ -345,7 +345,7 @@ Everything above predicts what a maintainer did. That has a flaw worth stating l
 
 The one case no version ever got right, pr-308696, is very likely exactly that. Real code, fixing a genuinely reported problem, confirmed against the actual source, closed anyway.
 
-So alongside the prediction we produce an **evidence card**, made only of claims that are true or false against the repository, with no human verdict involved: does it name a genuinely reported problem, does it name real files, does it carry tests, is it substantive, does the code match its description.
+So alongside the prediction we produce an **evidence card**, made only of claims that are true or false against the repository, with no human verdict involved. It asks five things: does it name a genuinely reported problem, does it name real files, does it carry tests, is it substantive, and does the code match its description.
 
 Of 16 factual claims the agent made across the 15 cases, **16 hold up**.
 
@@ -369,7 +369,7 @@ The floor for three equal piles is 33.3%, so **the simple version scored exactly
 
 Tied on the headline. Four times better at the job.
 
-**What fifteen cases can and cannot tell you.** One case moves balanced accuracy by 6.7 points, so two systems within about two cases of each other are not distinguishable here. The 40-point gap over guessing is well clear of that; the tie between the script and the agent is not a real tie in shape, but it IS a real tie in headline and we are not going to claim otherwise. The false-rejection figure is weaker still: 0 out of 10 carries a 95% upper bound of about 26%, so we **cannot** demonstrate our pre-registered "under 10%" at this sample size, and we do not claim to have.
+**What fifteen cases can and cannot tell you.** One case moves balanced accuracy by 6.7 points, so two systems within about two cases of each other are not distinguishable here. The 40-point gap over guessing is well clear of that. The tie between the script and the agent is not a real tie in shape. But it IS a real tie in headline, and we are not going to claim otherwise. The false-rejection figure is weaker still. 0 out of 10 carries a 95% upper bound of about 26%. So we **cannot** demonstrate our pre-registered "under 10%" at this sample size, and we do not claim to have.
 
 **Citations are counted in two groups on purpose.** A file path copied out of the case the system was just handed is free and proves nothing. Only a reported-problem number, which cannot be known without checking, is informative. The table uses those only. Counting both together is what produced a misleading 86.7% in our first scoring pass, written up in the changelog.
 
@@ -392,7 +392,7 @@ The shipped agent's records are marked **captured**: it writes each step as the 
 
 ## What every file is
 
-There are six agent versions at the root because this project improved by measurement, and each one's code and answers are kept so the table in `IMPROVEMENT-CHANGELOG.md` can be recomputed. **`src/agent_v4.py` is the one that ships.**
+Six agent versions sit at the root because this project improved by measurement. Each one's code and answers are kept so the table in `IMPROVEMENT-CHANGELOG.md` can be recomputed. **`src/agent_v4.py` is the one that ships.**
 
 | File | What it is |
 | --- | --- |
@@ -418,6 +418,6 @@ There are six agent versions at the root because this project improved by measur
 
 The harness is the support code built before kickoff, the plumbing that records what each agent does and checks nothing is broken. It contains no logic specific to the actual problem, since the problem was not known yet when it was built.
 
-- `src/harness/trace.py`: the logger that records every agent run as it happens, strips out anything that looks like a password or API key before saving (see `REPRODUCTION.md` for exactly what that redaction step does and does not guarantee), and turns the raw record into the readable trace files described above
+- `src/harness/trace.py`: the logger that records every agent run as it happens. It strips out anything that looks like a password or API key before saving (see `REPRODUCTION.md` for exactly what that redaction step does and does not guarantee). It also turns the raw record into the readable trace files described above
 - `run.sh`: `baseline` / `advanced` / `eval` entrypoints (the three commands above)
 - `tests/test_harness.py`: the harness's own test suite, run with `python3 tests/test_harness.py`

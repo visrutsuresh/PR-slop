@@ -4,7 +4,7 @@ Per rule book item 2: "Make it clear what existed before the competition and wha
 
 ## What existed before kickoff (2026-08-28 15:00 UTC)
 
-Built 2026-08-27, before the problem PDF (the document describing what to actually build) was released. Every commit dated before 2026-08-28 15:00 UTC in this repository's history is part of the pre-kickoff build. This can be checked directly by anyone by running `git log`, and none of these commits are ever rewritten afterward. This claim is based on the timestamp on purpose, not on a fixed commit count, so it stays true even as later commits keep tightening this same pre-kickoff code (bug fixes, safety hardening) without adding anything specific to the actual problem. The commits known at time of writing:
+Built 2026-08-27, before the problem PDF (the document describing what to actually build) was released. Every commit dated before 2026-08-28 15:00 UTC in this repository's history is part of the pre-kickoff build. This can be checked directly by anyone by running `git log`, and none of these commits are ever rewritten afterward. This claim is based on the timestamp on purpose, not on a fixed commit count. So it stays true even as later commits keep tightening this same pre-kickoff code (bug fixes, safety hardening) without adding anything specific to the actual problem. The commits known at time of writing:
 
 **Commit `f8be460869f94b00a5eb3340cfe8deb0dd2b5753`, 2026-08-27 23:43:54 UTC**, trajectory-logging
 infrastructure that cannot be reconstructed retroactively once real agent runs start:
@@ -28,7 +28,7 @@ submission-template scaffolding:
 **Commit `633aade`, 2026-08-28 00:09:18 UTC**, closed a pre-kickoff review pass: a connection-URL
 credential redaction gap (`scheme://user:password@host` strings), plus its test coverage.
 
-Later pre-kickoff commits keep hardening these same declared files (bug fixes found during review, for example making the logger survive a broken trace line, or widening what gets ignored by git) without adding anything specific to the actual problem. See `git log` for the full, current, authoritative list.
+Later pre-kickoff commits keep hardening these same declared files. Examples include bug fixes found during review, such as making the logger survive a broken trace line, or widening what gets ignored by git. None of this adds anything specific to the actual problem. See `git log` for the full, current, authoritative list.
 
 Nothing above is copied or adapted from any prior repository. It was written from scratch against the published rule book and deliverables page. None of it is specific to this year's problem; it would work the same way for any future one.
 
@@ -38,7 +38,7 @@ Everything else. This paragraph was written before kickoff in the future tense; 
 
 `harness/compare.py` was planned and **never built**. `src/scoring.py` does that job, shared by every system so none of them gets a different yardstick. No extra dependencies were added to the Dockerfile: the whole project uses the standard library only. Nothing anywhere is adapted from another repository.
 
-`src/harvest.py`, `src/baselines/regex_rule.py`, `src/baselines/__init__.py`, `tests/test_harvest.py`, and the `harvest` subcommand added to `run.sh`: the evaluation-set harvester, written from scratch after kickoff, against a design that went through three rounds of independent review before any code was written. That review is summarised in `IMPROVEMENT-CHANGELOG.md`. Nothing in these files is adapted from any prior repository. `data/cases/`, `data/issues.jsonl`, `data/manifest.json`, and `data/pseudonym_salt.txt` are its committed output, fetched live from `microsoft/vscode` via the authenticated `gh api` CLI.
+`src/harvest.py`, `src/baselines/regex_rule.py`, `src/baselines/__init__.py`, `tests/test_harvest.py`, and the `harvest` subcommand added to `run.sh` make up the evaluation-set harvester. It was written from scratch after kickoff, against a design that went through three rounds of independent review before any code was written. That review is summarised in `IMPROVEMENT-CHANGELOG.md`. Nothing in these files is adapted from any prior repository. `data/cases/`, `data/issues.jsonl`, `data/manifest.json`, and `data/pseudonym_salt.txt` are its committed output, fetched live from `microsoft/vscode` via the authenticated `gh api` CLI.
 
 ## Everything else in this repository was written after kickoff
 

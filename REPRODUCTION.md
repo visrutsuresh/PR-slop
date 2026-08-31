@@ -24,7 +24,7 @@ That is everything. **No account, no key, no payment, no internet.** Those three
 
 Python 3.10 or newer. Nothing else. No packages are installed, nothing is downloaded, and the standard library is all that is used.
 
-**On the Dockerfile.** There is one in the repository, from the pre-kickoff scaffolding. It copies the project into `python:3.12-slim` and runs the checks. We are not claiming it works, because Docker was not running on the machine this was finished on and we did not verify it. It is a convenience, not a requirement: the project needs nothing but Python, so running the commands directly is the supported path and the one we tested.
+**On the Dockerfile.** One sits in the repository, from the pre-kickoff scaffolding. It copies the project into `python:3.12-slim` and runs the checks. We are not claiming it works, because Docker was not running on the machine this was finished on and we did not verify it. It is a convenience, not a requirement: the project needs nothing but Python, so running the commands directly is the supported path and the one we tested.
 
 ## Why nothing needs an account
 
@@ -142,7 +142,7 @@ printf '%s\n' \
 
 Expect the handshake, then the three tool definitions. `./run.sh mcp` runs the same server and prints the registration line first. Running it by hand and seeing it wait is correct: it is reading stdin, not hanging.
 
-**No install step, deliberately.** There is no MCP SDK here. The transport is written against the standard library so that this section does not introduce the project's first dependency and does not put an install wall in front of the offline reproduction above.
+**No install step, deliberately.** No MCP SDK exists here. The transport is written against the standard library. This section does not introduce the project's first dependency, and it does not put an install wall in front of the offline reproduction above.
 
 **It cannot act.** The tools read, and they write one HTML file. No merge, no close, no comment, no label.
 
@@ -154,8 +154,8 @@ Expect the handshake, then the three tool definitions. `./run.sh mcp` runs the s
 | Per case | about 0.12 USD | about 0.13 USD | about 0.28 USD |
 
 The agent costs more because it makes several calls per submission rather than
-one: the investigator plans a search and then judges the results, the claim
-checker reads real source, the adjudicator decides, and the whole thing can go
+one. The investigator plans a search and then judges the results, the claim
+checker reads real source, and the adjudicator decides. The whole thing can go
 round again if the verifier rejects a claim.
 
 Verifying from the saved answers costs nothing and takes seconds.

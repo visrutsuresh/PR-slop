@@ -2,7 +2,7 @@
 
 **Deadline: Monday 2026-08-31, 18:00 UTC. That is Mon 14:00 EDT, Tue 02:00 SGT.**
 
-This was contradictory earlier and is now settled: the live page shows Aug 31 18:00 UTC in the timeline table AND in the deadline badge, and Aug 30 23:59 UTC is labelled only a checkpoint. An earlier version of this file carried the Aug 30 value. It was wrong.
+This was contradictory earlier and is now settled. The live page shows Aug 31 18:00 UTC in the timeline table AND in the deadline badge, and Aug 30 23:59 UTC is labelled only a checkpoint. An earlier version of this file carried the Aug 30 value. It was wrong.
 
 "Late or incomplete entries are not accepted", and a validation screen for reproducibility, plagiarism and trace integrity runs afterwards. **An entry that lands at 17:59 but does not run on a judge's machine still fails.** Do not plan to finish at the deadline.
 
@@ -32,4 +32,4 @@ This was contradictory earlier and is now settled: the live page shows Aug 31 18
 3. Clone the public URL into a fresh empty folder, exactly as a stranger would.
 4. In that clone run `./run.sh eval`, `./run.sh agent`, `./run.sh triage`.
 5. Confirm `git show HEAD:traces/INDEX.md` prints real content, so the records are in the repository and not merely on your machine.
-6. Open `reports/example-microsoft-vscode.html` in the fresh clone. This is the live tool's output, committed on purpose, because `./run.sh live` needs a GitHub login and real spend, roughly a few USD for a small queue. The footer of that page reports 3.39 USD for the 9 pull requests in this particular run; the figure moves with queue size and prices, so read it off the page rather than trusting a number quoted here.
+6. Open `reports/example-microsoft-vscode.html` in the fresh clone. This is the live tool's output, committed on purpose, because `./run.sh live` needs a GitHub login and real spend, roughly a few USD for a small queue. The footer of that page reports 3.39 USD for the 9 pull requests in this particular run. That figure moves with queue size and prices, so read it off the page rather than trusting a number quoted here.

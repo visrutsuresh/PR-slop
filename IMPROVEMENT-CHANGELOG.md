@@ -4,9 +4,9 @@ Each entry: what changed, and the evidence that drove it. Every number below is 
 
 **How to read this.** The arc, in one paragraph, so the detail has somewhere to sit.
 
-A simple prompt scored **33.3%**, exactly the same as guessing. Adding search over the project's recorded problems took a script to **73.3%**. The fully agentic version was then built and was **worse, 46.7%**, for a reason we could point at. Six rebuilds followed, two of which we broke ourselves, ending at **73.3%** with four times the script's ability to find the pile that matters. Along the way the evaluation itself turned out to be flawed, because it scores the tool against what a human decided, so we added a second output that judges the work instead.
+A simple prompt scored **33.3%**, exactly the same as guessing. Adding search over the project's recorded problems took a script to **73.3%**. The fully agentic version was then built and was **worse, 46.7%**, for a reason we could point at. Six rebuilds followed, two of which we broke ourselves, ending at **73.3%** with four times the script's ability to find the pile that matters. Along the way the evaluation itself turned out to be flawed. It scores the tool against what a human decided, so we added a second output that judges the work instead.
 
-**Six entries record us being wrong**, and they are the ones worth reading: a removed experiment that cost 27 points, three published figures that turned out to be invented, a data leak that survived its own fix twice, an overclaim in the first sentence of the README, a claim about our own live run that the run's own record contradicts, and an ordering rule the code had been applying backwards. None were found by a test we had written in advance.
+**Six entries record us being wrong**, and they are the ones worth reading. Two: a removed experiment that cost 27 points, and three published figures that turned out to be invented. Two more: a data leak that survived its own fix twice, and an overclaim in the first sentence of the README. And two last: a claim about our own live run that the run's own record contradicts, and an ordering rule the code had been applying backwards. None were found by a test we had written in advance.
 
 ## 2026-08-27: pre-kickoff harness
 
@@ -14,9 +14,9 @@ Built `src/harness/trace.py`, `tests/test_harness.py`, `run.sh`, and the submiss
 
 ## 2026-08-29: evaluation-set harvest
 
-Built `src/harvest.py`, `src/baselines/regex_rule.py`, `tests/test_harvest.py`, and wired a `harvest` subcommand into `run.sh`. Gated by contrarian plan-review PASS at loop 3 of 3 (change_id `prslop-harvest-2026-08-29`), which found and fixed 7 binding conditions before any code was written, most importantly: `created_at` was still in the allow-list and turned out to be an 8x to 30x open-duration leak in disguise (86.2% AUC, removed); the frozen closing-reference pattern did not actually capture owner/repo, so the cross-repo carve-out could not have worked; a third declaration form (`owner/repo#N`) was missing from the pattern; `changed_files` and `patch` are not obtainable from the raw pull object as originally written (`changed_files` there is an integer count, not a file list).
+Built `src/harvest.py`, `src/baselines/regex_rule.py`, `tests/test_harvest.py`, and wired a `harvest` subcommand into `run.sh`. Gated by contrarian plan-review PASS at loop 3 of 3 (change_id `prslop-harvest-2026-08-29`), which found and fixed 7 binding conditions before any code was written. Most importantly: `created_at` was still in the allow-list and turned out to be an 8x to 30x open-duration leak in disguise (86.2% AUC, removed). The frozen closing-reference pattern did not actually capture owner/repo, so the cross-repo carve-out could not have worked. A third declaration form (`owner/repo#N`) was missing from the pattern. And `changed_files` and `patch` are not obtainable from the raw pull object as originally written (`changed_files` there is an integer count, not a file list).
 
-Evidence from the real harvest run: the frozen pattern re-derives the bucket census as 23/54/23 on the true 100-most-recently-closed pull requests, against the earlier, narrower rule's 15/74/11 (condition E; both numbers are in `data/manifest.json`). The no-model reference rule that reads the (now-stripped) declared-link field directly scores 66.7% balanced accuracy by construction (`src/baselines/regex_rule.py`), which is the size of the leak the strip closes. All 15 harvested cases pass the allow-list, forbidden-field, and zero-surviving-match tests (`tests/test_harvest.py`, 14/14), including the positive control that at least one case's redacted reference used the URL or shorthand form and not just bare `#N`.
+Evidence from the real harvest run: the frozen pattern re-derives the bucket census as 23/54/23 on the true 100-most-recently-closed pull requests. This is against the earlier, narrower rule's 15/74/11 (condition E; both numbers are in `data/manifest.json`). The no-model reference rule that reads the (now-stripped) declared-link field directly scores 66.7% balanced accuracy by construction (`src/baselines/regex_rule.py`), which is the size of the leak the strip closes. All 15 harvested cases pass the allow-list, forbidden-field, and zero-surviving-match tests (`tests/test_harvest.py`, 14/14). That includes the positive control that at least one case's redacted reference used the URL or shorthand form and not just bare `#N`.
 
 ## Baseline, the starting point
 
@@ -38,17 +38,17 @@ It had not contradicted it. We were counting the wrong thing.
 
 Only three citations were issue numbers, which genuinely cannot be known without checking the project. **Two of those three did not exist.**
 
-**What we changed.** Citations are now counted in two groups: free ones, meaning a file path already present in that case's own input, and real ones, meaning an issue number that must be looked up. The headline rate uses real ones only. Under that measure the simple version scores **1 of 3**, and the original prediction stands.
+**What we changed.** Citations are now counted in two groups. Free ones mean a file path already present in that case's own input, and real ones mean an issue number that must be looked up. The headline rate uses real ones only. Under that measure the simple version scores **1 of 3**, and the original prediction stands.
 
 **What it taught us.** A metric that a system can satisfy by echoing its own input is not measuring the system. We caught this only because the result looked too good and we checked what was underneath it. That is now a standing check on every number in this project: before publishing a figure, ask what the cheapest way to score well on it would be.
 
 ## Stage 1, search the project's reported problems
 
-**What we tried and why.** The simple version scored exactly as well as guessing. It had no way to answer the question that decides the first pile: does this work fix something someone already reported? There are 403 reported problems in our saved copy, far too many to paste into one prompt, so answering that means going and searching.
+**What we tried and why.** The simple version scored exactly as well as guessing. It had no way to answer the question that decides the first pile: does this work fix something someone already reported? Our saved copy holds 403 reported problems, far too many to paste into one prompt, so answering that means going and searching.
 
-Added a plain word-overlap search, weighting rare words higher so a query does not simply match whichever entry is longest, and dividing by length so a very long entry does not win on volume alone. No clever model, no index, nothing installed.
+Added a plain word-overlap search, weighting rare words higher so a query does not simply match whichever entry is longest. It also divides by length, so a very long entry does not win on volume alone. No clever model, no index, nothing installed.
 
-**Evidence it works.** Across the nine cases that really do reference a reported problem, the search puts the correct one **first 78% of the time and in the top eight 89% of the time**.
+**Evidence it works.** Across the nine cases that really do reference a reported problem, the search puts the correct one **first 78% of the time**. It lands in the top eight **89% of the time**.
 
 **Decision.** Kept. The eight best matches are put in front of the model, with an explicit instruction that they may be irrelevant and not to cite one anyway if none fits.
 
@@ -114,7 +114,7 @@ Giving an agent a sharper sense of code quality made it WORSE at this task, beca
 
 **Decision: REMOVED.** The two-stage version ships. The agent is kept in the repository at `src/agent.py`, runnable, with its 15 saved responses, so anyone can reproduce this negative result.
 
-**What we would keep from it.** The investigator's habit of writing its own search wording is good, and it works: it produced queries like "snippet tab stop limit 10 nested placeholders" from a title that said none of those things, using the words a person REPORTING a problem would use rather than the words a developer FIXING it would use. That idea is worth carrying into a future version. The quality judgement is not.
+**What we would keep from it.** The investigator's habit of writing its own search wording is good, and it works. It produced queries like "snippet tab stop limit 10 nested placeholders" from a title that said none of those things. It used the words a person REPORTING a problem would use, rather than the words a developer FIXING it would use. That idea is worth carrying into a future version. The quality judgement is not.
 
 **Honest note on the verifier.** It sent nothing back across all 15, so the loop we built never actually ran. Twice now, across two architectures, our verification stage has fired zero times. That is worth saying plainly rather than describing a mechanism that has never once been exercised.
 
@@ -142,15 +142,15 @@ The agent was removed above at 46.7%. Rather than leave it there, it was rebuilt
 
 **v6, and where we stopped.** Letting the investigator grade its own certainty recovered to 66.7%, still below v4. We stopped there. One case is worth 6.7 points on fifteen, and six attempts against the same fifteen answers is the point where a better number stops indicating a better system. Continuing would have produced a nicer figure and a worse tool.
 
-**Decision: v4 ships, and the argument is not the headline.** It ties the simple script at 73.3%. But it catches **0.80 of the not-merged pile against the script's 0.20**, four times better at the one job the tool exists to do, while matching the script's zero wrongly-binned good work. The script earns its 73.3% by being uniformly generous, which is useless for finding the pile you want to skip.
+**Decision: v4 ships, and the argument is not the headline.** It ties the simple script at 73.3%. But it catches **0.80 of the not-merged pile against the script's 0.20**, four times better at the one job the tool exists to do. It still matches the script's zero wrongly-binned good work. The script earns its 73.3% by being uniformly generous, which is useless for finding the pile you want to skip.
 
 ## The reframe: stop predicting the human, start producing evidence
 
 **The problem with everything above, and it was the CEO who named it.**
 
-Every version so far predicts what a maintainer did. That contains a flaw we could not argue away: **if a maintainer overlooks something valuable and closes it, and the tool correctly says the work is good, we mark the tool wrong.** The scoring fights the product. A tool built this way can never help with the failure a maintainer would most want help with.
+Every version so far predicts what a maintainer did. That contains a flaw we could not argue away. **If a maintainer overlooks something valuable and closes it, and the tool correctly says the work is good, we mark the tool wrong.** The scoring fights the product. A tool built this way can never help with the failure a maintainer would most want help with.
 
-It is not hypothetical. The single case that no version out of six ever got right, pr-308696, is exactly that shape: real code, fixing a genuinely reported problem, confirmed against the actual source, closed anyway. Six versions all said "this is good work". We scored all six as mistakes.
+It is not hypothetical. The single case that no version out of six ever got right, pr-308696, is exactly that shape. Real code, fixing a genuinely reported problem, confirmed against the actual source, closed anyway. Six versions all said "this is good work". We scored all six as mistakes.
 
 **What we changed.** We kept the merge prediction, honestly labelled as what it is, a prediction of a human decision. Alongside it we now produce an **evidence card**: claims that are true or false against the repository, with no human verdict involved.
 
@@ -187,7 +187,7 @@ Recorded rather than quietly fixed, because the lesson is the useful part: writi
 
 **Why this came last, which was a mistake.** Everything before this improved a number without a stated product. That is how version 5 happened: a change that sounded obviously right, made with no picture of what it was for, cost 27 points.
 
-**The goal, written down before building.** A maintainer opens their queue, runs one command, and gets a single page: what to read first and why, the normal middle, what to leave, and separately anything closed that probably should not have been. Every claim points at something real. Nothing is touched.
+**The goal, written down before building.** A maintainer opens their queue, runs one command, and gets a single page. It shows what to read first and why, the normal middle, what to leave, and separately anything closed that probably should not have been. Every claim points at something real. Nothing is touched.
 
 Done means four things: one command, every factual claim resolves, it never acts, and a maintainer would behave differently for having read it. We had the first three and not the fourth. We produced scores for a judge, not a page for a person.
 
@@ -201,7 +201,7 @@ Done means four things: one command, every factual claim resolves, it never acts
 
 **Verified after.** Every reported problem named on the page resolves against the repository. Five named, zero fake.
 
-**The honest count of made-up numbers in this project: three.** The 86.7% citation figure, the 61.5% evidence figure, and the invented minutes. Each was caught, each is recorded. The pattern is worth more than any single fix: every one came from producing a number that felt reasonable rather than one that was measured, and every one was caught by a human or a machine noticing it sat oddly beside another number. Writing a rule against it did not prevent the second and third.
+**The honest count of made-up numbers in this project: three.** The 86.7% citation figure, the 61.5% evidence figure, and the invented minutes. Each was caught, each is recorded. The pattern is worth more than any single fix. Every one came from producing a number that felt reasonable rather than one that was measured. And every one was caught by a human or a machine noticing it sat oddly beside another number. Writing a rule against it did not prevent the second and third.
 
 ## A leak that survived the first scrub, found by auditing every tracked file
 
@@ -273,7 +273,7 @@ Two gaps the CEO found in the live tool.
 
 **"How does it decide how many go in each pile?"** It did not. Each submission is judged on its own, so the piles are whatever falls out. With eight open pull requests that is fine. Point it at a busy repository with two hundred and the first pile could hold sixty, which is the original problem with extra steps.
 
-Fixed without touching the model. Within each group, submissions are ordered by how much CHECKED evidence supports them: a confirmed link to a reported problem, then a confirmed description, then tests, then size. **Size ranks last deliberately.** A large diff is work, not value, and ranking by it would reward the exact thing this tool exists to filter. **Corrected later:** this ordering rule is withdrawn, both the tests-and-size keys and the "size ranks last" claim about the code, under the section "Size never ranked last, it ranked first" below, which states the key that actually ships.
+Fixed without touching the model. Within each group, submissions are ordered by how much CHECKED evidence supports them: a confirmed link to a reported problem, then a confirmed description, then tests, then size. **Size ranks last deliberately.** A large diff is work, not value, and ranking by it would reward the exact thing this tool exists to filter. **Corrected later:** this ordering rule is withdrawn, both the tests-and-size keys and the "size ranks last" claim about the code. See the section "Size never ranked last, it ranked first" below, which states the key that actually ships.
 
 Then a cap: only the strongest few per group are marked as today's reading, 5 and 8. The rest sit behind one click, still ordered. **Nothing is hidden.** A hidden submission is one nobody ever looks at again, which is the harm we are trying to prevent, so collapsing is as far as we go.
 
@@ -282,7 +282,7 @@ Then a cap: only the strongest few per group are marked as today's reading, 5 an
 ## The live tool was destroying the author's own evidence before the model saw it
 
 `./run.sh live` reused the evaluation's scrub wholesale. That scrub removes the
-author's declared closing reference, and it removes it for a good reason: on a
+author's declared closing reference, and it removes it for a good reason. On a
 CLOSED submission the declaration IS the answer key, so leaving it in would let
 the agent read its own label off its own input.
 
@@ -292,18 +292,18 @@ code rather than something a model inferred. We were deleting it and then
 binning the submission for having no evidence of a link.
 
 Measured on the eight-submission run of 2026-08-30 20:01 UTC: **three of eight
-submissions declared a reference and all three were destroyed** (#333390
+submissions declared a reference and all three were destroyed**. (#333390
 declared #231076, #333399 declared #333395, #333404 declared #330410; all three
-are real open issues).
+are real open issues.)
 
 A run writes its record to `reports/` (`src/live.py`), and this repository tracks
 nothing in there except the one example page, so that run would have left
 nothing to check. A reduced copy of its record is therefore
-committed at `data/live-record-prefix.json`: every field kept is verbatim, with
+committed at `data/live-record-prefix.json`. Every field kept is verbatim, with
 the raw GitHub objects, the submission bodies and the patches removed, because
 those carry contributor identity this project does not publish. In it, all
 three of those submissions carry an empty `problems` list, and #333390 had the
-reference removed from its **title**, so the page rendered
+reference removed from its **title**. So the page rendered
 `[REDACTED-CLOSING-REF]: Restore NODE_OPTIONS environment variable on Windows`.
 The three declarations themselves are readable on the later page,
 `reports/example-microsoft-vscode.html`, generated after this fix: *author's
@@ -323,7 +323,7 @@ fixes #231076*, which is a claim about INTENT that a regular expression cannot
 support: `This does not fix #123` matches the same pattern. Quoting the
 author's own words, from the start of their own line, means a negation, an
 unticked template checkbox and a `>` quote marker all reach the reader as
-written, and the reader decides. `tests/test_live_refs.py` locks all six cases.
+written. The reader decides. `tests/test_live_refs.py` locks all six cases.
 References inside a fenced code block are skipped outright, one line in the
 extractor. What survives is narrow and is stated on the page: a negated
 reference to a genuinely open issue would still show a chip.
@@ -333,7 +333,7 @@ investigator pulls the 300 most recent recorded problems; #231076 and #330410
 sit below that window. The page said *claimed #231076, does not exist*, about a
 real open issue, and the rework loop told the model the same thing and made it
 retract a correct citation. Any number not in the window is now resolved once
-against GitHub and reported as what it is: open, closed, actually a pull
+against GitHub and reported as what it is. That means open, closed, actually a pull
 request, genuinely absent, or **not checkable right now**. A 403 or a timeout
 is never quietly downgraded to "invented". This reaches the verifier through a
 membership object, with `src/agent_v4.py` unedited, so the evaluation path (which
@@ -343,7 +343,7 @@ builds its own plain set) cannot move.
 40000 characters before the counter runs (`src/live.py`), so every large submission
 was undercounted. #333423 read **209 lines against GitHub's 608**, #333404 read
 242 against 566. The control is exact, and it is scoped to a run rather than to
-a commit: in that same run #333426's patch came in under the cap, and its count
+a commit. In that same run #333426's patch came in under the cap, and its count
 of 473 matched GitHub's additions to the line. Both wrong ones were over it. The
 count now comes from GitHub's own per-file `additions`, and the file fetch is
 paginated, which it was not: above 100 changed files the file list was silently
@@ -353,9 +353,9 @@ One number needs saying out loud, because two committed files disagree about it
 and neither is wrong. 473 and 544 are the same pull request read an hour apart,
 with commits pushed to #333426 in between. `data/live-record-prefix.json` is the
 pre-fix run of eight submissions, generated 2026-08-30 20:01 UTC, and records
-473 lines for it; `reports/example-microsoft-vscode.html` is the later run of
+473 lines for it. `reports/example-microsoft-vscode.html` is the later run of
 nine, generated 21:00 UTC, and shows 544. Both name commit `e3ce07e8`, which is
-microsoft/vscode's own default branch head: it pins the source the roles read,
+microsoft/vscode's own default branch head. It pins the source the roles read,
 not the state of any one submission, so it cannot separate the two figures. The
 run is the unit of comparison here. The sha is not.
 
@@ -366,12 +366,12 @@ did, `re.fullmatch(r"#(\d+)", c)`, and anything else is dropped rather than
 counted as an invention.
 
 **And the labels stopped claiming more than we checked.** Every chip now carries
-one word saying where it came from: `fact` for anything you can re-derive from
-GitHub with no model at all, `checked` for a reference the model proposed and we
-then verified, `judgement` for the model's opinion with nothing behind it. The
+one word saying where it came from. `fact` is for anything you can re-derive from
+GitHub with no model at all. `checked` is for a reference the model proposed and we
+then verified. `judgement` is for the model's opinion with nothing behind it. The
 group headings say "predicted merge" and "predicted not merged" rather than
-"read these first" and "leave until last", because a bucket is a prediction
-about a human decision and a reading order is a different claim.
+"read these first" and "leave until last". A bucket is a prediction
+about a human decision, and a reading order is a different claim.
 
 **The gap this leaves, said plainly.** No automated check reads the live report.
 `tests/check_docs.py` parses offline replay metrics only, and teaching it to audit a
@@ -388,26 +388,26 @@ anyway, through a different door.
 That section claimed **#333399 was correctly linked to reported problem
 #333395**. The run record says the opposite. In
 `data/live-record-prefix.json` that submission carries no citations, no
-reported problems, pile 3, and a reason that explicitly REJECTS the link: *"No
+reported problems, pile 3, and a reason that explicitly REJECTS the link. It reads: *"No
 verifiable evidence the linked issue #333395 or others actually correspond to
 this bug"*.
 
 Worth being precise about what went wrong, because it is not a typo. The line
 describes a five-submission run at 145 seconds and 2.28 USD whose record this
-repository does not have, and it contradicts the eight-submission record that is
+repository does not have. It also contradicts the eight-submission record that is
 now committed here as `data/live-record-prefix.json`. So it is not merely
 contradicted, it is unreproducible, which is the worse of the two.
 
-The cause is understood and is fixed in the section above: live mode was
+The cause is understood and is fixed in the section above. Live mode was
 redacting the author's declared reference before the model ever saw it, then
 binning the submission for having no evidence of a link. Three of eight
 submissions in that run declared a reference and all three were destroyed.
 
-The corrected claim, taken from the record instead of from memory, specifically
-the eight-submission run of 2026-08-30 20:01 UTC, taken **before** this change
-and committed at `data/live-record-prefix.json`: of the eight open
+The corrected claim, taken from the record instead of from memory, is
+specifically about the eight-submission run of 2026-08-30 20:01 UTC, taken **before** this change
+and committed at `data/live-record-prefix.json`. Of the eight open
 submissions, **six returned at least one citation (an issue number or a file
-path), and only one of those was an issue number**, two returned nothing, there
+path), and only one of those was an issue number**. Two returned nothing, there
 were zero invented references, and exactly one had a confirmed link to an
 already-reported problem. The old bullet is **withdrawn**.
 
@@ -426,17 +426,17 @@ ranking by it would reward the exact thing this tool exists to filter.
 opposite of both documents, and both documents had been describing an intention
 rather than the behaviour. That sentence is **withdrawn**.
 
-Size is removed from the ordering key rather than reversed. There is no honest
-direction for it: small is not a virtue either. Tests went with it for a duller
+Size is removed from the ordering key rather than reversed. No honest
+direction exists for it: small is not a virtue either. Tests went with it for a duller
 reason, they are true of eight submissions out of eight, so that key was sorting
 on noise. Both are still shown on the card.
 
 The order is now a verified author-declared reference first, then a confirmed
 link to an already-reported problem, then a confirmed description. When those
-all tie, the newer submission goes first, and that is recency, not evidence: on
+all tie, the newer submission goes first, and that is recency, not evidence. On
 the eight-submission run, four of the eight cards have their position decided by
 pull request number alone. Said plainly because this entry is about writing
-claims from the record instead of from memory, and an "evidence ordering" that
+claims from the record instead of from memory. An "evidence ordering" that
 sometimes sorts by nothing but recency is the kind of sentence that got us here.
 
 ## The investigator was searching a keyhole
@@ -447,23 +447,23 @@ Everything above tunes how the roles reason. This entry is about what they were 
 
 It now unions that local index with GitHub's own issue search.
 
-**Reserved slots are the whole trick, and the obvious version does nothing.** The first design was "local first, then remote, cap the merged list at 8". Running the real matcher over the real corpus, local returns a full 8 hits on 9 of 9 submissions, because it keeps every document with any term overlap and truncates at 8. So the obvious merge would have let local crowd remote out completely and the change would have been a measured no-op. The merge alternates instead.
+**Reserved slots are the whole trick, and the obvious version does nothing.** The first design was "local first, then remote, cap the merged list at 8". Running the real matcher over the real corpus, local returns a full 8 hits on 9 of 9 submissions. That happens because it keeps every document with any term overlap and truncates at 8. So the obvious merge would have let local crowd remote out completely and the change would have been a measured no-op. The merge alternates instead.
 
 **The two search engines disagree about what a query means.** GitHub ANDs its terms; the local matcher soft-ORs them. The investigator writes one query, tuned for the soft-OR matcher, and we do not change its prompt. So a query like `memory leak extension host pseudoterminal` returns nothing from GitHub while `terminal memory leak` returns the plausible issue. On zero hits the search retries once with the three rarest words of the same query, scored by the idf table already built for the local index. No model call, no prompt change.
 
 **What it actually bought, measured offline and free.** Over the 9 open submissions, 21 issues that the old corpus could not contain were surfaced, across 7 of the 9 cards. Five narrowing retries fired, no failures.
 
-One is exactly the case this was built for. Submission #333418 is titled "migrate AsyncIterableObject to AsyncIterableProducer to fix memory leak", and an earlier run called it "a superficial class rename with no actual leak-fixing logic" and put it in the skip pile. Search surfaces #256854, "Review AsyncIterableObject usage: potential memory leaks and migration to AsyncIterableProducer", an open issue asking for precisely that migration. It is 76,000 numbers outside the old window.
+One is exactly the case this was built for. Submission #333418 is titled "migrate AsyncIterableObject to AsyncIterableProducer to fix memory leak". An earlier run called it "a superficial class rename with no actual leak-fixing logic" and put it in the skip pile. Search surfaces #256854, "Review AsyncIterableObject usage: potential memory leaks and migration to AsyncIterableProducer", an open issue asking for precisely that migration. It is 76,000 numbers outside the old window.
 
 **And some of it is noise, which is the honest half.** The same 21 include #519, "Allow to change the font size and font of the workbench". Raising candidate recall raises both signal and noise, and a wider net is not the same thing as a better answer.
 
-**What we deliberately did not claim.** A before-and-after on the live queue would be worthless: the queue changes every day, four of the nine submissions turned over between two runs hours apart, and one card is eleven points of any rate computed over nine. So the retrieval measurement above is offline, deterministic, model-free, and repeatable; it is the only part attributable to this change. The end-to-end numbers from those two runs are not comparable and are not published as a trend.
+**What we deliberately did not claim.** A before-and-after on the live queue would be worthless. The queue changes every day, four of the nine submissions turned over between two runs hours apart, and one card is eleven points of any rate computed over nine. So the retrieval measurement above is offline, deterministic, model-free, and repeatable; it is the only part attributable to this change. The end-to-end numbers from those two runs are not comparable and are not published as a trend.
 
 **It is also invisible on the 15 closed cases, by construction.** `src/harvest.py` seeds the evaluation corpus with every declared target plus a band of distractors, so retrieval there is solvable by design. A retrieval improvement therefore cannot show up in the headline accuracy, and we are not going to pretend otherwise by quoting one.
 
 ## Three smaller things the same pass fixed
 
-**The claim checker was reading an arbitrary file.** It took the first source file GitHub happened to list, which on a 24-file submission is usually a config or barrel file that says nothing about the claim. It now reads the file that gained the most lines. This sits behind a default argument: the 15 evaluation cases carry no per-file counts, so they take the original branch and the scored path is unchanged by construction rather than by hope.
+**The claim checker was reading an arbitrary file.** It took the first source file GitHub happened to list, which on a 24-file submission is usually a config or barrel file that says nothing about the claim. It now reads the file that gained the most lines. This sits behind a default argument. The 15 evaluation cases carry no per-file counts, so they take the original branch, and the scored path is unchanged by construction rather than by hope.
 
 **It was also reading the wrong repository.** `fetch_source` requested `repos/microsoft/vscode/contents/` no matter which repository the tool was pointed at, so `./run.sh live some/other-repo` read VS Code's source and still returned a verdict on it. It takes the repository now, defaulting to VS Code so the evaluation is untouched.
 
@@ -471,9 +471,9 @@ One is exactly the case this was built for. Submission #333418 is titled "migrat
 
 ## A regression check that could not regress
 
-`./run.sh agent` returning 73.3% was cited as proof that the two changes above were safe. It was not proof of anything. The published numbers replay from committed JSON and never enter `check_claims` or `fetch_source`, so those two functions had no test coverage at all and the headline number was structurally incapable of moving.
+`./run.sh agent` returning 73.3% was cited as proof that the two changes above were safe. It was not proof of anything. The published numbers replay from committed JSON and never enter `check_claims` or `fetch_source`, so those two functions had no test coverage at all. The headline number was structurally incapable of moving.
 
-Twelve offline checks now call them directly: the file chooser's fallback, its tie-breaking, the repository defaulting, the cache key, the merge's reserved slots, deduplication across the two sources, the counted search failure, and the filter that stops a pull request being offered as a reported problem. Each was verified by breaking the code and confirming the check fails. One of them was written vacuous on the first attempt, asserting something that could not fail, and was replaced.
+Twelve offline checks now call them directly. They cover the file chooser's fallback, its tie-breaking, the repository defaulting, and the cache key. They also cover the merge's reserved slots, deduplication across the two sources, the counted search failure, and the filter that stops a pull request being offered as a reported problem. Each was verified by breaking the code and confirming the check fails. One of them was written vacuous on the first attempt, asserting something that could not fail, and was replaced.
 
 ## The tool had no idea it had ever seen your queue before
 
@@ -483,13 +483,13 @@ A maintainer does not triage once. They open the queue on Monday, again on Wedne
 
 **What is new since your last visit.** On a repeat run the page marks genuinely new submissions and tells you which visit this is for the rest. Simulated over the nine live submissions plus one new arrival: visit one flags 9 of 9 as new, visit two flags exactly 1. That is the difference between reading ten cards and reading one.
 
-**How long something has been waiting, and whether we already put it in front of you.** A submission the tool ranked into your reading list three visits ago that is still open is a different object from one filed this morning, and the page now says so.
+**How long something has been waiting, and whether we already put it in front of you.** A submission the tool ranked into your reading list three visits ago that is still open is a different object from one filed this morning. The page now says so.
 
 **Resolved issue lookups.** Whether #231076 exists and is open is a fact about the repository, not about this run. Re-asking GitHub for it every time is a wasted call, and calls are what cost money and hit rate limits. Recalled lookups are reported to stderr so the saving is visible rather than assumed.
 
 **What it deliberately does not remember, which is the more interesting half.** No model output. Buckets, reasons and claim verdicts are re-derived every single run. Caching a judgement would let a stale conclusion silently outlive the evidence that produced it, and this file already contains six entries about claims that outlived their evidence. A cached fact is a saving. A cached judgement is a lie waiting to happen.
 
-Two failure modes are handled explicitly because a memory that can break the tool is worse than no memory. A corrupt or unreadable store degrades to no-memory rather than raising, and an unwritable store prints a warning and lets the run finish. Both are tested. So is the rule that `unresolved`, meaning we could not reach GitHub, is never cached: one rate-limited run must not poison every later run with a fact we never actually learned.
+Two failure modes are handled explicitly because a memory that can break the tool is worse than no memory. A corrupt or unreadable store degrades to no-memory rather than raising, and an unwritable store prints a warning and lets the run finish. Both are tested. So is the rule that `unresolved`, meaning we could not reach GitHub, is never cached. One rate-limited run must not poison every later run with a fact we never actually learned.
 
 Six offline checks cover it, including the corruption and unwritable paths.
 
@@ -507,7 +507,7 @@ Every command in this project assumes the maintainer opens a terminal, remembers
 
 **Nothing it exposes can act.** The tools read, and they write one HTML file. No merge, no close, no comment, no label, and every summary says so in its final line.
 
-Seven checks drive the server over its real transport with no network and no model, including the two failures that would be invisible in a demo and fatal in use: replying to a notification, which corrupts the stream, and a raising tool killing the transport instead of returning readable error content. Registration could not be exercised on the build machine, where local policy blocks adding MCP servers, so the protocol is tested directly, which is the stronger evidence anyway.
+Seven checks drive the server over its real transport with no network and no model. They include the two failures that would be invisible in a demo and fatal in use. One is replying to a notification, which corrupts the stream. The other is a raising tool killing the transport instead of returning readable error content. Registration could not be exercised on the build machine, where local policy blocks adding MCP servers, so the protocol is tested directly, which is the stronger evidence anyway.
 
 ## The MCP server shipped broken, with seven passing tests over it
 
@@ -525,22 +525,22 @@ The first triage call from any real client would have corrupted the session. The
 
 **Then the regression test for it was also written unable to fail.** The first version passed a fresh `StringIO` to `serve()`, so the tool's `print()` and the protocol writer never shared a stream, which is exactly the condition that produces the bug. It passed with the fix removed. It only means anything when both are bound to one stream the way the real server runs, and it is now verified by deleting the fix and confirming a `JSONDecodeError`.
 
-That is three tests in this project written so they could not fail, all with the same shape: **asserting on a channel the failure cannot reach**. The vacuous test in the union-search set was the same mistake, and so was citing `./run.sh agent` as proof that a change to `check_claims` was safe when the replay path never calls it.
+That is three tests in this project written so they could not fail, all with the same shape: **asserting on a channel the failure cannot reach**. The vacuous test in the union-search set was the same mistake. So was citing `./run.sh agent` as proof that a change to `check_claims` was safe when the replay path never calls it.
 
-**The lesson, and it is the one we would carry to the next agent we build.** A test you have not seen fail is a decoration. Every check added since is verified by breaking the code first and watching the assertion fire, and the ones that could not be made to fail were deleted rather than kept for the count. The specific trap for agent work is that the seam you mock is usually the seam the bug lives in: mock the model and you stop testing the plumbing, hand the server a private stream and you stop testing the transport. Writing the harness is not the same as writing a test, and passing is not the same as working.
+**The lesson, and it is the one we would carry to the next agent we build.** A test you have not seen fail is a decoration. Every check added since is verified by breaking the code first and watching the assertion fire. The ones that could not be made to fail were deleted rather than kept for the count. The specific trap for agent work is that the seam you mock is usually the seam the bug lives in. Mock the model, and you stop testing the plumbing; hand the server a private stream, and you stop testing the transport. Writing the harness is not the same as writing a test, and passing is not the same as working.
 
 
 ## Which pile is a useless answer when there is only one submission
 
-Everything in this project sorts a queue. Pointed at a single pull request that framing collapses: a maintainer looking at one change does not want to know which of three piles it falls in, they want to know whether it is any good and what to ask for before merging.
+Everything in this project sorts a queue. Pointed at a single pull request that framing collapses. A maintainer looking at one change does not want to know which of three piles it falls in. They want to know whether it is any good and what to ask for before merging.
 
-So on a single submission the tool now also reviews the work. Overall quality, what it genuinely does well, what should be improved with a file and a reason attached to each, anything that should block a merge outright, and what breaks if the judgement is wrong.
+So on a single submission the tool now also reviews the work. Overall quality, what it genuinely does well, and what should be improved, with a file and a reason attached to each. Also: anything that should block a merge outright, and what breaks if the judgement is wrong.
 
-**It is kept blind to our own conclusion, and that is the design.** The reviewer gets the diff, the source at a pinned commit and the line counts. It never sees the bucket, the evidence chips or what the investigator found. Handing a reviewer the answer we already reached invites it to agree with us, and a reviewer that agrees with the thing it is checking is worth nothing. It is rendered in its own block on the page, visually separate from the chips, because the chips are checked facts and this is a judgement, and running them together would let a judgement borrow the credibility of a fact.
+**It is kept blind to our own conclusion, and that is the design.** The reviewer gets the diff, the source at a pinned commit and the line counts. It never sees the bucket, the evidence chips or what the investigator found. Handing a reviewer the answer we already reached invites it to agree with us, and a reviewer that agrees with the thing it is checking is worth nothing. It is rendered in its own block on the page, visually separate from the chips, because the chips are checked facts and this is a judgement. Running them together would let a judgement borrow the credibility of a fact.
 
-On `microsoft/vscode#333418`, a rename titled as a memory-leak fix, it returned `workable` and found something nobody asked it to look for: a hand-edit to a pipeline config file whose own header forbids editing it by hand. It also named the real tension, that the title promises a leak fix while the visible diff is a pure rename, so a maintainer merging it takes on a false narrative. 0.55 USD.
+On `microsoft/vscode#333418`, a rename titled as a memory-leak fix, it returned `workable` and found something nobody asked it to look for. That was a hand-edit to a pipeline config file whose own header forbids editing it by hand. It also named the real tension, that the title promises a leak fix while the visible diff is a pure rename. So a maintainer merging it takes on a false narrative. 0.55 USD.
 
-Review is ON by default for one submission and OFF for a queue scan, because it is a per-submission model call and a scan should not pay for it on every card.
+Review is ON by default for one submission and OFF for a queue scan. It is a per-submission model call, and a scan should not pay for it on every card.
 
 ## Scanning the whole queue, and what that actually costs
 
@@ -552,9 +552,9 @@ That figure retroactively justifies two features we could not demonstrate on a n
 
 ## The server could not start
 
-The MCP config used a relative path, so it only launched if the client happened to start in this directory, and every path in the project has the same dependency: the evaluation cache, the reports directory, the memory store. Started from anywhere else it either failed to launch or launched and could not find its own data.
+The MCP config used a relative path, so it only launched if the client happened to start in this directory. And every path in the project has the same dependency: the evaluation cache, the reports directory, the memory store. Started from anywhere else it either failed to launch or launched and could not find its own data.
 
-`src/mcp_server.py` now anchors to its own file rather than to the caller, and a new install target writes the absolute path for whatever clone you happen to have, which is the part a judge needs.
+`src/mcp_server.py` now anchors to its own file rather than to the caller. A new install target writes the absolute path for whatever clone you happen to have, which is the part a judge needs.
 
 
 ## A number is not a choice until it has a price on it
@@ -572,14 +572,14 @@ So the depth is now chosen, not assumed. The default target is the 100 most rece
 
 **"100" means nothing to someone who has not priced a run.** That is the whole point of putting the cost on every line: it turns an invisible decision into a visible one. An option larger than the repository itself is never offered, so a small project is not asked whether it wants 100 of its 7 submissions.
 
-The options are returned as data rather than baked into a message, because two surfaces need the same choice. In a terminal the tool asks directly. An MCP tool cannot ask anything, so it hands the assistant the priced options and lets the assistant put them in front of the maintainer, then takes the answer back as `limit` plus `confirm_cost`.
+The options are returned as data rather than baked into a message, because two surfaces need the same choice. In a terminal the tool asks directly. An MCP tool cannot ask anything, so it hands the assistant the priced options and lets the assistant put them in front of the maintainer. It then takes the answer back as `limit` plus `confirm_cost`.
 
 With no terminal and no confirmation, it prints the menu and spends nothing, so a script or a CI job can never discover the price after the fact.
 
 
 ## The first command a judge runs crashed on their machine and passed on ours
 
-`./run.sh eval` read its fixture from `reports/microsoft-vscode.json`. That directory is gitignored, so the file exists only on a machine that has already paid for a live run. On a fresh clone the whole target died with `FileNotFoundError`, and because `run.sh` uses `set -euo pipefail`, everything after it went down too: the twenty protocol checks, the documentation guard and the reference baseline. The suite passed here for the worst possible reason, which is that we were not the audience.
+`./run.sh eval` read its fixture from `reports/microsoft-vscode.json`. That directory is gitignored, so the file exists only on a machine that has already paid for a live run. On a fresh clone the whole target died with `FileNotFoundError`, and because `run.sh` uses `set -euo pipefail`, everything after it went down too. That included the twenty protocol checks, the documentation guard and the reference baseline. The suite passed here for the worst possible reason, which is that we were not the audience.
 
 The fixture now comes from `data/live-record-prefix.json`, which is tracked. Verified the way it should have been from the start: copy only the tracked files into an empty directory, no `.git`, no artifacts, and run the command a judge would run. Exit 0, twenty of twenty.
 
@@ -625,6 +625,6 @@ The depth menu printed in the README and in this file carried the old 25-second 
 
 ## The command in the README did not do what the README said
 
-`./run.sh live owner/repo` passed `--limit 8`. Twelve is the confirmation threshold, so the documented command sat permanently underneath it: no menu, no bill, about 3.60 USD spent silently, four lines below a paragraph promising that nothing over a dozen runs until it has been chosen.
+`./run.sh live owner/repo` passed `--limit 8`. Twelve is the confirmation threshold, so the documented command sat permanently underneath it. That meant no menu, no bill, about 3.60 USD spent silently, four lines below a paragraph promising that nothing over a dozen runs until it has been chosen.
 
 The cap is gone. `PRSLOP_LIMIT` still overrides for a scripted run. This one mattered beyond the honesty of it, because it is the command a demo types on camera, and the feature would not have appeared.
