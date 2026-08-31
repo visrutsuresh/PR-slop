@@ -1,155 +1,525 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Triage, microsoft/vscode</title><style>
-:root{--ink:#12100e;--paper:#faf8f4;--card:#fff;--muted:#6f6862;--line:#e6e0d6;
-      --green:#1c7a4b;--amber:#b8830f;--slate:#5a6b80;--red:#b5382b}
+<title>microsoft/vscode triage, kanban</title>
+<style>
+:root{
+  --paper:#f8f5ee;
+  --ink:#18140f;
+  --muted:#635a4d;
+  --line:#e1d9ca;
+  --accent:#8a5f10;
+  --accent-soft:#f1e6ce;
+
+  /* morphism surfaces: three distinct planes, not one flat sheet */
+  --tray:#ede4d1;           /* recessed: the board column slot cards sit in */
+  --tray-shadow:inset 0 2px 5px rgba(24,20,15,.10), inset 0 -1px 0 rgba(255,255,255,.55);
+  --card-surface:#fffdf8;    /* raised: individual cards */
+  --card-shadow:0 1px 2px rgba(24,20,15,.05), 0 6px 16px rgba(24,20,15,.06);
+  --card-shadow-hover:0 2px 4px rgba(24,20,15,.07), 0 10px 24px rgba(24,20,15,.10);
+  --panel-surface:#f2ece0;   /* raised: sidebar / evidence panel */
+  --panel-shadow:0 1px 2px rgba(24,20,15,.04), 0 10px 26px rgba(24,20,15,.07);
+
+  --dur-snappy:220ms; --ease-snappy:cubic-bezier(.175,.885,.32,1.1);
+  --dur-smooth:300ms; --ease-smooth:cubic-bezier(.19,1,.22,1);
+}
 *{box-sizing:border-box}
+html{background:var(--paper)}
 body{margin:0;background:var(--paper);color:var(--ink);
-  font:400 16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+  font:400 15px/1.6 ui-monospace,"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
   -webkit-font-smoothing:antialiased}
-header{background:var(--ink);color:#f6f2ec;padding:34px 26px}
-.wrap{max-width:1060px;margin:0 auto}
-h1{margin:0 0 6px;font-size:27px;letter-spacing:-.02em}
-header .sub{color:#a9a096;font-size:15px}
-header .warn{margin-top:16px;background:#241f1a;border-left:3px solid #b8830f;
-  padding:11px 15px;border-radius:0 8px 8px 0;color:#d8cfc3;font-size:14.5px}
-main{padding:30px 26px 90px}
-.group{margin:34px 0 10px}
-.group h2{margin:0 0 3px;font-size:20px;letter-spacing:-.01em}
-.group p{margin:0 0 14px;color:var(--muted);font-size:14.5px}
-.bar{height:3px;border-radius:2px;margin-bottom:16px}
-.b1 .bar{background:var(--green)}.b2 .bar{background:var(--amber)}
-.b3 .bar{background:#c3bbb0}.bx .bar{background:var(--slate)}
-.pr{background:var(--card);border:1px solid var(--line);border-radius:12px;
-  padding:16px 18px;margin-bottom:11px}
-.pr .top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
-.num{font:600 14px ui-monospace,Menlo,monospace;color:var(--muted)}
-.title{font-weight:650;font-size:17px;flex:1;min-width:240px}
-.rank{font:600 12px ui-monospace,Menlo,monospace;color:#8a8078;background:#f2ede5;
-  padding:2px 8px;border-radius:6px}
-.rest{margin-top:8px}
-.rest summary{cursor:pointer;color:var(--muted);font-size:14.5px;padding:9px 2px;
-  list-style:revert}
-.rest summary:hover{color:var(--ink)}
-.chips{margin:11px 0 0;display:flex;gap:7px;flex-wrap:wrap}
-.chip{font-size:13px;padding:3px 10px;border-radius:999px;background:#f2ede5;color:#5c554e}
-.chip.ok{background:#e6f4ec;color:var(--green)}
-.chip.no{background:#f6ece9;color:var(--red)}
-.chip.hm{background:#f7f0dd;color:var(--amber)}
-.why{margin:11px 0 0;color:#463f39;font-size:15px}
-.why b{font-weight:650}
-.links{margin:11px 0 0;font-size:14px}
-a{color:#2f5d8f}
-.flag{margin-top:11px;padding:10px 13px;background:#fbf6e8;border-left:3px solid var(--amber);
-  border-radius:0 7px 7px 0;font-size:14.5px;color:#6b5410}
-footer{border-top:1px solid var(--line);padding:26px;color:var(--muted);font-size:14px}
-.k{display:inline-block;min-width:132px;color:var(--muted)}
-</style></head><body>
-<header><div class="wrap">
-  <h1>microsoft/vscode, 9 open pull requests</h1>
-  <div class="sub">A suggested reading order. Generated 2026-08-30 22:50 UTC.</div>
-  <div class="warn"><b>Nothing here has been acted on.</b> This tool cannot
-  merge, close, comment or label. It read 300 of your recorded
-  problems and the code at commit <code>23f50094</code>, and
-  every reference below was checked before you saw it. The order is a
-  suggestion; you decide.</div>
-</div></header>
-<main><div class="wrap"><section class="group b1"><div class="bar"></div><h2>Predicted merge, and the model tied it to an already-reported problem <span class="num">3</span></h2><p>A prediction about what a maintainer would decide, not a measurement. The link to a reported problem is the model's, checked against GitHub before you saw it. The order inside the group is evidence strength.</p><article class="pr">
-  <div class="top"><span class="num">#333431</span><span class="rank">1 of 3</span>
-    <span class="title">Test: add missing pointer-events assertion to sessionsListTwistie spec</span></div>
-  <div class="chips"><span class="chip ok">fact · author’s text: “…and visibility. Fixes #333430”, open issue, confirmed</span><span class="chip ok">checked · cites #333430, real open issue</span><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 4 test lines added</span><span class="chip">fact · 4 lines added, 1 file</span></div>
-  <div class="why"><b>Why:</b> Small, correct test addition that closes a coverage gap by asserting pointer-events in the unhover state, matching a previously filed issue.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333431">open on GitHub</a></div>
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+h1,h2,h3,h4{font-family:inherit;margin:0;font-weight:600;letter-spacing:-.01em}
+a{color:inherit}
+button{font:inherit}
+
+/* --- marks: fact square / checked diamond / judgement circle, 15px, shape+fill carries meaning --- */
+.mk{display:inline-block;width:15px;height:15px;flex:0 0 auto;vertical-align:-3px}
+.mk-fact{background:var(--muted);border-radius:2px}
+.mk-checked{background:var(--ink);transform:rotate(45deg);border-radius:2px;position:relative}
+.mk-checked.mk-hollow{background:transparent;border:2px solid var(--ink)}
+.mk-checked.mk-dashed{background:transparent;border:2px dashed var(--ink)}
+.mk-checked.mk-crossed{background:transparent;border:2px solid var(--ink)}
+.mk-checked.mk-crossed::after{content:"";position:absolute;left:50%;top:50%;width:19px;height:2.4px;
+  background:var(--ink);transform:translate(-50%,-50%) rotate(45deg)}
+.mk-judge{width:15px;height:15px;border-radius:50%;background:transparent;border:2px solid var(--ink);opacity:.8}
+/* nothing was verified: a neutral placeholder, never the filled "confirmed" diamond */
+.chip-checked .mk.mk-empty{width:15px;height:15px;border-radius:1px;background:transparent;border:1.5px dotted var(--muted);transform:none}
+/* compound selector: real specificity, so this beats .chip-checked's own
+   background regardless of source order (a plain .chip-empty tied at equal
+   specificity is inert and was caught rendering byte-identical to a filled
+   chip) */
+.chip-checked.chip-empty{background:var(--paper);color:var(--muted)}
+
+.mk-judge.mk-j-nomatch{background:var(--ink);opacity:1}
+.mk-judge.mk-j-unclear{border-style:dashed}
+.mktxt{margin-left:9px}
+
+/* --- board: recessed tray holds raised cards, so depth reads as structure --- */
+.board-head{padding:30px 0 18px;border-bottom:1px solid var(--line)}
+.board-head h1{font-size:20px}
+.board-sub{margin:8px 0 0;color:var(--muted);font-size:13.5px}
+.board-sub code{background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+
+/* --- one aggregate per run, read before any card --- */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:10px;margin:20px 0 4px}
+.strip .cell{background:var(--card-surface);box-shadow:var(--card-shadow);
+  border-radius:10px;padding:14px 16px}
+.strip .cell .n{font:650 26px/1 inherit;letter-spacing:-.02em}
+.strip .cell .lab{margin-top:5px;font-weight:600;font-size:13px}
+.strip .cell .sub{margin-top:2px;color:var(--muted);font-size:12px}
+
+.board-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:22px 0 0}
+.col{background:var(--tray);box-shadow:var(--tray-shadow);border-radius:12px;padding:18px 16px 22px;min-width:0}
+.col-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.col-head h2{font-size:14px}
+.col-head .count{font-size:13px;color:var(--muted);background:var(--card-surface);box-shadow:var(--card-shadow);
+  border-radius:999px;padding:1px 9px}
+.col-note{margin:6px 0 16px;color:var(--muted);font-size:12.5px;line-height:1.5}
+.col-cards{display:grid;gap:10px}
+.card{all:unset;display:block;background:var(--card-surface);box-shadow:var(--card-shadow);border-radius:10px;
+  padding:13px 14px;cursor:pointer;transition:transform var(--dur-snappy) var(--ease-snappy),
+  box-shadow var(--dur-snappy) var(--ease-snappy)}
+.card:hover,.card:focus-visible{transform:translateY(-2px);box-shadow:var(--card-shadow-hover)}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card:active{transform:translateY(0)}
+.card-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.card .num{font-size:12.5px;color:var(--muted)}
+.card .rank{font-size:11.5px;color:var(--muted)}
+.card-title{margin-top:6px;font-size:14.5px;font-weight:600;line-height:1.4}
+.card-evidence{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+
+/* --- later-today split inside a column, same shape as the flat report's <details> --- */
+.col-more{margin-top:10px}
+.col-more summary{cursor:pointer;color:var(--muted);font-size:12px;padding:6px 2px;list-style:revert}
+.col-more summary:hover{color:var(--ink)}
+.col-more .col-cards{margin-top:10px}
+
+/* labelled chips: each tier is its own small surface, not just a coloured dot */
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 8px 3px 6px;border-radius:6px;
+  color:var(--muted)}
+.chip .mk{width:10px;height:10px}
+.chip-fact{background:var(--paper)}
+.chip-checked{background:var(--accent-soft);color:#5b3f0a}
+.chip-checked .mk{background:var(--accent);border-color:var(--accent)}
+.chip-checked .mk.mk-crossed::after{background:var(--accent)}
+/* ponytail: font-weight is the only channel this ships with today for the
+   highest-severity finding (an invented citation). No PR in the shipped
+   dataset has a mixed checked state, so this path is unexercised; strengthen
+   with shape or border once a real one does. */
+.chip-flag{font-weight:700}
+.chip-judge{background:transparent;border:1px solid var(--line)}
+.chip-judge .mk{border-color:var(--muted)}
+.cflag{margin-top:9px;font-size:12px;color:var(--accent);border-top:1px dashed var(--line);padding-top:8px}
+.board-foot{margin:26px 0 60px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+
+/* --- page --- */
+.page{padding:28px 0 80px}
+.back{all:unset;display:inline-flex;align-items:center;gap:8px;cursor:pointer;color:var(--ink);
+  font-size:13.5px;font-weight:600;padding:7px 4px;margin-bottom:22px;
+  transition:transform var(--dur-snappy) var(--ease-snappy),color var(--dur-snappy) var(--ease-snappy)}
+.back:hover,.back:focus-visible{color:var(--accent);transform:translateX(-3px)}
+.back:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.page-title-block{margin-bottom:26px}
+.page-num{font-size:13px;color:var(--muted)}
+.page-title{font-size:26px;line-height:1.3;margin-top:6px;letter-spacing:-.015em}
+.pflag{margin-top:12px;padding:10px 13px;background:var(--accent-soft);border-radius:8px;font-size:13.5px;color:#5b3f0a}
+.props-h{font-size:12px;letter-spacing:.03em;color:var(--muted);margin-bottom:8px}
+.props{display:grid;gap:0;border-top:1px solid var(--line)}
+.prop-row{display:grid;grid-template-columns:100px 1fr;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);
+  line-height:1.6}
+.prop-k{color:var(--muted);font-size:12.5px}
+.prop-v{font-size:13px}
+.prop-v code{background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+.sec{margin-top:32px}
+.sec h3{font-size:13px;letter-spacing:.03em;color:var(--muted);margin-bottom:12px}
+.verdict-name{font-size:16.5px;font-weight:650;margin:0 0 6px}
+.verdict-reason{font-size:15px;max-width:74ch;line-height:1.65}
+.tier-block{margin-bottom:14px;padding:14px 16px;border-radius:10px}
+.tier-fact{background:var(--paper);box-shadow:var(--tray-shadow)}
+.tier-checked{background:var(--panel-surface);box-shadow:var(--panel-shadow)}
+.tier-judgement{background:transparent;border:1px solid var(--line)}
+.tier-block h4{font-size:12.5px;color:var(--ink);font-weight:700;margin-bottom:10px;letter-spacing:.01em;
+  display:flex;align-items:baseline;gap:8px}
+.tier-sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.tier-list{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.tier-list li{display:flex;align-items:flex-start;gap:0;font-size:14px;line-height:1.55;max-width:76ch}
+.tier-list .mk{margin-top:3px}
+.empty{color:var(--muted);font-size:14px}
+.review-tag{font-size:13.5px;color:var(--muted)}
+.review-head{font-size:16px;font-weight:600;margin:8px 0 0}
+.rl{margin-top:14px}
+.rk{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;
+  color:var(--ink);background:var(--panel-surface);box-shadow:var(--panel-shadow);border-radius:5px;
+  padding:2px 8px;margin-bottom:7px}
+.rl ul{margin:0;padding-left:18px}
+.rl li{margin:4px 0;font-size:14px}
+.review-risk{margin-top:14px;font-size:13.5px;color:#5b3f0a;background:var(--accent-soft);
+  padding:9px 12px;border-radius:6px;display:inline-block}
+.gh-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink);
+  background:var(--card-surface);box-shadow:var(--card-shadow);border-radius:8px;padding:9px 14px;text-decoration:none;
+  transition:box-shadow var(--dur-snappy) var(--ease-snappy),transform var(--dur-snappy) var(--ease-snappy)}
+.gh-link:hover,.gh-link:focus-visible{box-shadow:var(--card-shadow-hover);transform:translateY(-1px)}
+.gh-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* --- two-column page: sidebar reads as its own panel, not a bordered strip --- */
+.page-2col{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start}
+.page-side{position:sticky;top:24px;background:var(--panel-surface);box-shadow:var(--panel-shadow);
+  border-radius:14px;padding:20px}
+.page-side .sec{margin-top:22px}
+.page-side .sec:first-child{margin-top:0}
+.page-side .sec-link .gh-link{width:100%;justify-content:center}
+
+/* --- view swap --- */
+.swap{opacity:0;transform:translateY(6px);
+  transition:opacity var(--dur-smooth) var(--ease-smooth),transform var(--dur-smooth) var(--ease-smooth)}
+.swap[hidden]{display:none}
+.swap.in{opacity:1;transform:translateY(0)}
+@media (prefers-reduced-motion:reduce){
+  .card,.back,.swap{transition:none!important}
+}
+@media (max-width:900px){
+  .board-cols{grid-template-columns:1fr}
+  .page-2col{grid-template-columns:1fr}
+  .page-side{position:static}
+}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="swap in" id="view-board">
+    <div class="board" id="board" role="region" aria-label="Kanban board">
+  <header class="board-head">
+    <h1>microsoft/vscode, 9 open pull requests</h1>
+    <p class="board-sub">Read-only. Generated 2026-08-30 22:50 UTC, commit <code>23f50094</code>.</p>
+  </header>
+  <div class="strip"><div class="cell"><div class="n">3</div><div class="lab">Read first</div><div class="sub">answer a reported problem</div></div><div class="cell"><div class="n">9</div><div class="lab">In the queue</div><div class="sub">open right now</div></div></div>
+  <div class="board-cols"><section class="col" aria-label="Merge predicted, issue confirmed">
+  <header class="col-head"><h2>Merge predicted, issue confirmed</h2><span class="count">3</span></header>
+  <p class="col-note">Tied to a filed, open issue.</p>
+  <div class="col-cards"><button class="card" data-target="pr-333431" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333431</span><span class="rank">1 of 3</span></div>
+  <div class="card-title">Test: add missing pointer-events assertion to sessionsListTwistie spec</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked"><span class="mk mk-checked mk-solid" aria-hidden="true"></span>2 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-match" aria-hidden="true"></span>1 judgement</span></div>
   
-</article><article class="pr">
-  <div class="top"><span class="num">#333390</span><span class="rank">2 of 3</span>
-    <span class="title">Fix #231076: Restore NODE_OPTIONS environment variable on Windows</span></div>
-  <div class="chips"><span class="chip ok">fact · author’s text: “Fix #231076”, open issue, confirmed</span><span class="chip ok">checked · cites #231076, real open issue</span><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 37 test lines added</span><span class="chip">fact · 54 lines added, 4 files</span></div>
-  <div class="why"><b>Why:</b> The PR explicitly fixes a reported issue (#231076) about NODE_OPTIONS not being inherited by the integrated terminal on Windows, mirroring an existing macOS workaround, with tests added; this is a real, scoped bug fix addressing a known problem.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333390">open on GitHub</a></div>
+</button><button class="card" data-target="pr-333390" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333390</span><span class="rank">2 of 3</span></div>
+  <div class="card-title">Fix #231076: Restore NODE_OPTIONS environment variable on Windows</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked"><span class="mk mk-checked mk-solid" aria-hidden="true"></span>2 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-match" aria-hidden="true"></span>1 judgement</span></div>
   
-</article><article class="pr">
-  <div class="top"><span class="num">#333399</span><span class="rank">3 of 3</span>
-    <span class="title">Fix Copilot memory tool infinite loop with empty old_str in str_replace</span></div>
-  <div class="chips"><span class="chip ok">fact · author’s text: “This PR fixes #333395”, open issue, confirmed</span><span class="chip ok">checked · cites #333395, real open issue</span><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · 20 test lines added</span><span class="chip">fact · 26 lines added, 2 files</span></div>
-  <div class="why"><b>Why:</b> Small, targeted fix for a real reported hang (empty old_str causing infinite loop in str_replace) with a regression test added; matches an already-reported issue.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333399">open on GitHub</a></div>
+</button><button class="card" data-target="pr-333399" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333399</span><span class="rank">3 of 3</span></div>
+  <div class="card-title">Fix Copilot memory tool infinite loop with empty old_str in str_replace</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked"><span class="mk mk-checked mk-solid" aria-hidden="true"></span>2 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-unclear" aria-hidden="true"></span>1 judgement</span></div>
   
-</article></section>
-<section class="group b2"><div class="bar"></div><h2>Predicted merge, with no reported problem cited by the model <span class="num">5</span></h2><p>Same prediction, without the model finding and citing an already-reported problem for it. That describes the model's search, not the world: a card below can still carry the author's own declared reference, which is machine-derived and does not move the group. The order inside the group is evidence strength.</p><article class="pr">
-  <div class="top"><span class="num">#333432</span><span class="rank">1 of 5</span>
-    <span class="title">Fix multi-diff virtualization review follow-ups</span></div>
-  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 120 test lines added</span><span class="chip">fact · 140 lines added, 7 files</span></div>
-  <div class="why"><b>Why:</b> Genuine substantive follow-up fix with matching tests, but the referenced issue #333394 is not a verifiable real problem report, so it lacks confirmed evidence of addressing an already-reported issue.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333432">open on GitHub</a></div>
+</button></div>
   
-</article><article class="pr">
-  <div class="top"><span class="num">#333428</span><span class="rank">2 of 5</span>
-    <span class="title">Agents: refine pull request input banners</span></div>
-  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 250 test lines added</span><span class="chip">fact · 370 lines added, 24 files</span></div>
-  <div class="why"><b>Why:</b> A substantive multi-file refinement to PR review banner/feedback logic with tests, but no confirmed link to a specific already-reported issue, so it needs human review rather than being flagged as addressing a known bug.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333428">open on GitHub</a></div>
+</section><section class="col" aria-label="Merge predicted, no issue found">
+  <header class="col-head"><h2>Merge predicted, no issue found</h2><span class="count">5</span></header>
+  <p class="col-note">No confirmed issue behind it.</p>
+  <div class="col-cards"><button class="card" data-target="pr-333432" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333432</span><span class="rank">1 of 5</span></div>
+  <div class="card-title">Fix multi-diff virtualization review follow-ups</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked chip-empty"><span class="mk mk-empty" aria-hidden="true"></span>0 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-match" aria-hidden="true"></span>1 judgement</span></div>
   
-</article><article class="pr">
-  <div class="top"><span class="num">#333397</span><span class="rank">3 of 5</span>
-    <span class="title">fix: memory leak in extension host pseudoterminals</span></div>
-  <div class="chips"><span class="chip ok">judgement · code matches its description</span><span class="chip ok">fact · 59 test lines added</span><span class="chip">fact · 90 lines added, 2 files</span></div>
-  <div class="why"><b>Why:</b> Genuine substantive fix with tests matching a real leak, but there&#x27;s no verifiable evidence #211462 or the other cited issues actually describe this exact pseudoterminal cleanup bug, so I can&#x27;t confirm it addresses an already-reported problem.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333397">open on GitHub</a></div>
+</button><button class="card" data-target="pr-333428" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333428</span><span class="rank">2 of 5</span></div>
+  <div class="card-title">Agents: refine pull request input banners</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked chip-empty"><span class="mk mk-empty" aria-hidden="true"></span>0 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-match" aria-hidden="true"></span>1 judgement</span></div>
   
-</article><article class="pr">
-  <div class="top"><span class="num">#333418</span><span class="rank">4 of 5</span>
-    <span class="title">refactor: migrate AsyncIterableObject to AsyncIterableProducer to fix memory leaks</span></div>
-  <div class="chips"><span class="chip no">judgement · code does not match its description</span><span class="chip ok">fact · 3 test lines added</span><span class="chip">fact · 15 lines added, 7 files</span></div>
-  <div class="why"><b>Why:</b> Genuine mechanical rename refactor of AsyncIterableObject to AsyncIterableProducer across core and API files, but the memory-leak claim doesn&#x27;t match the diff and no already-reported issue confirms this fixes a known bug.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333418">open on GitHub</a></div>
+</button><button class="card" data-target="pr-333397" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333397</span><span class="rank">3 of 5</span></div>
+  <div class="card-title">fix: memory leak in extension host pseudoterminals</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked chip-empty"><span class="mk mk-empty" aria-hidden="true"></span>0 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-match" aria-hidden="true"></span>1 judgement</span></div>
   
-</article><article class="pr">
-  <div class="top"><span class="num">#333391</span><span class="rank">5 of 5</span>
-    <span class="title">Fix workspace symbol search with double-colon qualifiers</span></div>
-  <div class="chips"><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · 60 test lines added</span><span class="chip">fact · 70 lines added, 2 files</span></div>
-  <div class="why"><b>Why:</b> Genuine, tested contribution addressing double-colon symbol search, but I cannot verify #332901 or confirm maintainer acceptance, so I default to worth-reviewing rather than act-now.</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333391">open on GitHub</a></div>
+</button><button class="card" data-target="pr-333418" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333418</span><span class="rank">4 of 5</span></div>
+  <div class="card-title">refactor: migrate AsyncIterableObject to AsyncIterableProducer to fix memory leaks</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked chip-empty"><span class="mk mk-empty" aria-hidden="true"></span>0 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-nomatch" aria-hidden="true"></span>1 judgement</span></div>
   
-</article></section>
-<section class="group b3"><div class="bar"></div><h2>Predicted not merged <span class="num">1</span></h2><p>A prediction about a human decision, NOT a judgement that the work is bad. Housekeeping, superseded work and duplicates all land here.</p><article class="pr">
-  <div class="top"><span class="num">#333426</span>
-    <span class="title">Show action icons on title bar buttons, replace auto-merge with Agent Merge</span></div>
-  <div class="chips"><span class="chip hm">judgement · could not confirm the description</span><span class="chip ok">fact · 550 test lines added</span><span class="chip">fact · 684 lines added, 11 files</span></div>
-  <div class="why"><b>Why:</b> The investigator&#x27;s search terms don&#x27;t clearly match this PR&#x27;s actual content (icon/spinner rendering fix plus a UI replacement of auto-merge with Agent Merge); without verifiable evidence linking #332934 to this specific change, and given VS Code-style repos routinely have UI-pol</div>
-  <div class="links"><a href="https://github.com/microsoft/vscode/pull/333426">open on GitHub</a></div>
+</button><button class="card" data-target="pr-333391" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333391</span><span class="rank">5 of 5</span></div>
+  <div class="card-title">Fix workspace symbol search with double-colon qualifiers</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked chip-empty"><span class="mk mk-empty" aria-hidden="true"></span>0 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-unclear" aria-hidden="true"></span>1 judgement</span></div>
   
-</article></section></div></main>
-<footer><div class="wrap">
-  <div><span class="k">The groups</span> Which group a submission is in is a
-  <em>prediction</em> about the decision a maintainer would make, not a
-  measurement and not a quality verdict. The order <em>inside</em> a group is a
-  different thing: evidence strength, described next.</div>
-  <div><span class="k">The order</span> Within each group, by how much
-  <em>checked</em> evidence supports it: a reference the author declared and we
-  confirmed, then a confirmed link to an already-reported problem, then a
-  confirmed description. Ties break to the newer submission, which is recency,
-  not evidence. Tests and size do not affect the order; they are shown, not
-  ranked.</div>
-  <div><span class="k">How to read it</span> Chips marked <em>fact</em> you can
-  re-derive yourself from GitHub with no model involved: files changed, lines
-  added, whether test paths are touched, and any closing reference found in the
-  author's own title or body, quoted verbatim. That last one is a <b>text
-  match, not a statement of intent</b>: the tool reports the characters the
-  author wrote and whether the referenced issue is real and open. It does not
-  read the sentence around them, so a negation ("does not fix #123") or an
-  unticked template checkbox will still show a chip; a reference inside a
-  fenced code block is skipped. The quote is there so you can see which one you
-  are looking at. Chips marked <em>checked</em> were proposed by the model and
-  then verified against GitHub, so the reference is real and its state is
-  accurate, but the model chose to cite it. Chips marked <em>judgement</em> are
-  the model's opinion and nothing verified them. The order on this page puts
-  checked evidence first and breaks ties by recency, not an accuracy claim: these pull
-  requests are open, so no correct answer exists to score against.</div>
-  <div><span class="k">What it cannot do</span> It does not know your roadmap,
-  your release schedule, or that you already decided against an approach. Those
-  are the reasons good work gets closed, and it cannot see any of them.</div>
-  <div><span class="k">This run</span> microsoft/vscode, 9 submissions,
-  generated 2026-08-30 22:50 UTC, source read at commit
-  <code>23f50094</code>, 4.10 USD.</div>
-</div></footer></body></html>
+</button></div>
+  
+</section><section class="col" aria-label="Merge unlikely">
+  <header class="col-head"><h2>Merge unlikely</h2><span class="count">1</span></header>
+  <p class="col-note">Housekeeping and superseded work land here too.</p>
+  <div class="col-cards"><button class="card" data-target="pr-333426" aria-haspopup="true">
+  <div class="card-top"><span class="num">#333426</span><span class="rank">1 of 1</span></div>
+  <div class="card-title">Show action icons on title bar buttons, replace auto-merge with Agent Merge</div>
+  <div class="card-evidence"><span class="chip chip-fact"><span class="mk mk-fact" aria-hidden="true"></span>2 fact</span><span class="chip chip-checked chip-empty"><span class="mk mk-empty" aria-hidden="true"></span>0 checked</span><span class="chip chip-judge"><span class="mk mk-judge mk-j-unclear" aria-hidden="true"></span>1 judgement</span></div>
+  
+</button></div>
+  
+</section></div>
+  <footer class="board-foot">Checked against 300 known issues, 4.10 USD this run.
+  This ranking is a suggestion, not a decision.</footer>
+</div>
+  </div>
+  <article class="page swap" id="pr-333432" data-num="333432" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333432</span>
+  <h1 class="page-title">Fix multi-diff virtualization review follow-ups</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge predicted, no issue found</p>
+<p class="verdict-reason">Genuine substantive follow-up fix with matching tests, but the referenced issue #333394 is not a verifiable real problem report, so it lacks confirmed evidence of addressing an already-reported issue.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">120 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">140 lines changed, 7 files</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-match" aria-hidden="true"></span><span class="mktxt">the code matches its own description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge predicted, no issue found</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">1 of 5</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">medium</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">hediet</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">7</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">140</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">120</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333432" target="_blank" rel="noopener">Open #333432 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+<article class="page swap" id="pr-333431" data-num="333431" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333431</span>
+  <h1 class="page-title">Test: add missing pointer-events assertion to sessionsListTwistie spec</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge predicted, issue confirmed</p>
+<p class="verdict-reason">Small, correct test addition that closes a coverage gap by asserting pointer-events in the unhover state, matching a previously filed issue.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">4 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">4 lines changed, 1 file</span></li></ul></div><div class="tier-block tier-checked"><h4>Checked<span class="tier-sub">verified against GitHub</span></h4><ul class="tier-list"><li><span class="mk mk-checked mk-solid" aria-hidden="true"></span><span class="mktxt">author’s text: “…and visibility. Fixes #333430”, open issue, confirmed</span></li><li><span class="mk mk-checked mk-solid" aria-hidden="true"></span><span class="mktxt">cited #333430 as the problem this fixes: open, confirmed</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-match" aria-hidden="true"></span><span class="mktxt">the code matches its own description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge predicted, issue confirmed</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">1 of 3</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">medium</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">denizguney</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">1</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">4</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">4</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333431" target="_blank" rel="noopener">Open #333431 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+<article class="page swap" id="pr-333428" data-num="333428" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333428</span>
+  <h1 class="page-title">Agents: refine pull request input banners</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge predicted, no issue found</p>
+<p class="verdict-reason">A substantive multi-file refinement to PR review banner/feedback logic with tests, but no confirmed link to a specific already-reported issue, so it needs human review rather than being flagged as addressing a known bug.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">250 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">370 lines changed, 24 files</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-match" aria-hidden="true"></span><span class="mktxt">the code matches its own description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge predicted, no issue found</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">2 of 5</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">low</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">benibenj</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">24</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">370</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">250</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333428" target="_blank" rel="noopener">Open #333428 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+<article class="page swap" id="pr-333426" data-num="333426" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333426</span>
+  <h1 class="page-title">Show action icons on title bar buttons, replace auto-merge with Agent Merge</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge unlikely</p>
+<p class="verdict-reason">The investigator&#x27;s search terms don&#x27;t clearly match this PR&#x27;s actual content (icon/spinner rendering fix plus a UI replacement of auto-merge with Agent Merge); without verifiable evidence linking #332934 to this specific change, and given VS Code-style repos routinely have UI-polish PRs superseded or reworked by the maintainer&#x27;s own team, there&#x27;s no strong signal this was merged as-is.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">550 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">684 lines changed, 11 files</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-unclear" aria-hidden="true"></span><span class="mktxt">cannot confirm the code matches its description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge unlikely</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">1 of 1</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">low</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">benibenj</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">11</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">684</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">550</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333426" target="_blank" rel="noopener">Open #333426 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+<article class="page swap" id="pr-333418" data-num="333418" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333418</span>
+  <h1 class="page-title">refactor: migrate AsyncIterableObject to AsyncIterableProducer to fix memory leaks</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge predicted, no issue found</p>
+<p class="verdict-reason">Genuine mechanical rename refactor of AsyncIterableObject to AsyncIterableProducer across core and API files, but the memory-leak claim doesn&#x27;t match the diff and no already-reported issue confirms this fixes a known bug.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">3 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">15 lines changed, 7 files</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-nomatch" aria-hidden="true"></span><span class="mktxt">the code does not match its own description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge predicted, no issue found</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">4 of 5</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">medium</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">veerjain-1</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">7</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">15</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">3</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333418" target="_blank" rel="noopener">Open #333418 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+<article class="page swap" id="pr-333399" data-num="333399" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333399</span>
+  <h1 class="page-title">Fix Copilot memory tool infinite loop with empty old_str in str_replace</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge predicted, issue confirmed</p>
+<p class="verdict-reason">Small, targeted fix for a real reported hang (empty old_str causing infinite loop in str_replace) with a regression test added; matches an already-reported issue.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">20 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">26 lines changed, 2 files</span></li></ul></div><div class="tier-block tier-checked"><h4>Checked<span class="tier-sub">verified against GitHub</span></h4><ul class="tier-list"><li><span class="mk mk-checked mk-solid" aria-hidden="true"></span><span class="mktxt">author’s text: “This PR fixes #333395”, open issue, confirmed</span></li><li><span class="mk mk-checked mk-solid" aria-hidden="true"></span><span class="mktxt">cited #333395 as the problem this fixes: open, confirmed</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-unclear" aria-hidden="true"></span><span class="mktxt">cannot confirm the code matches its description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge predicted, issue confirmed</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">3 of 3</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">medium</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">atomlong</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">2</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">26</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">20</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333399" target="_blank" rel="noopener">Open #333399 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+<article class="page swap" id="pr-333397" data-num="333397" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333397</span>
+  <h1 class="page-title">fix: memory leak in extension host pseudoterminals</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge predicted, no issue found</p>
+<p class="verdict-reason">Genuine substantive fix with tests matching a real leak, but there&#x27;s no verifiable evidence #211462 or the other cited issues actually describe this exact pseudoterminal cleanup bug, so I can&#x27;t confirm it addresses an already-reported problem.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">59 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">90 lines changed, 2 files</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-match" aria-hidden="true"></span><span class="mktxt">the code matches its own description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge predicted, no issue found</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">3 of 5</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">low</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">SimonSiefke</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">2</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">90</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">59</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333397" target="_blank" rel="noopener">Open #333397 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+<article class="page swap" id="pr-333391" data-num="333391" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333391</span>
+  <h1 class="page-title">Fix workspace symbol search with double-colon qualifiers</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge predicted, no issue found</p>
+<p class="verdict-reason">Genuine, tested contribution addressing double-colon symbol search, but I cannot verify #332901 or confirm maintainer acceptance, so I default to worth-reviewing rather than act-now.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">60 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">70 lines changed, 2 files</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-unclear" aria-hidden="true"></span><span class="mktxt">cannot confirm the code matches its description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge predicted, no issue found</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">5 of 5</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">low</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">OskarEichler</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">2</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">70</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">60</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333391" target="_blank" rel="noopener">Open #333391 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+<article class="page swap" id="pr-333390" data-num="333390" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  <div class="page-title-block">
+  <span class="page-num">#333390</span>
+  <h1 class="page-title">Fix #231076: Restore NODE_OPTIONS environment variable on Windows</h1>
+  
+</div>
+<div class="page-2col">
+  <div class="page-main">
+    <section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">Merge predicted, issue confirmed</p>
+<p class="verdict-reason">The PR explicitly fixes a reported issue (#231076) about NODE_OPTIONS not being inherited by the integrated terminal on Windows, mirroring an existing macOS workaround, with tests added; this is a real, scoped bug fix addressing a known problem.</p></section>
+    <section class="sec"><h3>Evidence</h3><div class="tier-block tier-fact"><h4>Fact<span class="tier-sub">true with no model</span></h4><ul class="tier-list"><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">37 test lines added</span></li><li><span class="mk mk-fact" aria-hidden="true"></span><span class="mktxt">54 lines changed, 4 files</span></li></ul></div><div class="tier-block tier-checked"><h4>Checked<span class="tier-sub">verified against GitHub</span></h4><ul class="tier-list"><li><span class="mk mk-checked mk-solid" aria-hidden="true"></span><span class="mktxt">author’s text: “Fix #231076”, open issue, confirmed</span></li><li><span class="mk mk-checked mk-solid" aria-hidden="true"></span><span class="mktxt">cited #231076 as the problem this fixes: open, confirmed</span></li></ul></div><div class="tier-block tier-judgement"><h4>Judgement<span class="tier-sub">model opinion, unverified</span></h4><ul class="tier-list"><li><span class="mk mk-judge mk-j-match" aria-hidden="true"></span><span class="mktxt">the code matches its own description</span></li></ul></div></section>
+    <section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>
+    <section class="sec"><h3>Memory</h3><p>First visit, no prior run to compare.</p></section>
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    <div class="props"><div class="prop-row"><span class="prop-k">Status</span><span class="prop-v">Merge predicted, issue confirmed</span></div><div class="prop-row"><span class="prop-k">Rank</span><span class="prop-v">2 of 3</span></div><div class="prop-row"><span class="prop-k">Confidence</span><span class="prop-v">high</span></div><div class="prop-row"><span class="prop-k">Author</span><span class="prop-v">wasim-builds</span></div><div class="prop-row"><span class="prop-k">Files</span><span class="prop-v">4</span></div><div class="prop-row"><span class="prop-k">Lines</span><span class="prop-v">54</span></div><div class="prop-row"><span class="prop-k">Test lines</span><span class="prop-v">37</span></div><div class="prop-row"><span class="prop-k">Opened</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Updated</span><span class="prop-v">2026-08-30</span></div><div class="prop-row"><span class="prop-k">Commit</span><span class="prop-v"><code>23f50094</code></span></div></div>
+    <section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="https://github.com/microsoft/vscode/pull/333390" target="_blank" rel="noopener">Open #333390 on GitHub &#8594;</a></section>
+  </aside>
+</div>
+</article>
+</div>
+<script>
+(function(){
+  var board = document.getElementById("view-board");
+  var pages = document.querySelectorAll(".page");
+  var lastFocus = null;
+  function reveal(el){
+    el.hidden = false;
+    el.classList.remove("in");
+    void el.offsetWidth;
+    el.classList.add("in");
+  }
+  function showBoard(){
+    pages.forEach(function(p){ p.hidden = true; p.classList.remove("in"); });
+    reveal(board);
+    if(lastFocus){ lastFocus.focus(); }
+  }
+  function openPage(num){
+    var target = document.getElementById("pr-" + num);
+    if(!target) return;
+    lastFocus = document.querySelector('.card[data-target="pr-' + num + '"]');
+    board.hidden = true;
+    board.classList.remove("in");
+    pages.forEach(function(p){ p.hidden = (p !== target); if(p !== target) p.classList.remove("in"); });
+    reveal(target);
+    target.querySelector(".back").focus();
+    window.scrollTo(0,0);
+  }
+  document.addEventListener("click", function(e){
+    var card = e.target.closest(".card");
+    if(card){ openPage(card.dataset.target.replace("pr-","")); return; }
+    var back = e.target.closest("[data-action=back]");
+    if(back){ showBoard(); return; }
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && board.hidden){ showBoard(); }
+  });
+})();
+</script>
+</body></html>

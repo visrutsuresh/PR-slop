@@ -5,6 +5,10 @@ Terminal output is fine for a demo and useless in a real week. This writes a
 self-contained HTML file: no server, no build step, no internet. Open it, or
 send it to someone.
 
+A kanban board of predictions; click a card to open a Notion-style detail
+page for that pull request; a back arrow returns to the board. One file,
+swapped by inline JS: no router, no build step, opens from file://.
+
 Design rules, each from a real constraint:
   - every claim carries the evidence beside it, because a triage tool a
     maintainer cannot audit is one they will stop trusting after the first
@@ -12,389 +16,176 @@ Design rules, each from a real constraint:
   - anything the checker could not confirm is shown as unconfirmed rather than
     quietly dropped
   - nothing is ever presented as a decision. It is a reading order.
+  - every mark on the board and the page is derived from the record; none is
+    a literal, because a hardcoded mark is the same defect as a dropped
+    record: both let the page say something the data does not support.
 """
 import html
 import json
-import os
-
-THEME = os.environ.get("PRSLOP_THEME", "paper")
-
-# Direction A, "paper". A printed triage sheet. Warm ground, one accent, wide
-# measure, generous leading. Optimised for reading a reason paragraph and for
-# printing to hand to someone. Quiet on purpose: the evidence is the loud part.
-CSS_PAPER = """
-:root{--ink:#12100e;--paper:#faf8f4;--card:#fff;--muted:#6f6862;--line:#e6e0d6;
-      --green:#1c7a4b;--amber:#b8830f;--slate:#5a6b80;--red:#b5382b}
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);
-  font:400 16px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
-  -webkit-font-smoothing:antialiased}
-header{background:var(--ink);color:#f6f2ec;padding:34px 26px}
-.wrap{max-width:1060px;margin:0 auto}
-h1{margin:0 0 6px;font-size:27px;letter-spacing:-.02em}
-header .sub{color:#a9a096;font-size:15px}
-header .warn{margin-top:16px;background:#241f1a;border-left:3px solid #b8830f;
-  padding:11px 15px;border-radius:0 8px 8px 0;color:#d8cfc3;font-size:14.5px}
-main{padding:30px 26px 90px}
-.group{margin:34px 0 10px}
-.group h2{margin:0 0 3px;font-size:20px;letter-spacing:-.01em}
-.group p{margin:0 0 14px;color:var(--muted);font-size:14.5px}
-.bar{height:3px;border-radius:2px;margin-bottom:16px}
-.b1 .bar{background:var(--green)}.b2 .bar{background:var(--amber)}
-.b3 .bar{background:#c3bbb0}.bx .bar{background:var(--slate)}
-.pr{background:var(--card);border:1px solid var(--line);border-radius:12px;
-  padding:16px 18px;margin-bottom:11px}
-.pr .top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
-.num{font:600 14px ui-monospace,Menlo,monospace;color:var(--muted)}
-.title{font-weight:650;font-size:17px;flex:1;min-width:240px}
-.rank{font:600 12px ui-monospace,Menlo,monospace;color:#8a8078;background:#f2ede5;
-  padding:2px 8px;border-radius:6px}
-.rest{margin-top:8px}
-.rest summary{cursor:pointer;color:var(--muted);font-size:14.5px;padding:9px 2px;
-  list-style:revert}
-.rest summary:hover{color:var(--ink)}
-.chips{margin:11px 0 0;display:flex;gap:7px;flex-wrap:wrap}
-.chip{font-size:13px;padding:3px 10px;border-radius:999px;background:#f2ede5;color:#5c554e}
-.chip.ok{background:#e6f4ec;color:var(--green)}
-.chip.no{background:#f6ece9;color:var(--red)}
-.chip.hm{background:#f7f0dd;color:var(--amber)}
-.why{margin:11px 0 0;color:#463f39;font-size:15px}
-.why b{font-weight:650}
-.links{margin:11px 0 0;font-size:14px}
-a{color:#2f5d8f}
-.new{display:inline-block;margin-top:7px;font-size:13px;font-weight:650;
-  color:#1c7a4b;background:#e6f4ec;padding:2px 9px;border-radius:6px}
-.seen{display:inline-block;margin-top:7px;font-size:13px;color:var(--muted)}
-.flag{margin-top:11px;padding:10px 13px;background:#fbf6e8;border-left:3px solid var(--amber);
-  border-radius:0 7px 7px 0;font-size:14.5px;color:#6b5410}
-footer{border-top:1px solid var(--line);padding:26px;color:var(--muted);font-size:14px}
-.k{display:inline-block;min-width:132px;color:var(--muted)}
-.rev{margin-top:13px;padding:13px 15px;border-radius:10px;background:#f7f4ee;
-  border:1px solid var(--line)}
-.rev.q-ok{border-left:3px solid var(--green)}
-.rev.q-mid{border-left:3px solid var(--amber)}
-.rev.q-low{border-left:3px solid var(--red)}
-.rev.q-unk{border-left:3px solid var(--slate)}
-.rq{font-size:13px;color:var(--muted);letter-spacing:.01em}
-.rh{margin-top:5px;font-size:15.5px;font-weight:600}
-.rl{margin-top:9px;font-size:14.5px}
-.rk{display:inline-block;font-size:12px;font-weight:650;text-transform:uppercase;
-  letter-spacing:.07em;color:var(--muted)}
-.rk.block{color:var(--red)}
-.rl ul{margin:4px 0 0;padding-left:19px}
-.rl li{margin:3px 0}
-.why2{display:block;color:var(--muted);font-size:13.5px}
-.rr{margin-top:9px;font-size:13.5px;color:#6b5410}
-.rev code{font:600 13px ui-monospace,Menlo,monospace;background:#efe9df;padding:1px 5px;border-radius:4px}
-.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;
-  overflow:hidden;margin:4px 0 8px}
-.cell{background:var(--card);padding:18px 20px}
-.cell .n{font:650 30px/1 ui-sans-serif,system-ui;letter-spacing:-.03em}
-.cell .lab{margin-top:5px;font-weight:600;font-size:14.5px}
-.cell .sub{color:var(--muted);font-size:13.5px}
-.group h2{position:sticky;top:0;background:var(--paper);padding:6px 0;z-index:2}
-.pr:hover{border-color:#d3cabb}
-a:focus-visible,summary:focus-visible{outline:2px solid var(--green);
-  outline-offset:3px;border-radius:4px}
-@media print{
-  header{background:#fff;color:#000;border-bottom:2px solid #000}
-  header .sub,header .warn{color:#333;background:#fff;border-color:#999}
-  .pr{break-inside:avoid;border-color:#bbb}
-  .rest[open] summary{display:none}
-  .rest:not([open]){display:none}
-  footer{border-color:#999}
-}
-"""
-
-# Direction B, "console". Built for a maintainer who lives in a terminal and
-# has sixty open submissions, not nine. Dark, monospaced, one line per
-# submission with the evidence inline, so a long queue is scannable by eye
-# without scrolling past card after card. Same data, opposite density.
-CSS_CONSOLE = """
-:root{--ink:#d7dae0;--paper:#0e1014;--card:#15181e;--muted:#7d8794;--line:#242932;
-      --green:#4ec98a;--amber:#e0b341;--slate:#7f93ad;--red:#ef6a5c}
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);
-  font:400 14px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  -webkit-font-smoothing:antialiased}
-header{background:#090b0e;color:var(--ink);padding:26px;border-bottom:1px solid var(--line)}
-.wrap{max-width:1180px;margin:0 auto}
-h1{margin:0 0 5px;font-size:20px;letter-spacing:-.01em;font-weight:600}
-header .sub{color:var(--muted);font-size:13px}
-header .warn{margin-top:14px;background:#12161c;border-left:2px solid var(--amber);
-  padding:10px 13px;color:#b9c2cd;font-size:13px}
-main{padding:22px 26px 80px}
-.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-  gap:1px;background:var(--line);border:1px solid var(--line);margin:0 0 22px}
-.cell{background:var(--card);padding:14px 16px}
-.cell .n{font:600 26px/1 ui-monospace,Menlo,monospace;color:var(--green)}
-.cell .lab{margin-top:4px;font-size:13px;color:var(--ink)}
-.cell .sub{color:var(--muted);font-size:12px}
-.group{margin:26px 0 8px}
-.group h2{margin:0 0 2px;font-size:13px;font-weight:600;text-transform:uppercase;
-  letter-spacing:.09em;color:var(--muted);position:sticky;top:0;
-  background:var(--paper);padding:6px 0;z-index:2}
-.group p{margin:0 0 10px;color:var(--muted);font-size:12.5px}
-.bar{height:2px;margin-bottom:12px}
-.b1 .bar{background:var(--green)}.b2 .bar{background:var(--amber)}
-.b3 .bar{background:#39414d}.bx .bar{background:var(--slate)}
-.pr{background:var(--card);border:1px solid var(--line);border-left:2px solid var(--line);
-  padding:10px 14px;margin-bottom:5px}
-.b1 .pr{border-left-color:var(--green)}.b2 .pr{border-left-color:var(--amber)}
-.b3 .pr{border-left-color:#39414d}
-.pr:hover{background:#1a1e26}
-.pr .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-.num{font-size:13px;color:var(--muted)}
-.title{font-weight:600;font-size:14px;flex:1;min-width:220px;color:#eef1f5}
-.rank{font-size:11px;color:var(--muted);background:#1d222a;padding:1px 7px}
-.rest{margin-top:6px}
-.rest summary{cursor:pointer;color:var(--muted);font-size:12.5px;padding:7px 2px}
-.rest summary:hover{color:var(--ink)}
-.chips{margin:7px 0 0;display:flex;gap:5px;flex-wrap:wrap}
-.chip{font-size:12px;padding:1px 8px;background:#1d222a;color:#98a3b1}
-.chip.ok{background:#12291e;color:var(--green)}
-.chip.no{background:#2c1614;color:var(--red)}
-.chip.hm{background:#2a2312;color:var(--amber)}
-.why{margin:7px 0 0;color:#aab3bf;font-size:13px}
-.why b{color:var(--ink);font-weight:600}
-.links{margin:7px 0 0;font-size:12.5px}
-a{color:#6fb2f0}
-a:focus-visible,summary:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-.new{display:inline-block;margin-top:6px;font-size:12px;font-weight:600;
-  color:var(--green);background:#12291e;padding:1px 8px}
-.seen{display:inline-block;margin-top:6px;font-size:12px;color:var(--muted)}
-.flag{margin-top:8px;padding:8px 11px;background:#221d10;border-left:2px solid var(--amber);
-  font-size:12.5px;color:#dcc994}
-footer{border-top:1px solid var(--line);padding:22px;color:var(--muted);font-size:12.5px}
-.k{display:inline-block;min-width:132px;color:#5f6a78}
-.rev{margin-top:9px;padding:10px 12px;background:#11151b;border:1px solid var(--line)}
-.rev.q-ok{border-left:2px solid var(--green)}
-.rev.q-mid{border-left:2px solid var(--amber)}
-.rev.q-low{border-left:2px solid var(--red)}
-.rev.q-unk{border-left:2px solid var(--slate)}
-.rq{font-size:12px;color:var(--muted)}
-.rh{margin-top:4px;font-size:13.5px;font-weight:600;color:#eef1f5}
-.rl{margin-top:7px;font-size:13px}
-.rk{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--muted)}
-.rk.block{color:var(--red)}
-.rl ul{margin:3px 0 0;padding-left:17px}
-.why2{display:block;color:var(--muted);font-size:12.5px}
-.rr{margin-top:7px;font-size:12.5px;color:#dcc994}
-.rev code{background:#1d222a;padding:1px 5px;color:#9fb6d0}
-@media print{body{background:#fff;color:#000}.pr{break-inside:avoid}}
-"""
-
-CSS = CSS_CONSOLE if THEME == "console" else CSS_PAPER
 
 
 def esc(s):
     return html.escape(str(s or ""))
 
 
-DOT = "\u00b7"
+# --- marks: fact square / checked diamond / judgement circle. shape and fill
+# carry the state; colour is reinforcement only, so this survives greyscale
+# and deuteranopia. ---------------------------------------------------------
+def mk_fact():
+    return '<span class="mk mk-fact" aria-hidden="true"></span>'
 
 
-def declared_chip(d):
-    """The author's own closing reference, quoted rather than paraphrased.
+def mk_checked(sub):
+    return f'<span class="mk mk-checked mk-{sub}" aria-hidden="true"></span>'
 
-    The chip leads with the quote on purpose. The pattern proves a TEXT MATCH,
-    not intent, so "This does not fix #123" has to read correctly: "confirmed"
-    then attaches to *the issue is open*, which is the only thing we checked.
+
+def mk_judge(sub):
+    return f'<span class="mk mk-judge mk-j-{sub}" aria-hidden="true"></span>'
+
+
+def evidence_rows(f):
+    """Returns (tier, mark_html, text) rows for a pull request's Evidence
+    section: fact, checked, judgement, in that grouping.
+
+    A declared closing reference is worded the same way the flat report's
+    own chip worded it ("author's text: ..."), because IMPROVEMENT-CHANGELOG.md
+    quotes that exact phrase as what the page shows. Changing the wording
+    would make a shipped doc claim false with nothing left to catch it.
     """
-    q = (f'fact {DOT} author\u2019s text: \u201c{esc(d["quote"])}\u201d, ')
-    where = "this repository" if d["same_repo"] else f'{esc(d["owner"])}/{esc(d["repo"])}'
-    s = d["status"]
-    if s == "open" and d["same_repo"]:
-        return f'<span class="chip ok">{q}open issue, confirmed</span>'
-    if s == "open":
-        return f'<span class="chip ok">{q}open issue in another repo, confirmed</span>'
-    if s == "closed":
-        return f'<span class="chip">{q}that issue is already closed</span>'
-    if s == "pull_request":
-        return f'<span class="chip">{q}that number is a pull request, not an issue</span>'
-    if s == "missing":
-        return (f'<span class="chip no">{q}no issue #{d["number"]} in '
-                f'{where}</span>')
-    return f'<span class="chip hm">{q}could not reach GitHub to check</span>'
-
-
-def chips(f):
-    """Three categories, and the prefix is on the chip so nobody has to
-    remember which is which: `fact` is re-derivable with no model at all,
-    `checked` was proposed by the model and then verified against GitHub, and
-    `judgement` is the model's opinion with nothing behind it."""
-    out = [declared_chip(d) for d in f.get("declared") or []]
+    rows = []
+    for d in f["declared"]:
+        q = f'author’s text: “{esc(d["quote"])}”'
+        where = "this repo" if d["same_repo"] else f'{esc(d["owner"])}/{esc(d["repo"])}'
+        s = d["status"]
+        if s == "open" and d["same_repo"]:
+            rows.append(("checked", mk_checked("solid"), f'{q}, open issue, confirmed'))
+        elif s == "open":
+            rows.append(("checked", mk_checked("solid"), f'{q}, open issue in another repo, confirmed'))
+        elif s == "closed":
+            rows.append(("checked", mk_checked("hollow"), f'{q}, that issue is already closed'))
+        elif s == "pull_request":
+            rows.append(("checked", mk_checked("hollow"), f'{q}, that number is a pull request, not an issue'))
+        elif s == "missing":
+            rows.append(("checked", mk_checked("crossed"), f'{q}, no issue #{d["number"]} in {where}'))
+        else:
+            rows.append(("checked", mk_checked("dashed"), f'{q}, could not reach GitHub to check'))
     for p in f["problems"]:
-        out.append(f'<span class="chip ok">checked {DOT} cites {esc(p)}, '
-                   f'real open issue</span>')
+        rows.append(("checked", mk_checked("solid"), f'cited {esc(p)} as the problem this fixes: open, confirmed'))
     for p in f.get("closed_refs") or []:
-        out.append(f'<span class="chip">checked {DOT} cites {esc(p)}, '
-                   f'real issue, already closed</span>')
+        rows.append(("checked", mk_checked("hollow"), f'cited {esc(p)}: real, already closed'))
     for p in f.get("pr_refs") or []:
-        out.append(f'<span class="chip">checked {DOT} cites {esc(p)}, that '
-                   f'number is a pull request, not an issue</span>')
+        rows.append(("checked", mk_checked("hollow"), f'cited {esc(p)}: a pull request, not an issue'))
     for p in f["invented"]:
-        out.append(f'<span class="chip no">checked {DOT} cites {esc(p)}, '
-                   f'no such issue in this repository</span>')
+        rows.append(("checked", mk_checked("crossed"), f'cited {esc(p)}: no such issue exists here'))
     for p in f.get("unresolved") or []:
-        out.append(f'<span class="chip hm">checked {DOT} cites {esc(p)}, '
-                   f'could not reach GitHub to confirm</span>')
-    if f["claim"] is True:
-        out.append(f'<span class="chip ok">judgement {DOT} code matches its '
-                   f'description</span>')
-    elif f["claim"] is False:
-        out.append(f'<span class="chip no">judgement {DOT} code does not match '
-                   f'its description</span>')
+        rows.append(("checked", mk_checked("dashed"), f'cited {esc(p)}: could not confirm'))
+    claim = f["claim"]
+    if claim is True:
+        rows.append(("judgement", mk_judge("match"), "the code matches its own description"))
+    elif claim is False:
+        rows.append(("judgement", mk_judge("nomatch"), "the code does not match its own description"))
     else:
-        out.append(f'<span class="chip hm">judgement {DOT} could not confirm '
-                   f'the description</span>')
-    # "touches a test path" was true on every card of every run so far, because
-    # this repository has test directories everywhere. A chip that never varies
-    # is decoration. Added test LINES varies from 3 to 550 across the same queue,
-    # and it is the tell that separates a real test from a file merely brushed.
+        rows.append(("judgement", mk_judge("unclear"), "cannot confirm the code matches its description"))
     tl = f.get("test_lines")
     if tl is None:
-        out.append(f'<span class="chip {"ok" if f["has_tests"] else ""}">'
-                   f'fact {DOT} {"has tests" if f["has_tests"] else "no tests"}</span>')
+        rows.append(("fact", mk_fact(), "has test files" if f["has_tests"] else "touches no test files"))
     elif tl:
-        out.append(f'<span class="chip ok">fact {DOT} {tl} test lines added</span>')
+        rows.append(("fact", mk_fact(), f"{tl} test lines added"))
     else:
-        out.append(f'<span class="chip">fact {DOT} no test lines added</span>')
-    out.append(f'<span class="chip">fact {DOT} {f["lines"]} lines added, '
-               f'{f["files"]} file{"s" if f["files"] != 1 else ""}</span>')
-    return "".join(out)
+        rows.append(("fact", mk_fact(), "no test lines added, despite touching a test path"
+                     if f["has_tests"] else "no test lines added"))
+    rows.append(("fact", mk_fact(), f'{f["lines"]} lines changed, {f["files"]} file{"s" if f["files"] != 1 else ""}'))
+    return rows
 
 
-QUALITY_CLASS = {"solid": "q-ok", "workable": "q-mid",
-                 "needs work": "q-low", "cannot tell": "q-unk"}
+def tier_counts(f):
+    rows = evidence_rows(f)
+    n_fact = sum(1 for t, _, _ in rows if t == "fact")
+    n_checked = sum(1 for t, _, _ in rows if t == "checked")
+    n_judge = sum(1 for t, _, _ in rows if t == "judgement")
+    checked_bad = any(t == "checked" and "crossed" in m for t, m, _ in rows)
+    return n_fact, n_checked, n_judge, checked_bad
 
 
-def review_block(rev):
-    """The code review, when the tool was pointed at one submission.
+def compact_summary(f):
+    """Labelled chip per tier, always visible text, not tooltip-only.
 
-    Kept visually separate from the evidence chips on purpose. The chips are
-    checked facts; this is a judgement, and running them together would let a
-    judgement borrow the credibility of a fact.
+    Every mark here is DERIVED from the data. Nothing is a literal. A board
+    card and its own detail page must never disagree: an earlier draft drew
+    a "matches" circle on a pull request whose page said the code does not
+    match its description, because this function hardcoded the state.
     """
-    if not rev:
-        return ""
-    q = rev.get("quality") or "cannot tell"
-    bits = [f'<div class="rev {QUALITY_CLASS.get(q, "q-unk")}">'
-            f'<div class="rq">Code review, a judgement and not a checked fact: '
-            f'<b>{esc(q)}</b></div>']
-    if rev.get("headline"):
-        bits.append(f'<div class="rh">{esc(rev["headline"])}</div>')
-    if rev.get("blocking"):
-        bits.append('<div class="rl"><span class="rk block">Blocking</span><ul>'
-                    + "".join(f"<li>{esc(b)}</li>" for b in rev["blocking"])
-                    + "</ul></div>")
-    if rev.get("strengths"):
-        bits.append('<div class="rl"><span class="rk">Does well</span><ul>'
-                    + "".join(f"<li>{esc(x)}</li>" for x in rev["strengths"])
-                    + "</ul></div>")
-    if rev.get("improvements"):
-        items = []
-        for i in rev["improvements"]:
-            where = (f' <code>{esc(i["where"])}</code>') if i.get("where") else ""
-            why = (f'<span class="why2">{esc(i["why"])}</span>'
-                   if i.get("why") else "")
-            items.append(f'<li>{esc(i.get("what", ""))}{where}{why}</li>')
-        bits.append('<div class="rl"><span class="rk">Could be better</span><ul>'
-                    + "".join(items) + "</ul></div>")
-    if rev.get("risk"):
-        bits.append(f'<div class="rr">If this is wrong: {esc(rev["risk"])}</div>')
-    return "".join(bits) + "</div>"
+    n_fact, n_checked, n_judge, checked_bad = tier_counts(f)
+    rows = evidence_rows(f)
+
+    claim = f["claim"]
+    j_sub = "match" if claim is True else ("nomatch" if claim is False else "unclear")
+
+    # checked: show the WORST state present, so one bad reference stays
+    # visible on the board instead of being averaged away by good ones
+    subs = [m for t, m, _ in rows if t == "checked"]
+    checked_mark = ""
+    if subs:
+        for cand in ("crossed", "dashed", "hollow", "solid"):
+            if any(f'mk-{cand}"' in m for m in subs):
+                checked_mark = mk_checked(cand)
+                break
+    else:
+        # nothing verified: a neutral placeholder, never the filled
+        # "confirmed" diamond next to a zero
+        checked_mark = '<span class="mk mk-empty" aria-hidden="true"></span>'
+
+    bad_cls = " chip-flag" if checked_bad else ""
+    empty_cls = " chip-empty" if not n_checked else ""
+    return (
+        f'<span class="chip chip-fact">{mk_fact()}{n_fact} fact</span>'
+        f'<span class="chip chip-checked{bad_cls}{empty_cls}">{checked_mark}{n_checked} checked</span>'
+        f'<span class="chip chip-judge">{mk_judge(j_sub)}{n_judge} judgement</span>'
+    )
 
 
-def card(r, repo, data_has_memory=False):
-    ci, v, f = r["input"], r["verdict"], r["facts"]
+def is_strong(f):
+    return bool(f["problems"]) or bool(f.get("declared_ok"))
+
+
+def anchor_id(n):
+    return f"pr-{n}"
+
+
+# Which group a submission lands in is a PREDICTION about the merge decision.
+# Bucket 0 is a real, distinct outcome (the model declined to call it) and
+# must keep its own column: dropping it silently loses an undecided pull
+# request the same way a hardcoded mark loses the true state.
+BUCKET_META = {
+    1: ("Merge predicted, issue confirmed", "Tied to a filed, open issue."),
+    2: ("Merge predicted, no issue found", "No confirmed issue behind it."),
+    3: ("Merge unlikely", "Housekeeping and superseded work land here too."),
+    0: ("No prediction either way", "The model declined to guess. Shown rather than hidden."),
+}
+BUCKET_ORDER = [1, 2, 3, 0]
+
+
+def card_html(r, repo):
+    ci = r["input"]
     n = ci["number"]
-    strong = (bool(f["problems"]) and f["claim"] is True) or bool(f.get("declared_ok"))
+    f = r["facts"]
+    bucket = r["verdict"].get("bucket") or 0
     flag = ""
-    if strong and v.get("bucket") == 3:
-        flag = ('<div class="flag">The evidence here is stronger than the '
-                'suggested order implies. Worth a look before you skip it.</div>')
-    mem = ""
-    if r.get("is_new") and data_has_memory:
-        mem = '<span class="new">new since your last visit</span>'
-    elif (r.get("times_seen") or 0) > 1:
-        n = r["times_seen"]
-        extra = (", and it was in your reading list before"
-                 if r.get("was_today_before") else "")
-        mem = (f'<span class="seen">{n}th visit, first seen '
-               f'{esc(r.get("first_seen"))}{extra}</span>')
-    rankbadge = (f'<span class="rank">{r["rank"]} of {r["group_size"]}</span>'
-                 if r.get("group_size", 0) > 1 else "")
-    return f"""<article class="pr">
-  <div class="top"><span class="num">#{n}</span>{rankbadge}
-    <span class="title">{esc(ci['title'])}</span></div>
-  {mem}
-  <div class="chips">{chips(f)}</div>
-  <div class="why"><b>Why:</b> {esc((v.get('reason') or '')[:280])}</div>
-  <div class="links"><a href="https://github.com/{repo}/pull/{n}">open on GitHub</a></div>
+    if is_strong(f) and bucket == 3:
+        flag = '<div class="cflag">Stronger evidence than this pile suggests.</div>'
+    group_size = r.get("group_size") or 1
+    rank_txt = f'{r["rank"]} of {group_size}' if group_size > 1 else "1 of 1"
+    return f'''<button class="card" data-target="{anchor_id(n)}" aria-haspopup="true">
+  <div class="card-top"><span class="num">#{n}</span><span class="rank">{esc(rank_txt)}</span></div>
+  <div class="card-title">{esc(ci["title"])}</div>
+  <div class="card-evidence">{compact_summary(f)}</div>
   {flag}
-  {review_block(r.get("review"))}
-</article>"""
+</button>'''
 
 
-# Which group a submission lands in is a PREDICTION about the merge decision,
-# which is what the model was actually asked for. The earlier headings named a
-# reading order instead ("Read these first", "Leave until last"), a different
-# claim from the one behind them.
-GROUPS = [
-    (1, "b1", "Predicted merge, and the model tied it to an already-reported "
-     "problem",
-     "A prediction about what a maintainer would decide, not a measurement. "
-     "The link to a reported problem is the model's, checked against GitHub "
-     "before you saw it. The order inside the group is evidence strength."),
-    (2, "b2", "Predicted merge, with no reported problem cited by the model",
-     "Same prediction, without the model finding and citing an already-"
-     "reported problem for it. That describes the model's search, not the "
-     "world: a card below can still carry the author's own declared "
-     "reference, which is machine-derived and does not move the group. The "
-     "order inside the group is evidence strength."),
-    (3, "b3", "Predicted not merged",
-     "A prediction about a human decision, NOT a judgement that the work is "
-     "bad. Housekeeping, superseded work and duplicates all land here."),
-    (0, "bx", "No prediction either way",
-     "The model declined to call these rather than guess, which says nothing "
-     "about the evidence on the cards below. Shown rather than hidden."),
-]
-
-
-def write(data, path):
-    repo = data["repo"]
-    rs = data["results"]
-    # "new" only means something once there is a previous visit to be new since.
-    has_mem = bool(data.get("prior_runs"))
-    total = sum(r["cost"] for r in rs)
-    parts = []
-    for b, cls, name, note in GROUPS:
-        grp = [r for r in rs if (r["verdict"].get("bucket") or 0) == b]
-        if not grp:
-            continue
-        grp.sort(key=lambda r: r.get("rank", 999))
-        today = [r for r in grp if r.get("today", True)]
-        later = [r for r in grp if not r.get("today", True)]
-        head = (f'<section class="group {cls}"><div class="bar"></div>'
-                f'<h2>{name} <span class="num">{len(grp)}</span></h2>'
-                f'<p>{note}</p>')
-        body_html = "".join(card(r, repo, has_mem) for r in today)
-        if later:
-            body_html += (
-                f'<details class="rest"><summary>{len(later)} more in this '
-                f'group, ordered by checked evidence, then by how recent they '
-                f'are. Nothing is hidden, this is just not today\'s '
-                f'reading.</summary>'
-                + "".join(card(r, repo, has_mem) for r in later) + "</details>")
-        parts.append(head + body_html + "</section>")
-
-    body = "\n".join(parts)
-
-    # The one thing a maintainer wants before reading anything: how much of
-    # this is actually mine to do today, and what changed since last time.
+def summary_strip(data, rs, has_mem):
+    """The one thing a maintainer wants before reading anything: how much of
+    this is actually theirs to do today, and what changed since last time."""
     first = [r for r in rs if (r["verdict"].get("bucket") or 0) == 1]
     fresh = [r for r in rs if r.get("is_new")] if has_mem else []
     weak = [r for r in rs
@@ -408,57 +199,450 @@ def write(data, path):
     if weak:
         cells.append(("Cite an issue that does not exist", len(weak),
                       "worth a closer look"))
-    strip = '<div class="strip">' + "".join(
+    return '<div class="strip">' + "".join(
         f'<div class="cell"><div class="n">{v}</div>'
         f'<div class="lab">{esc(k)}</div><div class="sub">{esc(sub)}</div></div>'
         for k, v, sub in cells) + "</div>"
-    body = strip + body
-    out = f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+
+
+def board_html(data, rs, has_mem):
+    repo = data["repo"]
+    cols = []
+    for b in BUCKET_ORDER:
+        name, note = BUCKET_META[b]
+        items = [r for r in rs if (r["verdict"].get("bucket") or 0) == b]
+        if not items:
+            continue
+        items.sort(key=lambda r: r.get("rank") or 999)
+        today = [r for r in items if r.get("today", True)]
+        later = [r for r in items if not r.get("today", True)]
+        cards = "".join(card_html(r, repo) for r in today)
+        more = ""
+        if later:
+            more = (f'<details class="col-more"><summary>{len(later)} more in '
+                    f'this column, ordered by checked evidence, then by how '
+                    f"recent they are. Nothing is hidden, this is just not "
+                    f"today's reading.</summary>"
+                    f'<div class="col-cards">{"".join(card_html(r, repo) for r in later)}</div>'
+                    '</details>')
+        cols.append(f'''<section class="col" aria-label="{esc(name)}">
+  <header class="col-head"><h2>{esc(name)}</h2><span class="count">{len(items)}</span></header>
+  <p class="col-note">{esc(note)}</p>
+  <div class="col-cards">{cards}</div>
+  {more}
+</section>''')
+    total = sum(r["cost"] for r in rs)
+    return f'''<div class="board" id="board" role="region" aria-label="Kanban board">
+  <header class="board-head">
+    <h1>{esc(repo)}, {len(rs)} open pull requests</h1>
+    <p class="board-sub">Read-only. Generated {esc(data["generated"])}, commit <code>{esc(data["sha"][:8])}</code>.</p>
+  </header>
+  {summary_strip(data, rs, has_mem)}
+  <div class="board-cols">{"".join(cols)}</div>
+  <footer class="board-foot">Checked against {data["corpus"]} known issues, {total:.2f} USD this run.
+  This ranking is a suggestion, not a decision.</footer>
+</div>'''
+
+
+def properties_rows(r, sha8):
+    bucket = r["verdict"].get("bucket") or 0
+    name, _ = BUCKET_META[bucket]
+    group_size = r.get("group_size") or 1
+    rank_txt = f'{r["rank"]} of {group_size}' if group_size > 1 else "1 of 1"
+    f = r["facts"]
+    p = r.get("pr") or {}
+    user = (p.get("user") or {}).get("login") or "not recorded"
+    created = p.get("created_at")
+    updated = p.get("updated_at")
+    conf = r["verdict"].get("confidence") or r.get("confidence") or "none given"
+    return [
+        ("Status", esc(name)),
+        ("Rank", esc(rank_txt)),
+        ("Confidence", esc(conf)),
+        ("Author", esc(user)),
+        ("Files", str(f["files"])),
+        ("Lines", str(f["lines"])),
+        ("Test lines", str(f.get("test_lines")) if f.get("test_lines") is not None
+         else ("some" if f["has_tests"] else "none")),
+        ("Opened", esc(created[:10]) if created else "not recorded"),
+        ("Updated", esc(updated[:10]) if updated else "not recorded"),
+        ("Commit", f'<code>{esc(sha8)}</code>'),
+    ]
+
+
+def properties_html(r, sha8):
+    rows = "".join(f'<div class="prop-row"><span class="prop-k">{k}</span><span class="prop-v">{v}</span></div>'
+                   for k, v in properties_rows(r, sha8))
+    return f'<div class="props">{rows}</div>'
+
+
+def evidence_section_html(r):
+    f = r["facts"]
+    rows = evidence_rows(f)
+    by_tier = {"fact": [], "checked": [], "judgement": []}
+    for t, m, txt in rows:
+        by_tier[t].append((m, txt))
+    parts = ['<section class="sec"><h3>Evidence</h3>']
+    tier_labels = [("fact", "Fact", "true with no model"),
+                   ("checked", "Checked", "verified against GitHub"),
+                   ("judgement", "Judgement", "model opinion, unverified")]
+    for key, label, sub in tier_labels:
+        items = by_tier[key]
+        if not items:
+            continue
+        parts.append(f'<div class="tier-block tier-{key}"><h4>{label}'
+                     f'<span class="tier-sub">{sub}</span></h4><ul class="tier-list">')
+        parts.extend(f'<li>{m}<span class="mktxt">{txt}</span></li>' for m, txt in items)
+        parts.append('</ul></div>')
+    parts.append('</section>')
+    return "".join(parts)
+
+
+def verdict_section_html(r):
+    v = r["verdict"]
+    bucket = v.get("bucket") or 0
+    name, note = BUCKET_META[bucket]
+    reason = esc(v.get("reason") or "no reason recorded.")
+    return f'''<section class="sec"><h3>Verdict</h3>
+<p class="verdict-name">{esc(name)}</p>
+<p class="verdict-reason">{reason}</p></section>'''
+
+
+QUALITY_CLASS = {"solid": "q-ok", "workable": "q-mid",
+                 "needs work": "q-low", "cannot tell": "q-unk"}
+
+
+def review_section_html(r):
+    rev = r.get("review")
+    if not rev:
+        return '''<section class="sec"><h3>Code review</h3>
+<p class="empty">Not run in a full-queue pass.</p></section>'''
+    q = rev.get("quality") or "unclear"
+    bits = [f'<section class="sec"><h3>Code review</h3>'
+            f'<p class="review-tag">Opinion, not a checked fact: <b>{esc(q)}</b></p>']
+    if rev.get("headline"):
+        bits.append(f'<p class="review-head">{esc(rev["headline"])}</p>')
+    if rev.get("blocking"):
+        bits.append('<div class="rl"><span class="rk block">Blocking</span><ul>'
+                    + "".join(f"<li>{esc(b)}</li>" for b in rev["blocking"]) + "</ul></div>")
+    if rev.get("strengths"):
+        bits.append('<div class="rl"><span class="rk">Does well</span><ul>'
+                    + "".join(f"<li>{esc(x)}</li>" for x in rev["strengths"]) + "</ul></div>")
+    if rev.get("improvements"):
+        items = []
+        for i in rev["improvements"]:
+            where = f' <code>{esc(i["where"])}</code>' if i.get("where") else ""
+            why = f', {esc(i["why"])}' if i.get("why") else ""
+            items.append(f'<li>{esc(i.get("what", ""))}{where}{why}</li>')
+        bits.append('<div class="rl"><span class="rk">Could improve</span><ul>' + "".join(items) + "</ul></div>")
+    if rev.get("risk"):
+        bits.append(f'<p class="review-risk">If wrong: {esc(rev["risk"])}</p>')
+    bits.append("</section>")
+    return "".join(bits)
+
+
+def memory_section_html(r):
+    if r.get("is_new"):
+        body = "New since your last visit."
+    elif (r.get("times_seen") or 0) > 1:
+        body = f'Visit {r["times_seen"]}, first seen {esc(r.get("first_seen") or "unknown")}.'
+    else:
+        body = "First visit, no prior run to compare."
+    return f'<section class="sec"><h3>Memory</h3><p>{body}</p></section>'
+
+
+def link_section_html(r, repo):
+    n = r["input"]["number"]
+    url = f"https://github.com/{repo}/pull/{n}"
+    return f'''<section class="sec sec-link"><h3>Link out</h3>
+<a class="gh-link" href="{esc(url)}" target="_blank" rel="noopener">Open #{n} on GitHub &#8594;</a></section>'''
+
+
+def title_html(r):
+    flag = ""
+    f = r["facts"]
+    bucket = r["verdict"].get("bucket") or 0
+    if is_strong(f) and bucket == 3:
+        flag = '<div class="pflag">Stronger evidence than this pile implies.</div>'
+    ci = r["input"]
+    return f'''<div class="page-title-block">
+  <span class="page-num">#{ci["number"]}</span>
+  <h1 class="page-title">{esc(ci["title"])}</h1>
+  {flag}
+</div>'''
+
+
+def page_html(r, repo, sha8):
+    ci = r["input"]
+    pid = anchor_id(ci["number"])
+    body = f'''{title_html(r)}
+<div class="page-2col">
+  <div class="page-main">
+    {verdict_section_html(r)}
+    {evidence_section_html(r)}
+    {review_section_html(r)}
+    {memory_section_html(r)}
+  </div>
+  <aside class="page-side">
+    <h3 class="props-h">Properties</h3>
+    {properties_html(r, sha8)}
+    {link_section_html(r, repo)}
+  </aside>
+</div>'''
+    return f'''<article class="page swap" id="{pid}" data-num="{ci["number"]}" hidden>
+  <button class="back" data-action="back" aria-label="Back to board">&#8592; back to board</button>
+  {body}
+</article>'''
+
+
+# The single surface: warm paper ground, three distinct planes (recessed tray,
+# raised card, floating panel) so depth reads as structure rather than
+# decoration. One accent, no red, sentence case, no legend: the tier labels
+# and the per-row plain-English sentence are the only carriers of meaning.
+CSS = '''
+:root{
+  --paper:#f8f5ee;
+  --ink:#18140f;
+  --muted:#635a4d;
+  --line:#e1d9ca;
+  --accent:#8a5f10;
+  --accent-soft:#f1e6ce;
+
+  /* morphism surfaces: three distinct planes, not one flat sheet */
+  --tray:#ede4d1;           /* recessed: the board column slot cards sit in */
+  --tray-shadow:inset 0 2px 5px rgba(24,20,15,.10), inset 0 -1px 0 rgba(255,255,255,.55);
+  --card-surface:#fffdf8;    /* raised: individual cards */
+  --card-shadow:0 1px 2px rgba(24,20,15,.05), 0 6px 16px rgba(24,20,15,.06);
+  --card-shadow-hover:0 2px 4px rgba(24,20,15,.07), 0 10px 24px rgba(24,20,15,.10);
+  --panel-surface:#f2ece0;   /* raised: sidebar / evidence panel */
+  --panel-shadow:0 1px 2px rgba(24,20,15,.04), 0 10px 26px rgba(24,20,15,.07);
+
+  --dur-snappy:220ms; --ease-snappy:cubic-bezier(.175,.885,.32,1.1);
+  --dur-smooth:300ms; --ease-smooth:cubic-bezier(.19,1,.22,1);
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 15px/1.6 ui-monospace,"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+h1,h2,h3,h4{font-family:inherit;margin:0;font-weight:600;letter-spacing:-.01em}
+a{color:inherit}
+button{font:inherit}
+
+/* --- marks: fact square / checked diamond / judgement circle, 15px, shape+fill carries meaning --- */
+.mk{display:inline-block;width:15px;height:15px;flex:0 0 auto;vertical-align:-3px}
+.mk-fact{background:var(--muted);border-radius:2px}
+.mk-checked{background:var(--ink);transform:rotate(45deg);border-radius:2px;position:relative}
+.mk-checked.mk-hollow{background:transparent;border:2px solid var(--ink)}
+.mk-checked.mk-dashed{background:transparent;border:2px dashed var(--ink)}
+.mk-checked.mk-crossed{background:transparent;border:2px solid var(--ink)}
+.mk-checked.mk-crossed::after{content:"";position:absolute;left:50%;top:50%;width:19px;height:2.4px;
+  background:var(--ink);transform:translate(-50%,-50%) rotate(45deg)}
+.mk-judge{width:15px;height:15px;border-radius:50%;background:transparent;border:2px solid var(--ink);opacity:.8}
+/* nothing was verified: a neutral placeholder, never the filled "confirmed" diamond */
+.chip-checked .mk.mk-empty{width:15px;height:15px;border-radius:1px;background:transparent;border:1.5px dotted var(--muted);transform:none}
+/* compound selector: real specificity, so this beats .chip-checked's own
+   background regardless of source order (a plain .chip-empty tied at equal
+   specificity is inert and was caught rendering byte-identical to a filled
+   chip) */
+.chip-checked.chip-empty{background:var(--paper);color:var(--muted)}
+
+.mk-judge.mk-j-nomatch{background:var(--ink);opacity:1}
+.mk-judge.mk-j-unclear{border-style:dashed}
+.mktxt{margin-left:9px}
+
+/* --- board: recessed tray holds raised cards, so depth reads as structure --- */
+.board-head{padding:30px 0 18px;border-bottom:1px solid var(--line)}
+.board-head h1{font-size:20px}
+.board-sub{margin:8px 0 0;color:var(--muted);font-size:13.5px}
+.board-sub code{background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+
+/* --- one aggregate per run, read before any card --- */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:10px;margin:20px 0 4px}
+.strip .cell{background:var(--card-surface);box-shadow:var(--card-shadow);
+  border-radius:10px;padding:14px 16px}
+.strip .cell .n{font:650 26px/1 inherit;letter-spacing:-.02em}
+.strip .cell .lab{margin-top:5px;font-weight:600;font-size:13px}
+.strip .cell .sub{margin-top:2px;color:var(--muted);font-size:12px}
+
+.board-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:22px 0 0}
+.col{background:var(--tray);box-shadow:var(--tray-shadow);border-radius:12px;padding:18px 16px 22px;min-width:0}
+.col-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.col-head h2{font-size:14px}
+.col-head .count{font-size:13px;color:var(--muted);background:var(--card-surface);box-shadow:var(--card-shadow);
+  border-radius:999px;padding:1px 9px}
+.col-note{margin:6px 0 16px;color:var(--muted);font-size:12.5px;line-height:1.5}
+.col-cards{display:grid;gap:10px}
+.card{all:unset;display:block;background:var(--card-surface);box-shadow:var(--card-shadow);border-radius:10px;
+  padding:13px 14px;cursor:pointer;transition:transform var(--dur-snappy) var(--ease-snappy),
+  box-shadow var(--dur-snappy) var(--ease-snappy)}
+.card:hover,.card:focus-visible{transform:translateY(-2px);box-shadow:var(--card-shadow-hover)}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card:active{transform:translateY(0)}
+.card-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.card .num{font-size:12.5px;color:var(--muted)}
+.card .rank{font-size:11.5px;color:var(--muted)}
+.card-title{margin-top:6px;font-size:14.5px;font-weight:600;line-height:1.4}
+.card-evidence{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+
+/* --- later-today split inside a column, same shape as the flat report's <details> --- */
+.col-more{margin-top:10px}
+.col-more summary{cursor:pointer;color:var(--muted);font-size:12px;padding:6px 2px;list-style:revert}
+.col-more summary:hover{color:var(--ink)}
+.col-more .col-cards{margin-top:10px}
+
+/* labelled chips: each tier is its own small surface, not just a coloured dot */
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 8px 3px 6px;border-radius:6px;
+  color:var(--muted)}
+.chip .mk{width:10px;height:10px}
+.chip-fact{background:var(--paper)}
+.chip-checked{background:var(--accent-soft);color:#5b3f0a}
+.chip-checked .mk{background:var(--accent);border-color:var(--accent)}
+.chip-checked .mk.mk-crossed::after{background:var(--accent)}
+/* ponytail: font-weight is the only channel this ships with today for the
+   highest-severity finding (an invented citation). No PR in the shipped
+   dataset has a mixed checked state, so this path is unexercised; strengthen
+   with shape or border once a real one does. */
+.chip-flag{font-weight:700}
+.chip-judge{background:transparent;border:1px solid var(--line)}
+.chip-judge .mk{border-color:var(--muted)}
+.cflag{margin-top:9px;font-size:12px;color:var(--accent);border-top:1px dashed var(--line);padding-top:8px}
+.board-foot{margin:26px 0 60px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+
+/* --- page --- */
+.page{padding:28px 0 80px}
+.back{all:unset;display:inline-flex;align-items:center;gap:8px;cursor:pointer;color:var(--ink);
+  font-size:13.5px;font-weight:600;padding:7px 4px;margin-bottom:22px;
+  transition:transform var(--dur-snappy) var(--ease-snappy),color var(--dur-snappy) var(--ease-snappy)}
+.back:hover,.back:focus-visible{color:var(--accent);transform:translateX(-3px)}
+.back:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.page-title-block{margin-bottom:26px}
+.page-num{font-size:13px;color:var(--muted)}
+.page-title{font-size:26px;line-height:1.3;margin-top:6px;letter-spacing:-.015em}
+.pflag{margin-top:12px;padding:10px 13px;background:var(--accent-soft);border-radius:8px;font-size:13.5px;color:#5b3f0a}
+.props-h{font-size:12px;letter-spacing:.03em;color:var(--muted);margin-bottom:8px}
+.props{display:grid;gap:0;border-top:1px solid var(--line)}
+.prop-row{display:grid;grid-template-columns:100px 1fr;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);
+  line-height:1.6}
+.prop-k{color:var(--muted);font-size:12.5px}
+.prop-v{font-size:13px}
+.prop-v code{background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+.sec{margin-top:32px}
+.sec h3{font-size:13px;letter-spacing:.03em;color:var(--muted);margin-bottom:12px}
+.verdict-name{font-size:16.5px;font-weight:650;margin:0 0 6px}
+.verdict-reason{font-size:15px;max-width:74ch;line-height:1.65}
+.tier-block{margin-bottom:14px;padding:14px 16px;border-radius:10px}
+.tier-fact{background:var(--paper);box-shadow:var(--tray-shadow)}
+.tier-checked{background:var(--panel-surface);box-shadow:var(--panel-shadow)}
+.tier-judgement{background:transparent;border:1px solid var(--line)}
+.tier-block h4{font-size:12.5px;color:var(--ink);font-weight:700;margin-bottom:10px;letter-spacing:.01em;
+  display:flex;align-items:baseline;gap:8px}
+.tier-sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.tier-list{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.tier-list li{display:flex;align-items:flex-start;gap:0;font-size:14px;line-height:1.55;max-width:76ch}
+.tier-list .mk{margin-top:3px}
+.empty{color:var(--muted);font-size:14px}
+.review-tag{font-size:13.5px;color:var(--muted)}
+.review-head{font-size:16px;font-weight:600;margin:8px 0 0}
+.rl{margin-top:14px}
+.rk{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;
+  color:var(--ink);background:var(--panel-surface);box-shadow:var(--panel-shadow);border-radius:5px;
+  padding:2px 8px;margin-bottom:7px}
+.rl ul{margin:0;padding-left:18px}
+.rl li{margin:4px 0;font-size:14px}
+.review-risk{margin-top:14px;font-size:13.5px;color:#5b3f0a;background:var(--accent-soft);
+  padding:9px 12px;border-radius:6px;display:inline-block}
+.gh-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink);
+  background:var(--card-surface);box-shadow:var(--card-shadow);border-radius:8px;padding:9px 14px;text-decoration:none;
+  transition:box-shadow var(--dur-snappy) var(--ease-snappy),transform var(--dur-snappy) var(--ease-snappy)}
+.gh-link:hover,.gh-link:focus-visible{box-shadow:var(--card-shadow-hover);transform:translateY(-1px)}
+.gh-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* --- two-column page: sidebar reads as its own panel, not a bordered strip --- */
+.page-2col{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start}
+.page-side{position:sticky;top:24px;background:var(--panel-surface);box-shadow:var(--panel-shadow);
+  border-radius:14px;padding:20px}
+.page-side .sec{margin-top:22px}
+.page-side .sec:first-child{margin-top:0}
+.page-side .sec-link .gh-link{width:100%;justify-content:center}
+
+/* --- view swap --- */
+.swap{opacity:0;transform:translateY(6px);
+  transition:opacity var(--dur-smooth) var(--ease-smooth),transform var(--dur-smooth) var(--ease-smooth)}
+.swap[hidden]{display:none}
+.swap.in{opacity:1;transform:translateY(0)}
+@media (prefers-reduced-motion:reduce){
+  .card,.back,.swap{transition:none!important}
+}
+@media (max-width:900px){
+  .board-cols{grid-template-columns:1fr}
+  .page-2col{grid-template-columns:1fr}
+  .page-side{position:static}
+}
+'''
+
+JS = '''
+(function(){
+  var board = document.getElementById("view-board");
+  var pages = document.querySelectorAll(".page");
+  var lastFocus = null;
+  function reveal(el){
+    el.hidden = false;
+    el.classList.remove("in");
+    void el.offsetWidth;
+    el.classList.add("in");
+  }
+  function showBoard(){
+    pages.forEach(function(p){ p.hidden = true; p.classList.remove("in"); });
+    reveal(board);
+    if(lastFocus){ lastFocus.focus(); }
+  }
+  function openPage(num){
+    var target = document.getElementById("pr-" + num);
+    if(!target) return;
+    lastFocus = document.querySelector('.card[data-target="pr-' + num + '"]');
+    board.hidden = true;
+    board.classList.remove("in");
+    pages.forEach(function(p){ p.hidden = (p !== target); if(p !== target) p.classList.remove("in"); });
+    reveal(target);
+    target.querySelector(".back").focus();
+    window.scrollTo(0,0);
+  }
+  document.addEventListener("click", function(e){
+    var card = e.target.closest(".card");
+    if(card){ openPage(card.dataset.target.replace("pr-","")); return; }
+    var back = e.target.closest("[data-action=back]");
+    if(back){ showBoard(); return; }
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && board.hidden){ showBoard(); }
+  });
+})();
+'''
+
+
+def write(data, path):
+    repo = data["repo"]
+    rs = data["results"]
+    has_mem = bool(data.get("prior_runs"))
+    sha8 = data["sha"][:8]
+    board = board_html(data, rs, has_mem)
+    pages = "\n".join(page_html(r, repo, sha8) for r in rs)
+    out = f'''<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Triage, {esc(repo)}</title><style>{CSS}</style></head><body>
-<header><div class="wrap">
-  <h1>{esc(repo)}, {len(rs)} open pull requests</h1>
-  <div class="sub">A suggested reading order. Generated {esc(data['generated'])}.</div>
-  <div class="warn"><b>Nothing here has been acted on.</b> This tool cannot
-  merge, close, comment or label. It read {data['corpus']} of your recorded
-  problems and the code at commit <code>{esc(data['sha'][:8])}</code>, and
-  every reference below was checked before you saw it. The order is a
-  suggestion; you decide.</div>
-</div></header>
-<main><div class="wrap">{body}</div></main>
-<footer><div class="wrap">
-  <div><span class="k">The groups</span> Which group a submission is in is a
-  <em>prediction</em> about the decision a maintainer would make, not a
-  measurement and not a quality verdict. The order <em>inside</em> a group is a
-  different thing: evidence strength, described next.</div>
-  <div><span class="k">The order</span> Within each group, by how much
-  <em>checked</em> evidence supports it: a reference the author declared and we
-  confirmed, then a confirmed link to an already-reported problem, then a
-  confirmed description. Ties break to the newer submission, which is recency,
-  not evidence. Tests and size do not affect the order; they are shown, not
-  ranked.</div>
-  <div><span class="k">How to read it</span> Chips marked <em>fact</em> you can
-  re-derive yourself from GitHub with no model involved: files changed, lines
-  added, whether test paths are touched, and any closing reference found in the
-  author's own title or body, quoted verbatim. That last one is a <b>text
-  match, not a statement of intent</b>: the tool reports the characters the
-  author wrote and whether the referenced issue is real and open. It does not
-  read the sentence around them, so a negation ("does not fix #123") or an
-  unticked template checkbox will still show a chip; a reference inside a
-  fenced code block is skipped. The quote is there so you can see which one you
-  are looking at. Chips marked <em>checked</em> were proposed by the model and
-  then verified against GitHub, so the reference is real and its state is
-  accurate, but the model chose to cite it. Chips marked <em>judgement</em> are
-  the model's opinion and nothing verified them. The order on this page puts
-  checked evidence first and breaks ties by recency, not an accuracy claim: these pull
-  requests are open, so no correct answer exists to score against.</div>
-  <div><span class="k">What it cannot do</span> It does not know your roadmap,
-  your release schedule, or that you already decided against an approach. Those
-  are the reasons good work gets closed, and it cannot see any of them.</div>
-  <div><span class="k">This run</span> {esc(repo)}, {len(rs)} submissions,
-  generated {esc(data['generated'])}, source read at commit
-  <code>{esc(data['sha'][:8])}</code>, {total:.2f} USD.</div>
-</div></footer></body></html>"""
+<title>{esc(repo)} triage, kanban</title>
+<style>{CSS}</style></head>
+<body>
+<div class="wrap">
+  <div class="swap in" id="view-board">
+    {board}
+  </div>
+  {pages}
+</div>
+<script>{JS}</script>
+</body></html>'''
     open(path, "w").write(out)
     return path
 
