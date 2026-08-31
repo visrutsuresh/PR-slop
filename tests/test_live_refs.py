@@ -9,6 +9,10 @@ the chip reads as an endorsement of something the author was denying.
 
 Offline. No network, no credential, no model. Part of ./run.sh eval.
 """
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 import live
 
 

@@ -7,12 +7,15 @@ only that directory is ever rmtree'd. Real submission trajectories in
 traces/ must survive `python3 test_harness.py` / `./run.sh eval` untouched.
 """
 import json
+import os
 import shutil
+import sys
 from pathlib import Path
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 import harness.trace as trace
 
-_TEST_TRACE_DIR = Path(__file__).resolve().parent / "traces_test"
+_TEST_TRACE_DIR = Path(__file__).resolve().parent.parent / "traces_test"
 shutil.rmtree(_TEST_TRACE_DIR, ignore_errors=True)
 trace.TRACE_DIR = _TEST_TRACE_DIR
 

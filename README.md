@@ -88,14 +88,14 @@ The author is not a maintainer and does not claim to be. He is the person standi
 ./run.sh eval        # the checks
 ```
 
-All of these replay from committed responses. No account, no network, no cost. See `docs/reproduction.md` for the full step-by-step guide, written for someone starting from a clean checkout with nothing set up yet.
+All of these replay from committed responses. No account, no network, no cost. See `REPRODUCTION.md` for the full step-by-step guide, written for someone starting from a clean checkout with nothing set up yet.
 
 ## Use it from your own assistant
 
 A script is a thing you remember to run. An assistant is already open.
 
 ```
-claude mcp add pr-slop -- python3 /absolute/path/to/mcp_server.py
+claude mcp add pr-slop -- python3 /absolute/path/to/src/mcp_server.py
 ```
 
 Then ask it in plain language: *"what should I look at in vscode today"*, or *"triage pull request 333390 on microsoft/vscode"*, or *"anything new in my queue since last time"*.
@@ -146,11 +146,11 @@ A bare number is not a choice. "100" means nothing to someone who has not priced
 
 **Blast radius.** The tools read, and they write one HTML file. Nothing here can merge, close, comment or label, and every summary says so in its last line. Ground rule 4 asks for consequential actions to sit behind a human; the safest way to satisfy that is to have no consequential action to gate in the first place.
 
-**Verified how.** Seven checks in `test_live_refs.py` drive the server over its real stdio transport with no network and no model: the handshake, that notifications get no reply (replying to one corrupts the stream), that every advertised tool has a handler and every handler is advertised, that an unknown tool is a JSON-RPC error rather than a crash, that a raising tool returns readable error content instead of killing the transport, that malformed input does not kill the loop, and that the summary always states nothing was acted on. Registration itself could not be exercised on the build machine, where local policy blocks adding MCP servers; the protocol is tested directly instead, which is the stronger evidence.
+**Verified how.** Seven checks in `tests/test_live_refs.py` drive the server over its real stdio transport with no network and no model: the handshake, that notifications get no reply (replying to one corrupts the stream), that every advertised tool has a handler and every handler is advertised, that an unknown tool is a JSON-RPC error rather than a crash, that a raising tool returns readable error content instead of killing the transport, that malformed input does not kill the loop, and that the summary always states nothing was acted on. Registration itself could not be exercised on the build machine, where local policy blocks adding MCP servers; the protocol is tested directly instead, which is the stronger evidence.
 
 ## How it works
 
-Four roles, and a loop. Each was added only after a measurement showed it was needed; the six versions and their numbers are in `CHANGELOG.md`.
+Four roles, and a loop. Each was added only after a measurement showed it was needed; the six versions and their numbers are in `IMPROVEMENT-CHANGELOG.md`.
 
 1. **Investigator.** Decides for itself what to search for, reads what comes back, and can search again with different wording if the first attempt was poor. It chose 6 follow-up searches on its own across the 15 cases. This is the one choosing the action, not us.
 2. **Claim checker.** Reads the actual source at a pinned commit and tests whether the submission does what it says. It reads the real source on **every** submission. On 10 of 15 it reached a definite yes or no; on the other 5 it returned "cannot tell" rather than guess, which is the behaviour we wanted.
@@ -171,7 +171,7 @@ It prints that submission's evidence card, the suggested pile, and a second-look
 
 ## Evaluation
 
-**Repository:** `microsoft/vscode`. Repo selection was verified before use against a 15/74/11 split under an earlier, narrower label rule (`home-assistant/core` was the alternative, rejecting fewer pull requests, 4 per 100 against vscode's double-digit rate). **Re-derived at harvest time under the FROZEN pattern actually shipped (`harvest.py`), because a published number must be one the project's own rule reproduces:** of the true 100 most-recently-closed pull requests as of the harvest run, **23 fall in bucket 1, 54 in bucket 2, 23 in bucket 3** (see `data/manifest.json` -> `census_re_derived`). All three buckets still clear the 5-case floor comfortably, and no decision changes.
+**Repository:** `microsoft/vscode`. Repo selection was verified before use against a 15/74/11 split under an earlier, narrower label rule (`home-assistant/core` was the alternative, rejecting fewer pull requests, 4 per 100 against vscode's double-digit rate). **Re-derived at harvest time under the FROZEN pattern actually shipped (`src/harvest.py`), because a published number must be one the project's own rule reproduces:** of the true 100 most-recently-closed pull requests as of the harvest run, **23 fall in bucket 1, 54 in bucket 2, 23 in bucket 3** (see `data/manifest.json` -> `census_re_derived`). All three buckets still clear the 5-case floor comfortably, and no decision changes.
 
 **Cases:** 15, sampled DELIBERATELY to 5 per bucket. Random sampling would have skewed to bucket 2, which is 74% of recent closed pull requests.
 
@@ -238,7 +238,7 @@ Guessing scores 33.3%, because there are three equal piles. So the baseline is e
 
 ## Improvement Changelog
 
-See `CHANGELOG.md`. Its central table, six versions of the agent with what each changed, is not something you have to take on trust: **`./run.sh versions` recomputes every row from the committed answers**, offline. Every meaningful change is logged there with the evidence that drove the next decision (a failing test, a bad result, a judge-visible constraint).
+See `IMPROVEMENT-CHANGELOG.md`. Its central table, six versions of the agent with what each changed, is not something you have to take on trust: **`./run.sh versions` recomputes every row from the committed answers**, offline. Every meaningful change is logged there with the evidence that drove the next decision (a failing test, a bad result, a judge-visible constraint).
 
 ## Main failure mode
 
@@ -275,7 +275,7 @@ The exact instructions given to each AI agent used in this submission, in the wo
 
 ### The task description, given word for word to BOTH sides
 
-This is the whole of it. The simple version and our system receive this identical text, so the measured difference reflects what the systems can reach, not how hard we tried on the wording. It lives in one file, `task_spec.py`, for exactly that reason.
+This is the whole of it. The simple version and our system receive this identical text, so the measured difference reflects what the systems can reach, not how hard we tried on the wording. It lives in one file, `src/task_spec.py`, for exactly that reason.
 
 ```
 You are triaging a pull request for a busy open source maintainer.
@@ -337,7 +337,7 @@ The reason is precise. Its claim checker judged three submissions as not support
 
 We had already written down that "not merged" does not mean "bad work". Then we built a system whose extra ability is judging whether work is good, and used it to predict whether work was merged. Sharper judgement of quality made it worse, because the task is not about quality.
 
-It is removed from the shipped solution and kept at `agent.py`, runnable, with its saved responses, so the negative result reproduces.
+It is removed from the shipped solution and kept at `src/agent.py`, runnable, with its saved responses, so the negative result reproduces.
 
 ## Judging the work, not the decision
 
@@ -380,11 +380,11 @@ Required per the rule book: "You must disclose the tools you used and submit the
 | Tool / model | Where used | Notes |
 | --- | --- | --- |
 | `claude-sonnet-5` | Both the simple version and ours | Same model on both sides, so the comparison measures the system and not the model. Recorded in every saved response and checkable from them. |
-| Claude Code, non-interactive | How the model is called | Run from an empty folder outside this project with file reading, searching, shell, web access, editing and sub-agents all switched off. See `isolation_probe.py`. |
+| Claude Code, non-interactive | How the model is called | Run from an empty folder outside this project with file reading, searching, shell, web access, editing and sub-agents all switched off. See `src/isolation_probe.py`. |
 | `gh` command line | Collecting the fifteen cases, once | Its output is committed under `data/`. Nothing else needs it. |
 | Python standard library only | Everything else | No packages installed. |
 
-**Why the isolation matters.** Our first attempt asked the model, running normally inside this project, to report the recorded answer for one case. **It opened the answer file and returned the correct value.** Left alone, the simple comparison version could have read the answers instead of reasoning, making the whole comparison worthless. `isolation_probe.py` now has to pass before anything is generated, and it must reply that it has no way to read a file.
+**Why the isolation matters.** Our first attempt asked the model, running normally inside this project, to report the recorded answer for one case. **It opened the answer file and returned the correct value.** Left alone, the simple comparison version could have read the answers instead of reasoning, making the whole comparison worthless. `src/isolation_probe.py` now has to pass before anything is generated, and it must reply that it has no way to read a file.
 
 The trace files live in `traces/`, 45 records, one per run of each system, listed in `traces/INDEX.md`.
 
@@ -392,25 +392,25 @@ The shipped agent's records are marked **captured**: it writes each step as the 
 
 ## What every file is
 
-There are six agent versions at the root because this project improved by measurement, and each one's code and answers are kept so the table in `CHANGELOG.md` can be recomputed. **`agent_v4.py` is the one that ships.**
+There are six agent versions at the root because this project improved by measurement, and each one's code and answers are kept so the table in `IMPROVEMENT-CHANGELOG.md` can be recomputed. **`src/agent_v4.py` is the one that ships.**
 
 | File | What it is |
 | --- | --- |
-| **`agent_v4.py`** | **The shipped system.** Four roles and a loop. This is what `./run.sh agent` runs. |
-| `agent.py`, `agent_v2.py`, `agent_v3.py`, `agent_v5.py`, `agent_v6.py` | The other five versions, kept so `./run.sh versions` can recompute the whole table. Not shipped. |
-| `triage.py` | **The product.** The page a maintainer reads. `./run.sh triage` |
-| `retriever.py` | The search over the project's 403 recorded problems |
-| `evidence.py` | The evidence card and the second-opinion list, facts only |
-| `run_baseline.py` | The simple comparison version, one direct prompt |
-| `run_advanced.py` | The intermediate two-stage version |
-| `harvest.py` | Collected the 15 cases once. Its output is committed; you never need to run it |
-| `scoring.py` | Shared scoring, so no system gets a different yardstick |
-| `task_spec.py` | The task description, given word for word to every system |
-| `isolation_probe.py` | Proves the model cannot read the answers before anything is generated |
-| `versions.py` | Recomputes the six-version table from committed answers |
-| `check_docs.py` | Fails if a number in this README no longer matches what the code prints |
-| `test_harness.py`, `test_harvest.py` | The checks. 25 in total |
-| `build_traces.py`, `build_agent_traces.py` | Render the step-by-step records into `traces/` |
+| **`src/agent_v4.py`** | **The shipped system.** Four roles and a loop. This is what `./run.sh agent` runs. |
+| `src/agent.py`, `src/agent_v2.py`, `src/agent_v3.py`, `src/agent_v5.py`, `src/agent_v6.py` | The other five versions, kept so `./run.sh versions` can recompute the whole table. Not shipped. |
+| `src/triage.py` | **The product.** The page a maintainer reads. `./run.sh triage` |
+| `src/retriever.py` | The search over the project's 403 recorded problems |
+| `src/evidence.py` | The evidence card and the second-opinion list, facts only |
+| `src/run_baseline.py` | The simple comparison version, one direct prompt |
+| `src/run_advanced.py` | The intermediate two-stage version |
+| `src/harvest.py` | Collected the 15 cases once. Its output is committed; you never need to run it |
+| `src/scoring.py` | Shared scoring, so no system gets a different yardstick |
+| `src/task_spec.py` | The task description, given word for word to every system |
+| `src/isolation_probe.py` | Proves the model cannot read the answers before anything is generated |
+| `src/versions.py` | Recomputes the six-version table from committed answers |
+| `tests/check_docs.py` | Fails if a number in this README no longer matches what the code prints |
+| `tests/test_harness.py`, `tests/test_harvest.py` | The checks. 25 in total |
+| `src/build_traces.py`, `src/build_agent_traces.py` | Render the step-by-step records into `traces/` |
 | `data/` | The 15 cases, 403 recorded problems, and every answer every system gave |
 | `Dockerfile` | Pre-kickoff scaffolding. Present but **not verified**, see the reproduction guide. Nothing here needs it |
 
@@ -418,6 +418,6 @@ There are six agent versions at the root because this project improved by measur
 
 The harness is the support code built before kickoff, the plumbing that records what each agent does and checks nothing is broken. It contains no logic specific to the actual problem, since the problem was not known yet when it was built.
 
-- `harness/trace.py`: the logger that records every agent run as it happens, strips out anything that looks like a password or API key before saving (see `docs/reproduction.md` for exactly what that redaction step does and does not guarantee), and turns the raw record into the readable trace files described above
+- `src/harness/trace.py`: the logger that records every agent run as it happens, strips out anything that looks like a password or API key before saving (see `REPRODUCTION.md` for exactly what that redaction step does and does not guarantee), and turns the raw record into the readable trace files described above
 - `run.sh`: `baseline` / `advanced` / `eval` entrypoints (the three commands above)
-- `test_harness.py`: the harness's own test suite, run with `python3 test_harness.py`
+- `tests/test_harness.py`: the harness's own test suite, run with `python3 tests/test_harness.py`

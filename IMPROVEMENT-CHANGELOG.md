@@ -10,13 +10,13 @@ A simple prompt scored **33.3%**, exactly the same as guessing. Adding search ov
 
 ## 2026-08-27: pre-kickoff harness
 
-Built `harness/trace.py`, `test_harness.py`, `run.sh`, and the submission templates before the problem PDF (the document describing what to actually build) was published. This was done first because a trajectory, the full step-by-step record of what an agent run actually did, cannot be put together after the fact. It has to be captured live, while the run is happening. Evidence: competition deliverable 4 requires trajectories "from the agent instructions through to the final result." Without a logger already running before the first real agent run, that run's trajectory would be lost for good. See `PRE-EXISTING.md`.
+Built `src/harness/trace.py`, `tests/test_harness.py`, `run.sh`, and the submission templates before the problem PDF (the document describing what to actually build) was published. This was done first because a trajectory, the full step-by-step record of what an agent run actually did, cannot be put together after the fact. It has to be captured live, while the run is happening. Evidence: competition deliverable 4 requires trajectories "from the agent instructions through to the final result." Without a logger already running before the first real agent run, that run's trajectory would be lost for good. See `PRE-EXISTING.md`.
 
 ## 2026-08-29: evaluation-set harvest
 
-Built `harvest.py`, `baselines/regex_rule.py`, `test_harvest.py`, and wired a `harvest` subcommand into `run.sh`. Gated by contrarian plan-review PASS at loop 3 of 3 (change_id `prslop-harvest-2026-08-29`), which found and fixed 7 binding conditions before any code was written, most importantly: `created_at` was still in the allow-list and turned out to be an 8x to 30x open-duration leak in disguise (86.2% AUC, removed); the frozen closing-reference pattern did not actually capture owner/repo, so the cross-repo carve-out could not have worked; a third declaration form (`owner/repo#N`) was missing from the pattern; `changed_files` and `patch` are not obtainable from the raw pull object as originally written (`changed_files` there is an integer count, not a file list).
+Built `src/harvest.py`, `src/baselines/regex_rule.py`, `tests/test_harvest.py`, and wired a `harvest` subcommand into `run.sh`. Gated by contrarian plan-review PASS at loop 3 of 3 (change_id `prslop-harvest-2026-08-29`), which found and fixed 7 binding conditions before any code was written, most importantly: `created_at` was still in the allow-list and turned out to be an 8x to 30x open-duration leak in disguise (86.2% AUC, removed); the frozen closing-reference pattern did not actually capture owner/repo, so the cross-repo carve-out could not have worked; a third declaration form (`owner/repo#N`) was missing from the pattern; `changed_files` and `patch` are not obtainable from the raw pull object as originally written (`changed_files` there is an integer count, not a file list).
 
-Evidence from the real harvest run: the frozen pattern re-derives the bucket census as 23/54/23 on the true 100-most-recently-closed pull requests, against the earlier, narrower rule's 15/74/11 (condition E; both numbers are in `data/manifest.json`). The no-model reference rule that reads the (now-stripped) declared-link field directly scores 66.7% balanced accuracy by construction (`baselines/regex_rule.py`), which is the size of the leak the strip closes. All 15 harvested cases pass the allow-list, forbidden-field, and zero-surviving-match tests (`test_harvest.py`, 14/14), including the positive control that at least one case's redacted reference used the URL or shorthand form and not just bare `#N`.
+Evidence from the real harvest run: the frozen pattern re-derives the bucket census as 23/54/23 on the true 100-most-recently-closed pull requests, against the earlier, narrower rule's 15/74/11 (condition E; both numbers are in `data/manifest.json`). The no-model reference rule that reads the (now-stripped) declared-link field directly scores 66.7% balanced accuracy by construction (`src/baselines/regex_rule.py`), which is the size of the leak the strip closes. All 15 harvested cases pass the allow-list, forbidden-field, and zero-surviving-match tests (`tests/test_harvest.py`, 14/14), including the positive control that at least one case's redacted reference used the URL or shorthand form and not just bare `#N`.
 
 ## Baseline, the starting point
 
@@ -112,7 +112,7 @@ The claim checker may even have been correct about the code. It did not matter. 
 
 Giving an agent a sharper sense of code quality made it WORSE at this task, because the task is not about quality. Every extra reasoning step pulled it further toward answering a question nobody asked.
 
-**Decision: REMOVED.** The two-stage version ships. The agent is kept in the repository at `agent.py`, runnable, with its 15 saved responses, so anyone can reproduce this negative result.
+**Decision: REMOVED.** The two-stage version ships. The agent is kept in the repository at `src/agent.py`, runnable, with its 15 saved responses, so anyone can reproduce this negative result.
 
 **What we would keep from it.** The investigator's habit of writing its own search wording is good, and it works: it produced queries like "snippet tab stop limit 10 nested placeholders" from a title that said none of those things, using the words a person REPORTING a problem would use rather than the words a developer FIXING it would use. That idea is worth carrying into a future version. The quality judgement is not.
 
@@ -221,7 +221,7 @@ Done means four things: one command, every factual claim resolves, it never acts
 
 Three separate times the documents drifted from the code. The README described the wrong system. Then it published the wrong per-pile figures. Then it quoted a cost that had changed when one case was regenerated. Each time a human reading carefully was the only thing that caught it.
 
-`check_docs.py` now runs inside `./run.sh eval`. It reads what the code actually prints for all three systems, accuracy, per-pile recall and cost, and fails if any of it is missing from the README.
+`tests/check_docs.py` now runs inside `./run.sh eval`. It reads what the code actually prints for all three systems, accuracy, per-pile recall and cost, and fails if any of it is missing from the README.
 
 It is deliberately dumb: no parsing of our prose, just "does this number appear". That is enough, because all 3 drifts so far were a number that silently stopped being true, not an argument that stopped being valid.
 
@@ -261,7 +261,7 @@ Both halves were right, and together they were the difference between an evaluat
 - **zero invented references** across all five
 - 145 seconds, 2.28 USD
 
-**And a page instead of terminal text.** `report.py` writes a self-contained HTML file: no server, no build step, no internet. Three design rules, each from a real constraint. Every claim carries its evidence beside it, because a triage tool a maintainer cannot audit is one they stop trusting after the first wrong call. Anything unconfirmed is shown as unconfirmed rather than quietly dropped. And nothing is ever presented as a decision.
+**And a page instead of terminal text.** `src/report.py` writes a self-contained HTML file: no server, no build step, no internet. Three design rules, each from a real constraint. Every claim carries its evidence beside it, because a triage tool a maintainer cannot audit is one they stop trusting after the first wrong call. Anything unconfirmed is shown as unconfirmed rather than quietly dropped. And nothing is ever presented as a decision.
 
 **What the page says about its own limits**, in the footer, because a maintainer deserves to read it before they trust the order: *it does not know your roadmap, your release schedule, or that you already decided against an approach. Those are the reasons good work gets closed, and it cannot see any of them.*
 
@@ -296,7 +296,7 @@ submissions declared a reference and all three were destroyed** (#333390
 declared #231076, #333399 declared #333395, #333404 declared #330410; all three
 are real open issues).
 
-A run writes its record to `reports/` (`live.py`), and this repository tracks
+A run writes its record to `reports/` (`src/live.py`), and this repository tracks
 nothing in there except the one example page, so that run would have left
 nothing to check. A reduced copy of its record is therefore
 committed at `data/live-record-prefix.json`: every field kept is verbatim, with
@@ -323,7 +323,7 @@ fixes #231076*, which is a claim about INTENT that a regular expression cannot
 support: `This does not fix #123` matches the same pattern. Quoting the
 author's own words, from the start of their own line, means a negation, an
 unticked template checkbox and a `>` quote marker all reach the reader as
-written, and the reader decides. `test_live_refs.py` locks all six cases.
+written, and the reader decides. `tests/test_live_refs.py` locks all six cases.
 References inside a fenced code block are skipped outright, one line in the
 extractor. What survives is narrow and is stated on the page: a negated
 reference to a genuinely open issue would still show a chip.
@@ -336,11 +336,11 @@ retract a correct citation. Any number not in the window is now resolved once
 against GitHub and reported as what it is: open, closed, actually a pull
 request, genuinely absent, or **not checkable right now**. A 403 or a timeout
 is never quietly downgraded to "invented". This reaches the verifier through a
-membership object, with `agent_v4.py` unedited, so the evaluation path (which
+membership object, with `src/agent_v4.py` unedited, so the evaluation path (which
 builds its own plain set) cannot move.
 
 **The line count was measured off a truncated string.** The patch is capped at
-40000 characters before the counter runs (`live.py`), so every large submission
+40000 characters before the counter runs (`src/live.py`), so every large submission
 was undercounted. #333423 read **209 lines against GitHub's 608**, #333404 read
 242 against 566. The control is exact, and it is scoped to a run rather than to
 a commit: in that same run #333426's patch came in under the cap, and its count
@@ -374,7 +374,7 @@ group headings say "predicted merge" and "predicted not merged" rather than
 about a human decision and a reading order is a different claim.
 
 **The gap this leaves, said plainly.** No automated check reads the live report.
-`check_docs.py` parses offline replay metrics only, and teaching it to audit a
+`tests/check_docs.py` parses offline replay metrics only, and teaching it to audit a
 live page would be a new subsystem. The one thing `./run.sh eval` now checks is
 that the committed example page is tracked at all. That gap is why the error in
 the next section survived as long as it did.
@@ -459,7 +459,7 @@ One is exactly the case this was built for. Submission #333418 is titled "migrat
 
 **What we deliberately did not claim.** A before-and-after on the live queue would be worthless: the queue changes every day, four of the nine submissions turned over between two runs hours apart, and one card is eleven points of any rate computed over nine. So the retrieval measurement above is offline, deterministic, model-free, and repeatable; it is the only part attributable to this change. The end-to-end numbers from those two runs are not comparable and are not published as a trend.
 
-**It is also invisible on the 15 closed cases, by construction.** `harvest.py` seeds the evaluation corpus with every declared target plus a band of distractors, so retrieval there is solvable by design. A retrieval improvement therefore cannot show up in the headline accuracy, and we are not going to pretend otherwise by quoting one.
+**It is also invisible on the 15 closed cases, by construction.** `src/harvest.py` seeds the evaluation corpus with every declared target plus a band of distractors, so retrieval there is solvable by design. A retrieval improvement therefore cannot show up in the headline accuracy, and we are not going to pretend otherwise by quoting one.
 
 ## Three smaller things the same pass fixed
 
@@ -479,7 +479,7 @@ Twelve offline checks now call them directly: the file chooser's fallback, its t
 
 A maintainer does not triage once. They open the queue on Monday, again on Wednesday, again on Friday, and most of what they see is what they already saw. Every run until now started from nothing, so the third visit re-presented the same twenty submissions with the same conclusions and no indication which of them were actually new. That is the original problem wearing a different hat.
 
-`memory.py` is a plain JSON file per repository. It carries three things forward and refuses to carry anything else.
+`src/memory.py` is a plain JSON file per repository. It carries three things forward and refuses to carry anything else.
 
 **What is new since your last visit.** On a repeat run the page marks genuinely new submissions and tells you which visit this is for the rest. Simulated over the nine live submissions plus one new arrival: visit one flags 9 of 9 as new, visit two flags exactly 1. That is the difference between reading ten cards and reading one.
 
@@ -497,7 +497,7 @@ Six offline checks cover it, including the corruption and unwritable paths.
 
 Every command in this project assumes the maintainer opens a terminal, remembers the incantation and reads a page. That is a fine way to demonstrate a system and a poor way to fit into someone's Tuesday. The assistant they already have open is where the question actually gets asked.
 
-`mcp_server.py` exposes the same triage over the Model Context Protocol, so "what should I look at in vscode today" is answered where the maintainer is standing.
+`src/mcp_server.py` exposes the same triage over the Model Context Protocol, so "what should I look at in vscode today" is answered where the maintainer is standing.
 
 **The browser page stays, and the reason is a real constraint rather than a preference.** Chat is bad at tables. Nine submissions with five evidence chips, a rank and a reason each is a grid, and a grid pasted into a conversation is unreadable. So every tool returns a short summary inline and writes the full page beside it, handing back the path. Summary where you are, detail where detail belongs.
 
@@ -554,7 +554,7 @@ That figure retroactively justifies two features we could not demonstrate on a n
 
 The MCP config used a relative path, so it only launched if the client happened to start in this directory, and every path in the project has the same dependency: the evaluation cache, the reports directory, the memory store. Started from anywhere else it either failed to launch or launched and could not find its own data.
 
-`mcp_server.py` now anchors to its own file rather than to the caller, and a new install target writes the absolute path for whatever clone you happen to have, which is the part a judge needs.
+`src/mcp_server.py` now anchors to its own file rather than to the caller, and a new install target writes the absolute path for whatever clone you happen to have, which is the part a judge needs.
 
 
 ## A number is not a choice until it has a price on it
@@ -621,7 +621,7 @@ Two documents were also false while that was live, both stating the refusal as u
 
 The depth menu printed in the README and in this file carried the old 25-second estimate: 10, 42 and 743 minutes where the code says 12, 48 and 861. The commit that corrected the constant also claimed the correction was done, twenty-four lines from a block still showing the uncorrected numbers.
 
-`check_docs.py` did not catch it because it only ever checked accuracy, per-pile recall and cost. It now regenerates the depth menu from the code and fails if any published row differs. It caught two more truncated rows on its first run, which is the entire argument for writing it.
+`tests/check_docs.py` did not catch it because it only ever checked accuracy, per-pile recall and cost. It now regenerates the depth menu from the code and fails if any published row differs. It caught two more truncated rows on its first run, which is the entire argument for writing it.
 
 ## The command in the README did not do what the README said
 

@@ -3,7 +3,7 @@
 comparison version. The difference is what it can reach.
 
 Built one stage at a time, each added only after a measurement showed it was
-needed. See CHANGELOG.md for what each stage changed and why.
+needed. See IMPROVEMENT-CHANGELOG.md for what each stage changed and why.
 
   stage 1  search      the project's reported problems are searched, and the
                        best matches are put in front of the model. This is the

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild the six-version table in CHANGELOG.md from the committed answers.
+"""Rebuild the six-version table in IMPROVEMENT-CHANGELOG.md from the committed answers.
 
 The table is the central evidence that this project improved by measurement
 rather than by assertion. Without this command a judge would have to take it on
@@ -70,7 +70,7 @@ def main():
     print()
     print("v4 ships. It ties the simple script on the headline, and finds 0.80 of")
     print("the not-merged pile against the script's 0.20, which is the one job the")
-    print("tool exists to do. See CHANGELOG.md for what each version changed.")
+    print("tool exists to do. See IMPROVEMENT-CHANGELOG.md for what each version changed.")
 
 
 if __name__ == "__main__":

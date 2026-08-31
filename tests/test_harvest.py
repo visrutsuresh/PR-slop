@@ -6,11 +6,14 @@ harvested, committed cache under data/cases/ (also no network): the
 reproducibility promise of this project is that the committed cache IS the fixture.
 """
 import json
+import os
+import sys
 from pathlib import Path
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 import harvest
 
-CASES_DIR = Path(__file__).resolve().parent / "data" / "cases"
+CASES_DIR = Path(__file__).resolve().parent.parent / "data" / "cases"
 
 
 def _load_real_cases() -> list[dict]:
@@ -159,8 +162,8 @@ def test_link_declared_matches_bucket_1_definition():
 
 
 def test_issue_corpus_and_manifest_committed():
-    issues_path = Path(__file__).resolve().parent / "data" / "issues.jsonl"
-    manifest_path = Path(__file__).resolve().parent / "data" / "manifest.json"
+    issues_path = Path(__file__).resolve().parent.parent / "data" / "issues.jsonl"
+    manifest_path = Path(__file__).resolve().parent.parent / "data" / "manifest.json"
     assert issues_path.exists()
     assert manifest_path.exists()
     manifest = json.loads(manifest_path.read_text())

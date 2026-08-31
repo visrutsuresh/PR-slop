@@ -26,7 +26,7 @@ SYSTEM = "You answer exactly what is asked, with no preamble."
 # the probe proved isolation by asking the model to read a file that did not
 # exist. It failed closed rather than open, so no published number was wrong,
 # but the proof was only a proof on one machine.
-CASE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+CASE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                     "data", "cases", "pr-243255.json")
 
 PROMPT = (

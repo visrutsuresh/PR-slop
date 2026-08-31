@@ -8,13 +8,22 @@ carefully noticed.
 
 Runs offline from the committed cache. Part of ./run.sh eval.
 """
+import os
 import re
 import subprocess
 import sys
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
+
 
 def live(cmd):
-    out = subprocess.run(["./run.sh", cmd], capture_output=True, text=True).stdout
+    r = subprocess.run(["./run.sh", cmd], capture_output=True, text=True)
+    if r.returncode != 0:
+        print(f"DOC DRIFT CHECK ABORTED: ./run.sh {cmd} exited {r.returncode}")
+        print(r.stdout)
+        print(r.stderr)
+        sys.exit(1)
+    out = r.stdout
     got = {}
     m = re.search(r"balanced accuracy : ([\d.]+)%\s+per-bucket \[([^\]]+)\]", out)
     if m:
@@ -59,7 +68,7 @@ def check_depth_menu():
         "microsoft/vscode", live.depth_options("microsoft/vscode", 1782), 1782)
     rows = [l.rstrip() for l in real.splitlines() if "about" in l and "USD" in l]
     bad = []
-    for path in ("README.md", "CHANGELOG.md"):
+    for path in ("README.md", "IMPROVEMENT-CHANGELOG.md"):
         text = open(path).read()
         for row in rows:
             n = row.split()[0]

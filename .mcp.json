@@ -3,7 +3,7 @@
   "mcpServers": {
     "pr-slop": {
       "command": "python3",
-      "args": ["mcp_server.py"]
+      "args": ["src/mcp_server.py"]
     }
   }
 }

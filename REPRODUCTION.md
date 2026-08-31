@@ -85,10 +85,10 @@ It must print `PASS` and the model must say it has no way to read a file. If it 
 You can also confirm the answers never leaked into the questions:
 
 ```bash
-python3 test_harvest.py
+python3 tests/test_harvest.py
 ```
 
-Fifteen checks. Among them: the input half contains exactly five permitted fields and nothing else, no contributor name or email survives anywhere, and no giveaway phrase pointing at the answer survives. That last set exists because an earlier version of this project failed all three, which is written up in `CHANGELOG.md`.
+Fifteen checks. Among them: the input half contains exactly five permitted fields and nothing else, no contributor name or email survives anywhere, and no giveaway phrase pointing at the answer survives. That last set exists because an earlier version of this project failed all three, which is written up in `IMPROVEMENT-CHANGELOG.md`.
 
 ## If you want to run the models yourself
 
@@ -117,7 +117,7 @@ claude          # the pr-slop server is offered automatically
 If your client needs an explicit registration instead:
 
 ```
-claude mcp add pr-slop -- python3 /absolute/path/to/mcp_server.py
+claude mcp add pr-slop -- python3 /absolute/path/to/src/mcp_server.py
 ```
 
 Then ask in plain language. Three tools are exposed:
@@ -137,7 +137,7 @@ printf '%s\n' \
  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
- | python3 mcp_server.py
+ | python3 src/mcp_server.py
 ```
 
 Expect the handshake, then the three tool definitions. `./run.sh mcp` runs the same server and prints the registration line first. Running it by hand and seeing it wait is correct: it is reading stdin, not hanging.

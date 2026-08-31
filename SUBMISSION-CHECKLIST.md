@@ -10,10 +10,10 @@ This was contradictory earlier and is now settled: the live page shows Aug 31 18
 
 ## Done
 
-- [x] **1. Solution code plus Improvement Changelog.** `README.md` names the intended user, the bottleneck, why it matters, where it still fails, and the hot take. `CHANGELOG.md` has one entry per real iteration, each tied to evidence, including the experiments that were removed and the three made-up numbers that were caught.
-- [x] **2. Reproduction guide.** `docs/reproduction.md`. Verified by cloning fresh into an empty folder and running with only `/usr/bin` on the path: no account, no network, no cost, and the numbers reproduce exactly.
+- [x] **1. Solution code plus Improvement Changelog.** `README.md` names the intended user, the bottleneck, why it matters, where it still fails, and the hot take. `IMPROVEMENT-CHANGELOG.md` has one entry per real iteration, each tied to evidence, including the experiments that were removed and the three made-up numbers that were caught.
+- [x] **2. Reproduction guide.** `REPRODUCTION.md`. Verified by cloning fresh into an empty folder and running with only `/usr/bin` on the path: no account, no network, no cost, and the numbers reproduce exactly.
 - [x] **4. Agent trajectories.** 45 records in `traces/`, covering all three systems. The shipped agent's 15 are marked **captured**, written as each run happened. The other 30 are marked **reconstructed** from committed responses. `traces/INDEX.md` lists them.
-- [x] **Tests.** `python3 test_harness.py` 10/10, `python3 test_harvest.py` 15/15. Includes an anti-leak suite with a positive control, proven to fail when a leak is planted.
+- [x] **Tests.** `python3 tests/test_harness.py` 10/10, `python3 tests/test_harvest.py` 15/15. Includes an anti-leak suite with a positive control, proven to fail when a leak is planted.
 - [x] **Tool disclosure.** `README.md`, naming the model, how it is called, and the isolation applied to it.
 - [x] **PRE-EXISTING.md.** Timestamp-based, so it stays true as later commits land.
 - [x] **Every command runs clean from a fresh clone.** `triage`, `baseline`, `script`, `agent`, `eval`, all offline.

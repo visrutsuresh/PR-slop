@@ -111,7 +111,7 @@ Open a terminal in the repo. Nothing below needs an account or a network.
 | 2:20 | `./run.sh versions` | the whole six-version table, recomputed live |
 | 3:10 | `./run.sh triage 308696` | `NOTE: closed without merging, but the evidence above is strong` |
 | 3:40 | `./run.sh evidence` | `16 factual claims, 16 hold up`, then the two flagged submissions |
-| 4:00 | `CHANGELOG.md`, search for "made-up" | the three invented figures and how each was caught |
+| 4:00 | `IMPROVEMENT-CHANGELOG.md`, search for "made-up" | the three invented figures and how each was caught |
 | 4:35 | (slide) 17 closed submissions: 4 bots, 10 insiders, 1 slop | the single slop case |
 
 **One rehearsal note.** `./run.sh versions` and `./run.sh triage` both print more than a screen. Scroll slowly or pre-size the window, because the numbers are the point and an unreadable frame wastes the shot.

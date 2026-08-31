@@ -2,8 +2,8 @@
 """Harvest the PR-slop evaluation set from microsoft/vscode.
 
 Gated by contrarian plan-review PASS loop 3 (change_id prslop-harvest-2026-08-29,
-an independent review, three rounds, summarised in CHANGELOG.md),
-conditions found in review. The reasoning behind each is in CHANGELOG.md.
+an independent review, three rounds, summarised in IMPROVEMENT-CHANGELOG.md),
+conditions found in review. The reasoning behind each is in IMPROVEMENT-CHANGELOG.md.
 
 ponytail: fetch-and-write script, not a framework. No classes beyond what
 the stdlib already gives us. Idempotent: a second run with no flags is a
@@ -25,7 +25,7 @@ REPO_OWNER = "microsoft"
 REPO_NAME = "vscode"
 REPO = f"{REPO_OWNER}/{REPO_NAME}"
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 CASES_DIR = DATA_DIR / "cases"
 ISSUES_PATH = DATA_DIR / "issues.jsonl"

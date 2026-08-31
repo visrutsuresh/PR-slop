@@ -36,9 +36,9 @@ Nothing above is copied or adapted from any prior repository. It was written fro
 
 Everything else. This paragraph was written before kickoff in the future tense; it is now rewritten against what actually happened.
 
-`harness/compare.py` was planned and **never built**. `scoring.py` does that job, shared by every system so none of them gets a different yardstick. No extra dependencies were added to the Dockerfile: the whole project uses the standard library only. Nothing anywhere is adapted from another repository.
+`harness/compare.py` was planned and **never built**. `src/scoring.py` does that job, shared by every system so none of them gets a different yardstick. No extra dependencies were added to the Dockerfile: the whole project uses the standard library only. Nothing anywhere is adapted from another repository.
 
-`harvest.py`, `baselines/regex_rule.py`, `baselines/__init__.py`, `test_harvest.py`, and the `harvest` subcommand added to `run.sh`: the evaluation-set harvester, written from scratch after kickoff, against a design that went through three rounds of independent review before any code was written. That review is summarised in `CHANGELOG.md`. Nothing in these files is adapted from any prior repository. `data/cases/`, `data/issues.jsonl`, `data/manifest.json`, and `data/pseudonym_salt.txt` are its committed output, fetched live from `microsoft/vscode` via the authenticated `gh api` CLI.
+`src/harvest.py`, `src/baselines/regex_rule.py`, `src/baselines/__init__.py`, `tests/test_harvest.py`, and the `harvest` subcommand added to `run.sh`: the evaluation-set harvester, written from scratch after kickoff, against a design that went through three rounds of independent review before any code was written. That review is summarised in `IMPROVEMENT-CHANGELOG.md`. Nothing in these files is adapted from any prior repository. `data/cases/`, `data/issues.jsonl`, `data/manifest.json`, and `data/pseudonym_salt.txt` are its committed output, fetched live from `microsoft/vscode` via the authenticated `gh api` CLI.
 
 ## Everything else in this repository was written after kickoff
 
@@ -46,22 +46,22 @@ Listed in full, so "what existed before" and "what we added" are both explicit r
 
 | File | What it does |
 | --- | --- |
-| `agent_v4.py` | The shipped system: four roles and a loop |
-| `agent.py`, `agent_v2.py`, `agent_v3.py`, `agent_v5.py`, `agent_v6.py` | The other five agent versions, kept so the six-version table can be recomputed |
-| `triage.py` | The product, the page a maintainer reads, and the single-submission view |
-| `retriever.py` | The search over the project's recorded problems |
-| `evidence.py` | The evidence card and the second-opinion list |
-| `run_baseline.py` | The simple comparison version |
-| `run_advanced.py` | The intermediate two-stage version |
-| `scoring.py` | Shared scoring for every system |
-| `task_spec.py` | The task description handed identically to every system |
-| `isolation_probe.py` | Proves the model cannot reach the answers |
-| `versions.py` | Recomputes the six-version table |
-| `check_docs.py` | Fails if a published number stops matching the code |
-| `build_traces.py`, `build_agent_traces.py` | Render the step-by-step records |
+| `src/agent_v4.py` | The shipped system: four roles and a loop |
+| `src/agent.py`, `src/agent_v2.py`, `src/agent_v3.py`, `src/agent_v5.py`, `src/agent_v6.py` | The other five agent versions, kept so the six-version table can be recomputed |
+| `src/triage.py` | The product, the page a maintainer reads, and the single-submission view |
+| `src/retriever.py` | The search over the project's recorded problems |
+| `src/evidence.py` | The evidence card and the second-opinion list |
+| `src/run_baseline.py` | The simple comparison version |
+| `src/run_advanced.py` | The intermediate two-stage version |
+| `src/scoring.py` | Shared scoring for every system |
+| `src/task_spec.py` | The task description handed identically to every system |
+| `src/isolation_probe.py` | Proves the model cannot reach the answers |
+| `src/versions.py` | Recomputes the six-version table |
+| `tests/check_docs.py` | Fails if a published number stops matching the code |
+| `src/build_traces.py`, `src/build_agent_traces.py` | Render the step-by-step records |
 | `data/responses/` | Every answer every system gave, 120 files |
 | `docs/explainer.html`, `docs/versions.html` | Plain-language explanations of the problem and the six versions |
-| `CHANGELOG.md` content | Every entry after the pre-kickoff harness entry |
+| `IMPROVEMENT-CHANGELOG.md` content | Every entry after the pre-kickoff harness entry |
 
 The `traces/` records themselves are generated output, not hand-written.
 

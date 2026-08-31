@@ -32,9 +32,10 @@ import os
 import sys
 import traceback
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-if HERE not in sys.path:
-    sys.path.insert(0, HERE)
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC = os.path.join(HERE, "src")
+if SRC not in sys.path:
+    sys.path.insert(0, SRC)
 # An MCP client starts this from ITS working directory, not ours, and every
 # path in the project is relative: data/, reports/, .prslop-memory/. Without
 # this the server either fails to launch or launches and then cannot find its

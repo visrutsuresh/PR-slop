@@ -21,7 +21,7 @@ import json
 import sys
 from pathlib import Path
 
-CASES_DIR = Path(__file__).resolve().parent.parent / "data" / "cases"
+CASES_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "cases"
 
 
 def load_cases() -> list[dict]:

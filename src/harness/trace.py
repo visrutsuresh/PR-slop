@@ -16,7 +16,7 @@ from typing import Any
 
 # Anchored to the module location, not the process cwd: a run launched from
 # a subdirectory must still land in the one traces dir render_index() reads.
-TRACE_DIR = Path(__file__).resolve().parent.parent / "traces"
+TRACE_DIR = Path(__file__).resolve().parent.parent.parent / "traces"
 MAX_FIELD_CHARS = 4000
 
 _HOME = os.path.expanduser("~")
