@@ -4,7 +4,6 @@
 venv/
 __pycache__/
 *.pyc
-traces/*.jsonl
 traces_test/
 results/
 .DS_Store

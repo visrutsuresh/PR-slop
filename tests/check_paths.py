@@ -68,6 +68,10 @@ ALLOW = {
     "docs/reproduction.md":
         "PRE-EXISTING.md:26, describing pre-kickoff commit 6ab12f8's actual "
         "tree at that commit, before REPRODUCTION.md's rename.",
+    "reports/microsoft-vscode.json":
+        "IMPROVEMENT-CHANGELOG.md:582, narrating the superseded fixture in "
+        "the entry about that very bug. reports/* is gitignored; historical "
+        "reference, not drift.",
 }
 
 
